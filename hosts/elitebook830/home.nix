@@ -2,33 +2,31 @@
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
   inputs,
-  outputs,
   lib,
   config,
   pkgs,
+  userSettings,
   ...
 }: {
   # You can import other home-manager modules here
   imports = [
-    # If you want to use modules your own flake exports (from modules/home-manager):
-    # outputs.homeManagerModules.example
+    # If you want to use home-manager modules from other flakes (such as nix-colors):
+    # inputs.nix-colors.homeManagerModule
 
-    # Or modules exported from other flakes (such as nix-colors):
-    # inputs.nix-colors.homeManagerModules.default
-
-    # You can also split up your configuration and import pieces of it here:
-    # ./nvim.nix
+    ./../../modules/home-manager/app/wezterm.nix
+    ./../../modules/home-manager/app/librewolf.nix
+    ./../../modules/home-manager/app/yazi.nix
+    ./../../modules/home-manager/app/git.nix
+    ./../../modules/home-manager/hardware/bluetooth.nix
+    ./../../modules/home-manager/shell/sh.nix
+    ./../../modules/home-manager/shell/cli-collection.nix
+    ./../../modules/home-manager/hyprland/hyprland.nix
   ];
 
   nixpkgs = {
     # You can add overlays here
     overlays = [
-      # Add overlays your own flake exports (from overlays and pkgs dir):
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-
-      # You can also add overlays exported from other flakes:
+      # If you want to use overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
 
       # Or define it inline, for example:
@@ -42,13 +40,14 @@
     config = {
       # Disable if you don't want unfree packages
       allowUnfree = true;
+      # Workaround for https://github.com/nix-community/home-manager/issues/2942
+      allowUnfreePredicate = _: true;
     };
   };
 
-  # TODO: Set your username
   home = {
-    username = "your-username";
-    homeDirectory = "/home/your-username";
+    username = userSettings.username;
+    homeDirectory = "/home/"+userSettings.username;
   };
 
   # Add stuff for your user as you see fit:
@@ -63,5 +62,5 @@
   systemd.user.startServices = "sd-switch";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  home.stateVersion = "23.05";
+  home.stateVersion = "24.05";
 }
