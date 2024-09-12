@@ -1,121 +1,45 @@
 {
-  description = "Hier0nim's nixos config";
+  description = "Hier0nim's NixOS Configuration.";
 
   inputs = {
-    # Nixpkgs
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    
-    # Home Manager
-    home-manager.url = "github:nix-community/home-manager/release-23.11";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
 
-    # Hyprland
-    hyprland = {
-      type = "git";
-      url = "https://github.com/hyprwm/Hyprland";
-      submodules = true;
-    };
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Blocklist-hosts
-    blocklist-hosts = {
-      url = "github:StevenBlack/hosts";
-      flake = false;
+    catppuccin.url = "github:catppuccin/nix";
+
+    hyprland.url = "github:hyprwm/Hyprland";
+    hyprlock.url = "github:hyprwm/hyprlock";
+    hypridle.url = "github:hyprwm/hypridle";
+
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, ... }: let
-    inherit (self) outputs;
-
-    # ---- SYSTEM SETTINGS ---- #
-    systemSettings = {
-      system = "x86_64-linux";
-      hostname = "elitebook830";  # This can be dynamically changed based on the system
-      timezone = "Europe/Warsaw";
-      locale = "en_US.UTF-8";
-    };
-
-    # ----- USER SETTINGS ----- #
-    userSettings = rec {
-      username = "hieronim";
-      gitUsername = "Hier0nim";
-      gitEmail = "hieronimdaniel@gmail.com";
-      theme = "io";
-      browser = "librewolf";
-      term = "wezterm";
-      font = "JetBrains Mono";
-      fontPkg = pkgs.jetbrains-mono;
-      editor = "nvim";
-      spawnEditor = if (editor == "vim" || editor == "nvim" || editor == "nano")
-                    then "exec " + term + " -e " + editor
-                    else editor;
-    };
-
-    # Importing packages with nixpkgs
-    pkgs = import inputs.nixpkgs {
-      system = systemSettings.system;
-      config = {
-        allowUnfree = true;
-        allowUnfreePredicate = (_: true);
-      };
-    };
-
-    supportedSystems = [ "x86_64-linux" ];
-
-    # Generates attributes for supported systems
-    forAllSystems = inputs.nixpkgs.lib.genAttrs supportedSystems;
-
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    ...
+  } @ inputs: let
+    inherit (import ./system/options.nix) hostName system;
+    inherit (import ./home/options.nix) userName;
+    pkgs = nixpkgs.legacyPackages.${system};
   in {
-    # NixOS configurations for rebuilding the system
-    nixosConfigurations = {
-      elitebook830 = nixpkgs.lib.nixosSystem {
-        system = systemSettings.system;
-        modules = [
-            (./. + "/hosts" + ("/" + systemSettings.hostname) + "/configuration.nix")
-        ];
-        specialArgs = {
-          inherit inputs;
-          inherit outputs;
-          inherit userSettings;
-          inherit systemSettings;
-        };
-      };
+    homeConfigurations."${userName}" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      extraSpecialArgs = {inherit inputs;};
+      modules = [./home/home.nix];
     };
 
-    # Home Manager configurations
-    homeConfigurations = {
-      user = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [
-          ./hosts/elitebook830/home.nix
-        ];
-        extraSpecialArgs = {
-          inherit inputs;
-          inherit outputs;
-          inherit userSettings;
-          inherit systemSettings;
-        };
-      };
+    nixosConfigurations."${hostName}" = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [./system/configuration.nix];
     };
-
-    # Your custom packages
-    # Accessible through 'nix build', 'nix shell', etc
-    packages = forAllSystems (system: import ./pkgs nixpkgs.legacyPackages.${system});
-    # Formatter for your nix files, available through 'nix fmt'
-    # Other options beside 'alejandra' include 'nixpkgs-fmt'
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
-
-    # Your custom packages and modifications, exported as overlays
-    overlays = import ./overlays {inherit inputs;};
-    # Reusable nixos modules you might want to export
-    # These are usually stuff you would upstream into nixpkgs
-    nixosModules = import ./modules/nixos;
-    # Reusable home-manager modules you might want to export
-    # These are usually stuff you would upstream into home-manager
-    homeManagerModules = import ./modules/home-manager;
   };
 }
