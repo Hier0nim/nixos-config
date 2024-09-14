@@ -18,7 +18,10 @@ in {
     backgrounds = [
       {
         monitor = "";
-        path = "./../wallpapers/pink-cat.png"
+        path = toString (pkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/0fie/Wallpapers/main/images/cat-leaves.png";
+          sha256 = "sha256-kegUK62YtI7G3P/pIqcWdFGlqN4S1/4xOOmOboPxJKE=";
+        });
       }
     ];
 

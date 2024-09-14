@@ -7,4 +7,11 @@ in {
   programs.wezterm = {
     enable = true;
   };
+
+  home.file = {
+    ".config/wezterm" = {
+      source = "./../dotfiles/wezterm/";
+      target = "copy";
+    };
+  };
 }

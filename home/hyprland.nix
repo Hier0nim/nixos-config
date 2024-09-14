@@ -1,7 +1,10 @@
 {pkgs, ...}:
 # The wallpaper will be fetched from GitHub. I don't store my wallpapers locally.
 let
-  currentWallpaper =  "./../wallpapers/pink-cat.png"
+  currentWallpaper = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/0fie/Wallpapers/main/images/street-tn.png";
+    sha256 = "sha256-GoUQ8sxE0W7Wf8VsQIzKRQX41tJyMAD1KvqKsRp5y7k=";
+  };
 
   hyprpaperConf = pkgs.writeText "hyprpaper.conf" ''
     preload = ${currentWallpaper}
