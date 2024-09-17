@@ -12,5 +12,7 @@
       powerKey = "suspend";
       powerKeyLongPress = "reboot";
     };
+
+    udisks2.enable = true;
   };
 }

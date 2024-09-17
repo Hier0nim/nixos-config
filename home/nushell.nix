@@ -75,10 +75,8 @@ in {
       # See the Nushell docs for more options.
       extraConfig = let
         conf = builtins.toJSON {
-          show_banner = false;
+          show_banner = false ;
           edit_mode = "vi";
-          shell_integration = true;
-
           ls.clickable_links = true;
           rm.always_trash = true;
 
@@ -132,7 +130,7 @@ in {
         	rm -fp $tmp
         }
 
-        source /home/${userName}/.config/nushell/extra.nu
+        # source /home/${userName}/.config/nushell/extra.nu
       '';
     };
   };

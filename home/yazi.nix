@@ -1,7 +1,6 @@
 {pkgs, ...}: {
   programs.yazi = {
     enable = true;
-    catppuccin.enable = true;
     package = pkgs.yazi-unwrapped;
     enableNushellIntegration = true;
     settings = {

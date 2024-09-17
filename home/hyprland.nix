@@ -1,14 +1,10 @@
 {pkgs, ...}:
 # The wallpaper will be fetched from GitHub. I don't store my wallpapers locally.
 let
-  currentWallpaper = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/0fie/Wallpapers/main/images/street-tn.png";
-    sha256 = "sha256-GoUQ8sxE0W7Wf8VsQIzKRQX41tJyMAD1KvqKsRp5y7k=";
-  };
-
+  inherit (import ./options.nix) dotfilesDir;
   hyprpaperConf = pkgs.writeText "hyprpaper.conf" ''
-    preload = ${currentWallpaper}
-    wallpaper = ,${currentWallpaper}
+    preload = ${dotfilesDir}/wallpapers/dark-cat-rosewater.png
+    wallpaper = ,${dotfilesDir}/wallpapers/dark-cat-rosewater.png
   '';
   inherit (import ./scripts.nix {inherit pkgs;}) batteryNotificationScript rofiPowerMenuScript;
 in {
@@ -29,10 +25,10 @@ in {
       };
 
       input = {
-        kb_layout = "us";
+        kb_layout = "pl";
         kb_options = "grp:alt_shift_toggle,caps:escape";
         touchpad = {
-          natural_scroll = false;
+          natural_scroll = true;
           disable_while_typing = true;
         };
 
@@ -82,11 +78,11 @@ in {
       decoration = {
         rounding = 7;
         "col.shadow" = "rgba(1a1a1aee)";
-        active_opacity = 0.75;
-        inactive_opacity = 0.75;
+        active_opacity = 1.0;
+        inactive_opacity = 1.0;
         fullscreen_opacity = 1.0;
         blur = {
-          enabled = true;
+          enabled = false;
           size = 4;
           passes = 2;
 
@@ -125,7 +121,7 @@ in {
         pseudotile = true;
         preserve_split = true;
       };
-      master.new_is_master = true;
+      master.new_status = "master";
       gestures.workspace_swipe = true;
 
       # Using the Super key (windows button) as the main mod.
@@ -134,21 +130,27 @@ in {
       bind =
         [
           # Launch apps
-          "$mainMod,        b,   exec,   ${pkgs.firefox}/bin/firefox"
+          "$mainMod,        b,   exec,   ${pkgs.librewolf}/bin/librewolf"
           "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
           "$mainMod,        e,   exec,   ${pkgs.emote}/bin/emote"
-          "$mainMod,        f,   exec,   ${pkgs.gnome.nautilus}/bin/nautilus"
+          "$mainMod,        f,   exec,   ${pkgs.nautilus}/bin/nautilus"
           "$mainMod,        i,   exec,   ${pkgs.loupe}/bin/loupe"
           "$mainMod,        k,   exec,   ${pkgs.keepassxc}/bin/keepassxc"
           "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"
           "$mainMod,        r,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
           "$mainMod,        s,   exec,   ${pkgs.spotify}/bin/spotify"
           "$mainMod,        x,   exec,   hyprlock" # Make sure you have Hyprlock installed. There's an official flake for it. See /flake.nix
-          "$mainMod,   return,   exec,   ${pkgs.wezterm}/bin/wezterm"
+          "$mainMod,   return,   exec,   [float;tile] ${pkgs.wezterm}/bin/wezterm start --always-new-process"
           "$mainMod SHIFT,  b,   exec,   ${batteryNotificationScript}/bin/script"
           "$mainMod SHIFT, F5,   exec,   ${pkgs.brightnessctl}/bin/brightnessctl s 0"
-          ",            Print,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-          "SHIFT,       Print,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+          "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+          "$mainMod SHIFT,  s,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+
+          # Brightness control
+          # ",$XF86MonBrightnessUp,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
+          # ",$XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
+          "$mainMod SHIFT, F3,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
+          "$mainMod SHIFT, F4,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
 
           # Control media players.
           ",XF86AudioPlay,  exec, ${pkgs.playerctl}/bin/playerctl play-pause"

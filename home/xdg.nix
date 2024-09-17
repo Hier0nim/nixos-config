@@ -3,8 +3,8 @@
   pkgs,
   ...
 }: let
-  browser = "firefox.desktop";
-  fileManager = "org.gnome.Nautilus.desktop";
+  browser = "librefox.desktop";
+  fileManager = "org.Nautilus.desktop";
   imageViewer = "org.gnome.Loupe.desktop";
   mediaPlayer = "mpv.desktop";
   textEditor = "neovim.desktop";

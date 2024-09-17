@@ -6,7 +6,8 @@
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
   inherit (import ../system/options.nix) fontName;
-in {
+in 
+{
   home.packages = [pkgs.libnotify];
 
   services.mako = {
@@ -19,7 +20,6 @@ in {
     defaultTimeout = 10000;
     groupBy = "summary";
     iconPath = "${config.gtk.iconTheme.package}/share/icons/Papirus-Dark";
-
     backgroundColor = "#24273a";
     textColor = "#cad3f5";
     borderColor = "#f5bde6";

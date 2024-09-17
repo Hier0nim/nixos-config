@@ -1,7 +1,6 @@
 -- Pull in the wezterm API
 local wez = require("wezterm")
 
-local utils = require("lua/utils")
 local appearance = require("lua/appearance")
 local mappings = require("lua/keymappings")
 
@@ -10,13 +9,13 @@ local bar = wez.plugin.require("https://github.com/adriankarlen/bar.wezterm")
 -- This table will hold the configuration.
 local c = {}
 
--- In newer versions of wezterm, use the config_builder which will
+-- in newer versions of wezterm, use the config_builder which will
 -- help provide clearer error messages
 if wez.config_builder then
 	c = wez.config_builder()
 end
 
-c.enable_wayland = true
+c.front_end = "WebGpu"
 
 -- General configurations
 c.font_rules = {
@@ -27,7 +26,6 @@ c.font_rules = {
 	},
 }
 c.font_size = 12
--- c.default_prog = utils.is_windows and { "pwsh", "-NoLogo" } or "zsh"
 c.adjust_window_size_when_changing_font_size = false
 c.audible_bell = "Disabled"
 c.scrollback_lines = 3000

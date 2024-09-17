@@ -12,7 +12,7 @@
   system = "x86_64-linux";
 
   # Required by system/fonts.nix
-  fontName = "JetBrains Mono";
+  fontName = "Iosevka Nerd Font";
 
   # Do not modify the variable below.
   # We're using it to make sure that home-manager's stateVersion is in sync with the system's stateVersion.

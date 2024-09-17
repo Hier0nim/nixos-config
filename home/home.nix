@@ -7,16 +7,15 @@ let
   inherit (import ../system/options.nix) stateVersion;
 in {
   imports = [
-    ./cli.nix
-    ./files.nix
-    ./librewolf.nix
-    ./git.nix
-    ./gtk.nix
     ./hyprland.nix
     ./hyprlock.nix
-    ./izrss.nix
-    ./wezterm.nix
+    ./cli.nix
+    ./files.nix
+    ./git.nix
+    ./gtk.nix
     ./mako.nix
+    ./wezterm.nix
+    ./librewolf.nix
     ./nushell.nix
     ./nix-settings.nix
     ./rofi.nix
@@ -28,10 +27,6 @@ in {
     ./yazi.nix
     ./neovim.nix
     inputs.catppuccin.homeManagerModules.catppuccin
-    inputs.hyprland.homeManagerModules.default
-    inputs.hypridle.homeManagerModules.hypridle
-    inputs.hyprlock.homeManagerModules.hyprlock
-    inputs.izrss.homeManagerModules.default
   ];
 
   # Info required by home-manager and some session variables.
@@ -43,6 +38,11 @@ in {
   };
 
   news.display = "silent";
-  catppuccin.flavour = "macchiato";
+  # catppuccin.flavour = "mocha";
+  programs.starship.catppuccin.enable = true;
+  programs.bat.catppuccin.enable = true;
+  programs.btop.catppuccin.enable = true;
+  programs.yazi.catppuccin.enable = true;
+
   programs.home-manager.enable = true;
 }

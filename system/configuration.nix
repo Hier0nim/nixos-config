@@ -16,7 +16,7 @@ in {
     ./sound.nix
     ./sys.nix
     ./users.nix
-    inputs.catppuccin.nixosModules.catppuccin
+    # inputs.catppuccin.nixosModules.catppuccin
   ];
 
   system.stateVersion = "${stateVersion}";

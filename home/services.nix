@@ -19,20 +19,24 @@ in {
 
     hypridle = rec {
       enable = true;
-      lockCmd = lib.getExe config.programs.hyprlock.package;
-      beforeSleepCmd = "${pkgs.systemd}/bin/loginctl lock-session";
-      ignoreDbusInhibit = false;
+      settings = {
+        general = {
+          lock_cmd = lib.getExe config.programs.hyprlock.package;
+          before_sleep_cmd = "${pkgs.systemd}/bin/loginctl lock-session";
+          ignore_dbus_inhibit = false;
+        };
 
-      listeners = [
-        {
-          timeout = 600;
-          onTimeout = lockCmd;
-        }
-        {
-          timeout = 1200;
-          onTimeout = "${suspendScript}/bin/script";
-        }
-      ];
+        listeners = [
+          {
+            timeout = 600;
+            onTimeout = lib.getExe config.programs.hyprlock.package;
+          }
+          {
+            timeout = 1200;
+            onTimeout = "${suspendScript}/bin/script";
+          }
+        ];
+      };
     };
   };
 }
