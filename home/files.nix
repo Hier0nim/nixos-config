@@ -9,8 +9,9 @@
         "https://catppuccin.github.io/discord/dist/catppuccin-mocha.theme.css"
         "https://catppuccin.github.io/discord/dist/catppuccin-mocha-pink.theme.css"
       ];
-      enabledThemes = [
-      ];
+      enabledThemes =
+        [
+        ];
       enableReactDevtools = false;
       frameless = false;
       transparent = false;

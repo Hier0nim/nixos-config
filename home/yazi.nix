@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.yazi = {
     enable = true;
     package = pkgs.yazi-unwrapped;
@@ -10,12 +11,18 @@
         sort_dir_first = true;
         prepend_keymap = [
           {
-            on = ["f" "g"];
+            on = [
+              "f"
+              "g"
+            ];
             run = "plugin fg";
             desc = "Find file by content";
           }
           {
-            on = ["f" "f"];
+            on = [
+              "f"
+              "f"
+            ];
             run = "plugin fg --args='fzf'";
             desc = "find file by file name";
           }

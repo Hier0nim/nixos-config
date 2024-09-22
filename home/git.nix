@@ -1,8 +1,9 @@
-{config, ...}:
+{ config, ... }:
 # Fetch the user's Git email & username from home/options.nix
 let
   inherit (import ./options.nix) gitUserName gitEmail;
-in {
+in
+{
   programs.git = {
     enable = true;
     userName = "${gitUserName}";

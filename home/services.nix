@@ -3,9 +3,11 @@
   pkgs,
   lib,
   ...
-}: let
-  inherit (import ./scripts.nix {inherit pkgs;}) suspendScript;
-in {
+}:
+let
+  inherit (import ./scripts.nix { inherit pkgs; }) suspendScript;
+in
+{
   services = {
     udiskie = {
       enable = true;

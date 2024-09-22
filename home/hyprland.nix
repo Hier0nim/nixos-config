@@ -1,4 +1,4 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 # The wallpaper will be fetched from GitHub. I don't store my wallpapers locally.
 let
   inherit (import ./options.nix) dotfilesDir;
@@ -6,13 +6,14 @@ let
     preload = ${dotfilesDir}/wallpapers/dark-cat-rosewater.png
     wallpaper = ,${dotfilesDir}/wallpapers/dark-cat-rosewater.png
   '';
-  inherit (import ./scripts.nix {inherit pkgs;}) batteryNotificationScript rofiPowerMenuScript;
-in {
+  inherit (import ./scripts.nix { inherit pkgs; }) batteryNotificationScript rofiPowerMenuScript;
+in
+{
   wayland.windowManager.hyprland = {
     enable = true;
     systemd = {
       enable = true;
-      variables = ["--all"];
+      variables = [ "--all" ];
     };
     settings = {
       general = {
@@ -179,20 +180,32 @@ in {
           "$mainMod SHIFT,  j, movewindow, d"
         ]
         # WTF is this? I don't understand Nix code. 😿
-        ++ map (n: "$mainMod SHIFT, ${toString n}, movetoworkspace, ${
-          toString (
-            if n == 0
-            then 10
-            else n
-          )
-        }") [1 2 3 4 5 6 7 8 9 0]
-        ++ map (n: "$mainMod, ${toString n}, workspace, ${
-          toString (
-            if n == 0
-            then 10
-            else n
-          )
-        }") [1 2 3 4 5 6 7 8 9 0];
+        ++
+          map (n: "$mainMod SHIFT, ${toString n}, movetoworkspace, ${toString (if n == 0 then 10 else n)}")
+            [
+              1
+              2
+              3
+              4
+              5
+              6
+              7
+              8
+              9
+              0
+            ]
+        ++ map (n: "$mainMod, ${toString n}, workspace, ${toString (if n == 0 then 10 else n)}") [
+          1
+          2
+          3
+          4
+          5
+          6
+          7
+          8
+          9
+          0
+        ];
 
       binde = [
         # Move windows.

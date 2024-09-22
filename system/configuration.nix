@@ -1,8 +1,9 @@
-{inputs,...}:
+{ inputs, ... }:
 # Fetches the stateVersion variable from our system's options.nix file.
 let
   inherit (import ./options.nix) stateVersion;
-in {
+in
+{
   imports = [
     ./boot.nix
     ./environment.nix

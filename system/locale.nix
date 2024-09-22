@@ -2,7 +2,8 @@
 # Time zone and locale are fetched from system/options.nix
 let
   inherit (import ./options.nix) theTimezone theLocale;
-in {
+in
+{
   i18n = {
     defaultLocale = "${theLocale}";
     extraLocaleSettings = {

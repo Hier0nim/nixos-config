@@ -7,7 +7,8 @@
 # have additional rights when interacting with the Nix daemon.
 let
   inherit (import ../home/options.nix) userName;
-in {
+in
+{
   nix = {
     # Keep build-time dependencies around to be able to rebuild while being offline.
     extraOptions = ''
@@ -17,8 +18,11 @@ in {
 
     settings = {
       auto-optimise-store = true;
-      trusted-users = ["${userName}"];
-      experimental-features = ["nix-command" "flakes"];
+      trusted-users = [ "${userName}" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
 
     # Enable auto cleanup.

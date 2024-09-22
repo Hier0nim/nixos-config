@@ -1,4 +1,4 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
   inherit (import ../system/options.nix) fontName;
@@ -6,7 +6,8 @@ let
 
   # TODO: Replace this with proper Catppuccin colors.
   placeholderAndTimeColor = "rgb(205, 214, 244)";
-in {
+in
+{
   programs.hyprlock = {
     enable = true;
     settings = {

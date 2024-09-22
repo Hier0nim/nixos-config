@@ -1,9 +1,10 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
-  inherit (import ./scripts.nix {inherit pkgs;}) waybarTemperatureScript;
+  inherit (import ./scripts.nix { inherit pkgs; }) waybarTemperatureScript;
   inherit (import ../system/options.nix) fontName;
-in {
+in
+{
   programs.waybar = {
     enable = true;
     settings.mainBar = {
@@ -14,9 +15,17 @@ in {
       margin-bottom = 0;
       margin-left = 0;
       margin-right = 0;
-      modules-left = ["custom/launcher" "hyprland/workspaces"];
-      modules-center = ["clock"];
-      modules-right = ["cpu" "custom/temperature" "pulseaudio" "tray"];
+      modules-left = [
+        "custom/launcher"
+        "hyprland/workspaces"
+      ];
+      modules-center = [ "clock" ];
+      modules-right = [
+        "cpu"
+        "custom/temperature"
+        "pulseaudio"
+        "tray"
+      ];
 
       clock = {
         calendar.format.today = "<span color='#b4befe'><b>{}</b></span>";
@@ -69,7 +78,9 @@ in {
       pulseaudio = {
         format = "{icon} {volume}%";
         format-muted = "󰖁 ";
-        format-icons = {default = [" "];};
+        format-icons = {
+          default = [ " " ];
+        };
         scroll-step = 5;
         on-click = "${pkgs.pavucontrol}/bin/pavucontrol";
       };
@@ -81,95 +92,97 @@ in {
       };
     };
 
-    style = let
-      custom = {
-        font = "${fontName}";
-        font_size = "15px";
-        font_weight = "bold";
-        text_color = "#cdd6f4";
-        secondary_accent = "89b4fa";
-        tertiary_accent = "f5f5f5";
-        background = "11111B";
-        opacity = "0.98";
-      };
-    in ''
-      * {
-          border: none;
-          border-radius: 0px;
-          padding: 0;
-          margin: 0;
-          min-height: 0px;
-          font-family: ${custom.font};
-          font-weight: ${custom.font_weight};
-          opacity: ${custom.opacity};
-      }
+    style =
+      let
+        custom = {
+          font = "${fontName}";
+          font_size = "15px";
+          font_weight = "bold";
+          text_color = "#cdd6f4";
+          secondary_accent = "89b4fa";
+          tertiary_accent = "f5f5f5";
+          background = "11111B";
+          opacity = "0.98";
+        };
+      in
+      ''
+        * {
+            border: none;
+            border-radius: 0px;
+            padding: 0;
+            margin: 0;
+            min-height: 0px;
+            font-family: ${custom.font};
+            font-weight: ${custom.font_weight};
+            opacity: ${custom.opacity};
+        }
 
-      window#waybar {
-          background: none;
-      }
+        window#waybar {
+            background: none;
+        }
 
-      #workspaces {
-          font-size: ${custom.font_size};
-          padding-left: 15px;
-      }
-      #workspaces button {
-          color: ${custom.text_color};
-          padding-left:  6px;
-          padding-right: 6px;
-      }
-      #workspaces button.empty {
-          color: #6c7086;
-      }
-      #workspaces button.active {
-          color: #b4befe;
-      }
+        #workspaces {
+            font-size: ${custom.font_size};
+            padding-left: 15px;
+        }
+        #workspaces button {
+            color: ${custom.text_color};
+            padding-left:  6px;
+            padding-right: 6px;
+        }
+        #workspaces button.empty {
+            color: #6c7086;
+        }
+        #workspaces button.active {
+            color: #b4befe;
+        }
 
-      #tray, #pulseaudio, #network, #cpu, #custom-temperature, #disk, #clock {
-          font-size: ${custom.font_size};
-          color: ${custom.text_color};
-      }
+        #tray, #pulseaudio, #network, #cpu, #custom-temperature, #disk, #clock {
+            font-size: ${custom.font_size};
+            color: ${custom.text_color};
+        }
 
-      #cpu {
-          font-size: ${custom.font_size};
-          padding-left: 9px;
-          padding-right: 9px;
-          margin-left: 7px;
-      }
-      #custom-temperature {
-          font-size: ${custom.font_size};
-          padding-left: 9px;
-          padding-right: 9px;
-      }
+        #cpu {
+            font-size: ${custom.font_size};
+            padding-left: 9px;
+            padding-right: 9px;
+            margin-left: 7px;
+        }
+        #custom-temperature {
+            font-size: ${custom.font_size};
+            padding-left: 9px;
+            padding-right: 9px;
+        }
 
-      #tray {
-          padding: 0 16px;
-          padding-right: 12px;
-          margin-left: 7px;
-      }
+        #tray {
+            padding: 0 16px;
+            padding-right: 12px;
+            margin-left: 7px;
+        }
 
-      #pulseaudio {
-          font-size: ${custom.font_size};
-          padding-left: 15px;
-          padding-right: 9px;
-          margin-left: 7px;
-      }
-      #network {
-          padding-left: 9px;
-          padding-right: 15px;
-      }
+        #pulseaudio {
+            font-size: ${custom.font_size};
+            padding-left: 15px;
+            padding-right: 9px;
+            margin-left: 7px;
+        }
+        #network {
+            padding-left: 9px;
+            padding-right: 15px;
+        }
 
-      #clock {
-          padding-left: 9px;
-          padding-right: 15px;
-      }
+        #clock {
+            padding-left: 9px;
+            padding-right: 15px;
+        }
 
-      #custom-launcher {
-          font-size: 18px;
-          color: #b4befe;
-          font-weight: ${custom.font_weight};
-          padding-left: 10px;
-          padding-right: 12px;
-      }
-    '';
+        #custom-launcher {
+            font-size: 18px;
+            color: #b4befe;
+            font-weight: ${custom.font_weight};
+            padding-left: 10px;
+            padding-right: 12px;
+        }
+      '';
   };
 }

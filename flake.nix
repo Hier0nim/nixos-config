@@ -22,25 +22,32 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    home-manager,
-    ...
-  } @ inputs: let
-    inherit (import ./system/options.nix) hostName system;
-    inherit (import ./home/options.nix) userName;
-    pkgs = nixpkgs.legacyPackages.${system};
-  in {
-    homeConfigurations."${userName}" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      extraSpecialArgs = {inherit inputs;};
-      modules = [./home/home.nix];
-    };
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
+    let
+      inherit (import ./system/options.nix) hostName system;
+      inherit (import ./home/options.nix) userName;
+      pkgs = nixpkgs.legacyPackages.${system};
+    in
+    {
+      homeConfigurations."${userName}" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        extraSpecialArgs = {
+          inherit inputs;
+        };
+        modules = [ ./home/home.nix ];
+      };
 
-    nixosConfigurations."${hostName}" = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      modules = [./system/configuration.nix];
+      nixosConfigurations."${hostName}" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs;
+        };
+        modules = [ ./system/configuration.nix ];
+      };
     };
-  };
 }

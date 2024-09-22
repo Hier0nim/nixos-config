@@ -1,9 +1,9 @@
 {
   boot = {
-    loader ={
+    loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
-    }; 
+    };
 
     kernel.sysctl = {
       # Do not try to use swap space unless absolutely necessary.
@@ -18,6 +18,6 @@
     };
 
     # TCP congestion control.
-    kernelModules = ["tcp_bbr"];
+    kernelModules = [ "tcp_bbr" ];
   };
 }

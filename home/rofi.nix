@@ -1,9 +1,10 @@
-{pkgs, ...}:
+{ pkgs, ... }:
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
   inherit (import ../system/options.nix) fontName;
-in {
-  home.packages = with pkgs; [rofi];
+in
+{
+  home.packages = with pkgs; [ rofi ];
 
   xdg.configFile."rofi/config.rasi".text = ''
     configuration{
