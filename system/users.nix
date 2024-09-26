@@ -19,7 +19,6 @@ in
 
   programs.hyprland = {
     enable = true;
-    xwayland.enable = true;
   };
 
   # This is required by Hyprlock. The package installed through home-manager will not be able to unlock the session

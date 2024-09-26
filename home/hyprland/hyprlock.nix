@@ -1,8 +1,8 @@
 { pkgs, ... }:
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
-  inherit (import ../system/options.nix) fontName;
-  inherit (import ./options.nix) dotfilesDir;
+  inherit (import ../../system/options.nix) fontName;
+  inherit (import ../options.nix) dotfilesDir;
 
   # TODO: Replace this with proper Catppuccin colors.
   placeholderAndTimeColor = "rgb(205, 214, 244)";
@@ -24,7 +24,7 @@ in
         }
       ];
 
-      input-fields = [
+      input-field = [
         {
           size = {
             width = 300;
@@ -41,7 +41,7 @@ in
         }
       ];
 
-      labels = [
+      label = [
         {
           monitor = "";
           text = "$TIME";

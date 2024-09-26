@@ -1,12 +1,13 @@
 { pkgs, ... }:
 # The wallpaper will be fetched from GitHub. I don't store my wallpapers locally.
 let
-  inherit (import ./options.nix) dotfilesDir;
+  inherit (import ../options.nix) dotfilesDir;
+  inherit (import ../scripts.nix { inherit pkgs; }) batteryNotificationScript rofiPowerMenuScript;
+
   hyprpaperConf = pkgs.writeText "hyprpaper.conf" ''
     preload = ${dotfilesDir}/wallpapers/dark-cat-rosewater.png
     wallpaper = ,${dotfilesDir}/wallpapers/dark-cat-rosewater.png
   '';
-  inherit (import ./scripts.nix { inherit pkgs; }) batteryNotificationScript rofiPowerMenuScript;
 in
 {
   wayland.windowManager.hyprland = {
@@ -16,6 +17,10 @@ in
       variables = [ "--all" ];
     };
     settings = {
+      monitor = [
+        ",preferred,auto,1"
+      ];
+
       general = {
         layout = "master";
         gaps_in = 5;
@@ -74,6 +79,8 @@ in
         "float,title:^(File Operation Progress)$"
         "float,title:^(Open File)$"
         "float,title:^(Save As)$"
+        "movetoworkspace 10,class:^(spotify)$"
+        "movetoworkspace 9,class:^(discord)$"
       ];
 
       decoration = {
@@ -133,9 +140,7 @@ in
           # Launch apps
           "$mainMod,        b,   exec,   ${pkgs.librewolf}/bin/librewolf"
           "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
-          "$mainMod,        e,   exec,   ${pkgs.emote}/bin/emote"
-          "$mainMod,        f,   exec,   ${pkgs.nautilus}/bin/nautilus"
-          "$mainMod,        i,   exec,   ${pkgs.loupe}/bin/loupe"
+          "$mainMod,        e,   exec,   ${pkgs.nautilus}/bin/nautilus"
           "$mainMod,        k,   exec,   ${pkgs.keepassxc}/bin/keepassxc"
           "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"
           "$mainMod,        r,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
@@ -143,21 +148,25 @@ in
           "$mainMod,        x,   exec,   hyprlock" # Make sure you have Hyprlock installed. There's an official flake for it. See /flake.nix
           "$mainMod,   return,   exec,   [float;tile] ${pkgs.wezterm}/bin/wezterm start --always-new-process"
           "$mainMod SHIFT,  b,   exec,   ${batteryNotificationScript}/bin/script"
-          "$mainMod SHIFT, F5,   exec,   ${pkgs.brightnessctl}/bin/brightnessctl s 0"
           "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
           "$mainMod SHIFT,  s,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
 
           # Brightness control
-          # ",$XF86MonBrightnessUp,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
-          # ",$XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
-          "$mainMod SHIFT, F3,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
-          "$mainMod SHIFT, F4,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
+          ",$XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
+          ",$XF86MonBrightnessUp,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
+          "$mainMod SHIFT, F3,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
+          "$mainMod SHIFT, F4,   exec, ${pkgs.brightnessctl}/bin/brightnessctl s +10%"
 
           # Control media players.
           ",XF86AudioPlay,  exec, ${pkgs.playerctl}/bin/playerctl play-pause"
           ",XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
           ",XF86AudioNext,  exec, ${pkgs.playerctl}/bin/playerctl next"
           ",XF86AudioPrev,  exec, ${pkgs.playerctl}/bin/playerctl previous"
+
+          "$mainMod SHIFT, F8,  exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          "$mainMod SHIFT, F8,  exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          "$mainMod SHIFT, F9,  exec, ${pkgs.playerctl}/bin/playerctl next"
+          "$mainMod SHIFT, F7,  exec, ${pkgs.playerctl}/bin/playerctl previous"
 
           # Close a window or quit Hyprland.
           "$mainMod, Q, killactive,"
@@ -178,6 +187,10 @@ in
           "$mainMod SHIFT,  l, movewindow, r"
           "$mainMod SHIFT,  k, movewindow, u"
           "$mainMod SHIFT,  j, movewindow, d"
+
+          # Move to next monitor
+          "$mainMod SHIFT, u, movecurrentworkspacetomonitor, l"
+          "$mainMod SHIFT, i, movecurrentworkspacetomonitor, r"
         ]
         # WTF is this? I don't understand Nix code. 😿
         ++
@@ -232,12 +245,16 @@ in
         "$mainMod, mouse:273, resizewindow"
       ];
 
+      bindl = [
+        # trigger when the switch is turning off
+        ", switch:off:Lid Switch,exec,hyprctl keyword monitor \"eDP-1, 1920x1080, 0x0, 1\""
+        # trigger when the switch is turning on
+        ", switch:on:Lid Switch,exec,hyprctl keyword monitor \"eDP-1, disable\""
+      ];
+
       exec-once = [
         "${pkgs.hyprpaper}/bin/hyprpaper -c ${hyprpaperConf}"
         "${pkgs.waybar}/bin/waybar"
-
-        # Please see home/gtk.nix before modifying the line below. It actually sets the cursor to Bibata-Modern-Ice.
-        "hyprctl setcursor default 24"
       ];
     };
   };

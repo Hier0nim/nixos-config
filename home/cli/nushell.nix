@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (import ./options.nix) dotfilesDir userName;
+  inherit (import ../options.nix) dotfilesDir userName;
 in
 {
   programs = {
@@ -58,7 +58,7 @@ in
           nd = "nix develop -c $env.SHELL";
           nlu = "nix flake lock --update-input";
 
-          # Modern yuunix, uwu <3
+          # Modern unix
           cat = "${pkgs.bat}/bin/bat";
           df = "${pkgs.duf}/bin/duf";
           find = "${pkgs.fd}/bin/fd";
@@ -142,7 +142,30 @@ in
           	rm -fp $tmp
           }
 
-          # source /home/${userName}/.config/nushell/extra.nu
+          def start_zellij [] {
+            if 'ZELLIJ' not-in ($env | columns) {
+              # Check if Hyprland is installed
+              if (which Hyprland | is-empty) {
+                zellij
+                exit
+              }
+              # Check if Hyprland is running, exit if not
+              if (pgrep Hyprland | is-empty) {
+                exit
+              }
+              if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+                zellij attach -c
+              } else {
+                zellij
+              }
+
+              if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+                exit
+              }
+            }
+          }
+
+          start_zellij
         '';
     };
   };

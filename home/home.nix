@@ -8,25 +8,13 @@ let
 in
 {
   imports = [
-    ./hyprland.nix
-    ./hyprlock.nix
-    ./cli.nix
-    ./files.nix
+    ./hyprland
+    ./cli
+    ./apps
     ./git.nix
-    ./gtk.nix
-    ./mako.nix
-    ./wezterm.nix
-    ./librewolf.nix
-    ./nushell.nix
     ./nix-settings.nix
-    ./rofi.nix
     ./services.nix
-    ./starship.nix
     ./tools.nix
-    ./waybar.nix
-    ./xdg.nix
-    ./yazi.nix
-    ./neovim.nix
     inputs.catppuccin.homeManagerModules.catppuccin
   ];
 
@@ -39,11 +27,11 @@ in
   };
 
   news.display = "silent";
-  # catppuccin.flavour = "mocha";
   programs.starship.catppuccin.enable = true;
   programs.bat.catppuccin.enable = true;
   programs.btop.catppuccin.enable = true;
   programs.yazi.catppuccin.enable = true;
+  programs.zellij.catppuccin.enable = true;
 
   programs.home-manager.enable = true;
 }

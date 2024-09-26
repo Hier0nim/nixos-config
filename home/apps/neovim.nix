@@ -8,5 +8,6 @@
     cargo
     zig
     neovim
+    gcc
   ];
 }

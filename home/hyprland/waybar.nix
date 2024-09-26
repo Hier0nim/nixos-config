@@ -1,8 +1,7 @@
 { pkgs, ... }:
 # Fetch the fontName variable from system/options.nix to determine which font to use.
 let
-  inherit (import ./scripts.nix { inherit pkgs; }) waybarTemperatureScript;
-  inherit (import ../system/options.nix) fontName;
+  inherit (import ../../system/options.nix) fontName;
 in
 {
   programs.waybar = {
@@ -52,16 +51,10 @@ in
           "6" = "6";
           "7" = "7";
           "8" = "8";
-          "9" = "9";
-          "10" = "0";
+          "9" = "chat";
+          "10" = "music";
           sort-by-number = true;
         };
-      };
-
-      "custom/temperature" = {
-        exec = "${waybarTemperatureScript}/bin/script";
-        format = "{}°C";
-        interval = 1;
       };
 
       cpu = {

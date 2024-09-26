@@ -10,6 +10,7 @@
     logind = {
       lidSwitch = "suspend";
       powerKey = "suspend";
+      lidSwitchExternalPower = "ignore";
       powerKeyLongPress = "reboot";
     };
 
