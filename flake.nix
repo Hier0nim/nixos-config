@@ -1,27 +1,6 @@
 {
   description = "Hier0nim's NixOS Configuration.";
 
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    catppuccin.url = "github:catppuccin/nix";
-
-    wezterm = {
-      url = "github:wez/wezterm/main?dir=nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    firefox-addons = {
-      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-
   outputs =
     {
       self,
@@ -30,24 +9,49 @@
       ...
     }@inputs:
     let
-      inherit (import ./system/options.nix) hostName system;
-      inherit (import ./home/options.nix) userName;
-      pkgs = nixpkgs.legacyPackages.${system};
+      settings = import (./. + "/settings.nix") { inherit pkgs; };
+      pkgs = import nixpkgs { system = settings.system; };
     in
     {
-      homeConfigurations."${userName}" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        extraSpecialArgs = {
-          inherit inputs;
+      nixosConfigurations = {
+        ${settings.hostname} = nixpkgs.lib.nixosSystem {
+          modules = [
+            (./. + "/profiles" + ("/" + settings.profile) + "/configuration.nix")
+          ];
+          specialArgs = {
+            inherit inputs;
+            inherit settings;
+          };
         };
-        modules = [ ./home/home.nix ];
       };
 
-      nixosConfigurations."${hostName}" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs;
+      homeConfigurations = {
+        ${settings.username} = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${settings.system};
+          modules = [
+            (./. + "/profiles" + ("/" + settings.profile) + "/home.nix")
+          ];
+          extraSpecialArgs = {
+            inherit inputs;
+            inherit settings;
+          };
         };
-        modules = [ ./system/configuration.nix ];
       };
     };
+
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    wezterm = {
+      url = "github:wez/wezterm/main?dir=nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    catppuccin.url = "github:catppuccin/nix";
+  };
 }
