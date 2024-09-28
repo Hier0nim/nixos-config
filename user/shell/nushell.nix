@@ -127,18 +127,63 @@
             "nix"
             "man"
             "cargo"
-            "zellij"
           ]}
 
-          # def --env ff [...args] {
-          # 	let tmp = (mktemp -t "yazi-cwd.XXXXX")
-          # 	yazi ...$args --cwd-file $tmp
-          # 	let cwd = (open $tmp)
-          # 	if $cwd != "" and $cwd != $env.PWD {
-          # 		cd $cwd
-          # 	}
-          # 	rm -fp $tmp
-          # }
+          def --env ff [...args] {
+          	let tmp = (mktemp -t "yazi-cwd.XXXXX")
+          	yazi ...$args --cwd-file $tmp
+          	let cwd = (open $tmp)
+          	if $cwd != "" and $cwd != $env.PWD {
+          		cd $cwd
+          	}
+          	rm -fp $tmp
+          }
+
+          do --env {
+              let ssh_agent_file = (
+                  $nu.temp-path | path join $"ssh-agent-($env.USER?).nuon"
+              )
+
+              if ($ssh_agent_file | path exists) {
+                  let ssh_agent_env = open ($ssh_agent_file)
+                  if ($"/proc/($ssh_agent_env.SSH_AGENT_PID)" | path exists) {
+                      load-env $ssh_agent_env
+                      ^ssh-add -q
+                      return
+                  } else {
+                      rm $ssh_agent_file
+                  }
+              }
+
+              let ssh_agent_env = ^ssh-agent -c
+                  | lines
+                  | first 2
+                  | parse "setenv {name} {value};"
+                  | transpose --header-row
+                  | into record
+              load-env $ssh_agent_env
+              $ssh_agent_env | save --force $ssh_agent_file
+          }
+
+          def start_zellij [] {
+            if 'ZELLIJ' not-in ($env | columns) {
+              if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+                try {
+                  zellij attach -c
+                } catch {
+                  return 0
+                }
+              } else {
+                zellij
+              }
+
+              if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+                exit
+              }
+            }
+          }
+
+          start_zellij
         '';
     };
   };
