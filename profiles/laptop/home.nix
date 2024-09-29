@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   config,
   inputs,
   settings,
@@ -20,7 +21,6 @@
     stateVersion = "${settings.stateVersion}";
   };
 
-  nix.package = pkgs.nix;
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
     sway-contrib.grimshot
@@ -113,6 +113,24 @@
     btop.catppuccin.enable = true;
     yazi.catppuccin.enable = true;
     zellij.catppuccin.enable = true;
+  };
+
+  nix = {
+    # Keep build-time dependencies around to be able to rebuild while being offline.
+    extraOptions = ''
+      keep-outputs = true
+      keep-derivations = true
+    '';
+
+    registry = lib.mapAttrs (_: v: { flake = v; }) inputs;
+    package = pkgs.nix;
+
+    # Enable auto cleanup.
+    gc = {
+      automatic = true;
+      frequency = "weekly";
+      options = "--delete-older-than 7d";
+    };
   };
 
   programs.home-manager.enable = true;
