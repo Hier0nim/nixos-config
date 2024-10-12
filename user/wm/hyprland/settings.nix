@@ -1,8 +1,8 @@
 { pkgs, settings, ... }:
 let
   hyprpaperConf = pkgs.writeText "hyprpaper.conf" ''
-    preload = ${settings.dotfilesDir}/user/wm/wallpapers/dark-cat-rosewater.png
-    wallpaper = ,${settings.dotfilesDir}/user/wm/wallpapers/dark-cat-rosewater.png
+    preload = ${settings.dotfilesDir}/user/wm/wallpapers/bkg1.png
+    wallpaper = ,${settings.dotfilesDir}/user/wm/wallpapers/bkg1.png
   '';
 in
 {
@@ -19,9 +19,10 @@ in
     general = {
       layout = "master";
       gaps_in = 5;
-      gaps_out = 10;
+      gaps_out = 5;
       border_size = 2;
-      "col.active_border" = "0x9399b2FF";
+      "col.active_border" = "0xFF7f849c";
+      # "col.active_border" = "0xFF89b4fa";
       "col.inactive_border" = "0x4488a3EE";
     };
 
@@ -51,7 +52,7 @@ in
     };
 
     decoration = {
-      rounding = 7;
+      rounding = 5;
       "col.shadow" = "rgba(1a1a1aee)";
       active_opacity = 1.0;
       inactive_opacity = 1.0;
