@@ -23,7 +23,6 @@ in
   };
   services = {
     blueman.enable = true;
-    hypridle.enable = true;
 
     greetd = {
       enable = true;

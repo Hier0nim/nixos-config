@@ -7,6 +7,7 @@
   imports = [
     ./hyprland/gtk.nix
     ./hyprland/hyprlock.nix
+    ./hyprland/hypridle.nix
     ./hyprland/keybindings.nix
     ./hyprland/mako.nix
     ./hyprland/portal.nix
