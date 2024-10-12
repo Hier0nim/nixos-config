@@ -52,7 +52,7 @@ in
         "$mainMod,   return,   exec,   wezterm start"
         "$mainMod SHIFT,  b,   exec,   ${batteryNotificationScript}/bin/script"
         "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod SHIFT,  s,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod,        a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
         "$mainMod,        v,   exec,   cliphist list | rofi -dmenu | cliphist decode | wl-copy"
 
         # Brightness control
