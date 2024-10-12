@@ -1,7 +1,7 @@
 {
   xdg.configFile = {
     "vesktop/settings/settings.json".text = builtins.toJSON {
-      notifyAboutUpdates = true;
+      notifyAboutUpdates = false;
       autoUpdate = false;
       autoUpdateNotification = false;
       useQuickCss = true;

@@ -1,5 +1,4 @@
 { ... }:
-
 {
   wayland.windowManager.hyprland.settings = {
     windowrule = [
@@ -25,6 +24,8 @@
       "float,title:^(File Operation Progress)$"
       "float,title:^(Open File)$"
       "float,title:^(Save As)$"
+      "workspace 9,title:^(vesktop)$"
+      "workspace 10,title:^(Spotify)$"
     ];
   };
 }
