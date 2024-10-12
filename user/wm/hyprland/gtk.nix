@@ -26,7 +26,7 @@
     theme = {
       name = "Catppuccin-GTK-Purple-Dark";
       package = pkgs.magnetic-catppuccin-gtk.override {
-        accent = [ "default" ];
+        accent = [ "purple" ];
       };
     };
     gtk3.extraConfig = {
