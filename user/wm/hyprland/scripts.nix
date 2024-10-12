@@ -29,7 +29,7 @@
     $logout
     $sleep
     $reboot
-    $shutdown" | ${pkgs.rofi-wayland}/bin/rofi -dmenu -i -p "Power" -theme-str 'mainbox { children: [ listview ]; }')
+    $shutdown" | ${pkgs.rofi-wayland}/bin/rofi -dmenu -i -p "Power" -theme-str 'listview { lines: 5; fixed-height: true; } mainbox { children: [ listview ]; }')
     # Do something based on selected option
     if [ "$selected_option" == "$lock" ]
     then

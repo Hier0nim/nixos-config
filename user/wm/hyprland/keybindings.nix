@@ -54,7 +54,7 @@ in
         "$mainMod SHIFT,  b,   exec,   ${batteryNotificationScript}/bin/script"
         "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
         "$mainMod,        a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod,        v,   exec,   cliphist list | rofi -dmenu | cliphist decode | wl-copy"
+        "$mainMod,        v,   exec,   cliphist list | rofi -dmenu -p 'Cliphist' -theme-str 'listview { fixed-height: true; }' | cliphist decode | wl-copy"
 
         # Brightness control
         ",$XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-"
