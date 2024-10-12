@@ -74,4 +74,5 @@ in
   };
 
   xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
+  xdg.configFile."tridactyl/themes/tridactyl-theme.css".source = ./tridactyl-theme.css;
 }
