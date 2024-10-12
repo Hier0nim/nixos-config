@@ -1,0 +1,108 @@
+(defcfg process-unmapped-keys no
+)
+(defsrc
+  esc  1    2    3    4    5    6    7    8    9    0    -    =
+  tab  q    w    e    r    t    y    u    i    o    p    [
+  caps a    s    d    f    g    h    j    k    l    ;    '
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc                 rmet cmp  rctl
+)
+(defvar
+  tap-time 200
+  hold-time 200
+
+  left-hand-keys (
+    q w e r t
+    a s d f g
+    z x c v b
+    spc
+  )
+  right-hand-keys (
+    y u i o p
+    h j k l ;
+    n m , . /
+    spc
+  )
+)
+(deflayer base
+  esc  1    2    3    4    5    6    7    8    9    0    -    =
+  tab  q    w    e    r    t    y    u    i    o    p    [
+  lctl @a   @s   @d   @f   g    h    @j   @k   @l   @;   '
+  lsft z    @x   c    v    b    @n   @m   @,   @.   /    rsft
+  lctl lmet lalt           @spc                rmet cmp  rctl
+
+)
+
+(deflayer nomods
+  esc  1    2    3    4    5    6    7    8    9    0    -    =
+  tab  q    w    e    r    t    y    u    i    o    p    [
+  caps a    s    d    f    g    h    j    k    l    ;    '
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc                 rmet cmp  rctl
+)
+(deffakekeys
+  to-base (layer-switch base)
+)
+(defalias
+  tap (multi
+    (layer-switch nomods)
+    (on-idle-fakekey to-base tap 20)
+  )
+
+  a     (tap-hold-release-keys $tap-time $hold-time (multi a @tap) lmet $left-hand-keys)
+  s     (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lalt $left-hand-keys)
+  d     (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
+  f     (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+  x     (tap-hold-release-keys $tap-time $hold-time (multi x @tap) ralt $left-hand-keys)
+  .     (tap-hold-release-keys $tap-time $hold-time (multi . @tap) ralt $right-hand-keys)
+  j     (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
+  k     (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
+  l     (tap-hold-release-keys $tap-time $hold-time (multi l @tap) lalt $right-hand-keys)
+  ;     (tap-hold-release-keys $tap-time $hold-time (multi ; @tap) rmet $right-hand-keys)
+  spc   (tap-hold-press $tap-time $hold-time (multi spc @tap) (layer-while-held space_layer))
+  n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held num_layer) $right-hand-keys)
+  m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held sym_layer) $right-hand-keys)
+  ,     (tap-hold-release-keys $tap-time $hold-time (multi , @tap) (layer-while-held fun_layer) $right-hand-keys)
+)
+
+(deflayer space_layer
+  _    f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11   f12
+  _    _    _    _    _    caps cmp  mwl  mwd  mwu  mwr  _
+  _    lmet lalt lctl lsft _    del  lft  down up   rght _
+  _    _    ralt _    _    _    bspc home pgdn pgup end  _
+  _    _    _              XX                  _    _    _
+)
+
+(deflayer num_layer
+  _    _    _    _    _    _    _    _    _    _    _    _     _
+  _    [    7    8    9    ]    _    _    _    _    _    _
+  _    '    4    5    6    =    _    rsft rctl lalt rmet _
+  _    `    1    2    3    \    _    _    _    ralt _    _
+  _    _    0              -                   _    _    _
+)
+
+(deflayer sym_layer
+  _    _    _    _    _    _    _    _    _    _    _    _     _
+  _    S-[  S-7  S-8  S-9  S-]  _    _    _    _    _    _
+  _    S-'  S-4  S-5  S-6  S-=  _    rsft rctl lalt rmet _
+  _    S-`  S-1  S-2  S-3  S-\  _    _    _    ralt _    _
+  _    S-9  S-0            S--                 _    _    _
+)
+
+(deflayer fun_layer
+  _    _    _    _    _    _    _    _    _    _    _    _     _
+  _    f12  f7   f8   f9   caps _    _    _    _    _    _
+  _    f11  f4   f5   f6   _    _    rsft rctl lalt rmet _
+  _    f10  f1   f2   f3   _    _    _    _    ralt _    _
+  _    _    _              _                   _    _    _
+)
+
+#|
+(deflayer template
+  _    _    _    _    _    _    _    _    _    _    _    _     _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _              _                   _    _    _
+)
+|#
