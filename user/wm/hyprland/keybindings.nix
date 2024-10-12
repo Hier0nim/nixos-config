@@ -41,7 +41,7 @@ in
     bind =
       [
         # Launch apps
-        "$mainMod,        b,   exec,   ${pkgs.librewolf}/bin/librewolf"
+        "$mainMod,        b,   exec,   librewolf"
         "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
         "$mainMod,        e,   exec,   ${pkgs.nautilus}/bin/nautilus"
         "$mainMod,        k,   exec,   ${pkgs.keepassxc}/bin/keepassxc"
