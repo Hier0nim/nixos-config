@@ -4,8 +4,7 @@
 
   xdg.configFile."rofi/config.rasi".text = ''
     configuration{
-      modi: "run,drun,window";
-      icon-theme: "Oranchelo";
+      modi: "";
       show-icons: true;
       terminal: "wezterm";
       drun-display-format: "{icon} {name}";
@@ -17,122 +16,138 @@
       display-window: "   Window";
       display-Network: " 󰤨  Network";
       sidebar-mode: true;
+      me-select-entry: "MousePrimary";
+      me-accept-entry: "MouseDPrimary";
     }
 
-    @theme "catppuccin-mocha"
+    @theme "my-rofi"
   '';
 
-  home.file.".local/share/rofi/themes/catppuccin-mocha.rasi".text = ''
+  home.file.".local/share/rofi/themes/my-rofi.rasi".text = ''
     * {
-        bg-col:  #1e1e2e;
-        bg-col-light: #1e1e2e;
-        border-col: #1e1e2e;
-        selected-col: #1e1e2e;
+        rosewater: #f5e0dc;
+        flamingo: #f2cdcd;
+        pink: #f5c2e7;
+        mauve: #cba6f7;
+        red: #f38ba8;
+        maroon: #eba0ac;
+        peach: #fab387;
+        yellow: #f9e2af;
+        green: #a6e3a1;
+        teal: #94e2d5;
+        sky: #89dceb;
+        sapphire: #74c7ec;
         blue: #89b4fa;
-        fg-col: #cdd6f4;
-        fg-col2: #f38ba8;
-        grey: #6c7086;
-
-        width: 600;
-        font: "${settings.font} 13";
+        lavender: #b4befe;
+        text: #cdd6f4;
+        subtext1: #bac2de;
+        subtext0: #a6adc8;
+        overlay2: #9399b2;
+        overlay1: #7f849c;
+        overlay0: #6c7086;
+        surface2: #585b70;
+        surface1: #45475a;
+        surface0: #313244;
+        base: #1e1e2e;
+        mantle: #181825;
+        crust: #11111b;
     }
 
-    element-text, element-icon , mode-switcher {
-        background-color: inherit;
-        text-color:       inherit;
+    * {
+        font: "${settings.font} 13";
+
+        background-color:   transparent;
+        text-color:         @text;
+
+        margin:     0px;
+        padding:    0px;
+        spacing:    0px;
     }
 
     window {
-        height: 360px;
-        border: 3px;
-        border-color: @border-col;
-        background-color: @bg-col;
+        location:       center;
+        width:          480;
+        border-radius:  7px;
+
+        border:         2px;
+        
+        border-color:       @overlay1;
+        background-color:   @base;
     }
 
     mainbox {
-        background-color: @bg-col;
+        padding:    12px;
+        children: [inputbar, message, listview ];
     }
 
     inputbar {
-        children: [prompt,entry];
-        background-color: @bg-col;
-        border-radius: 5px;
-        padding: 2px;
+        background-color:   @surface0;
+        border-color:       @overlay1;
+
+        border:         2px;
+        border-radius:  7px;
+
+        padding:    8px 16px;
+        spacing:    8px;
+        children:   [ prompt, entry ];
     }
 
     prompt {
-        background-color: @blue;
-        padding: 6px;
-        text-color: @bg-col;
-        border-radius: 3px;
-        margin: 20px 0px 0px 20px;
-    }
-
-    textbox-prompt-colon {
-        expand: false;
-        str: ":";
+        text-color: @text;
     }
 
     entry {
-        padding: 6px;
-        margin: 20px 0px 0px 10px;
-        text-color: @fg-col;
-        background-color: @bg-col;
-    }
-
-    listview {
-        border: 0px 0px 0px;
-        padding: 6px 0px 0px;
-        margin: 10px 0px 0px 20px;
-        columns: 2;
-        lines: 5;
-        background-color: @bg-col;
-    }
-
-    element {
-        padding: 5px;
-        background-color: @bg-col;
-        text-color: @fg-col  ;
-    }
-
-    element-icon {
-        size: 25px;
-    }
-
-    element selected {
-        background-color:  @selected-col ;
-        text-color: @fg-col2  ;
-    }
-
-    mode-switcher {
-        spacing: 0;
-      }
-
-    button {
-        padding: 10px;
-        background-color: @bg-col-light;
-        text-color: @grey;
-        vertical-align: 0.5;
-        horizontal-align: 0.5;
-    }
-
-    button selected {
-      background-color: @bg-col;
-      text-color: @blue;
+        placeholder:        "Search";
+        placeholder-color:  @text;
     }
 
     message {
-        background-color: @bg-col-light;
-        margin: 2px;
-        padding: 2px;
-        border-radius: 5px;
+        margin:             12px 0 0;
+        border-radius:      7px;
+        border-color:       @overlay1;
+        background-color:   @surface0;
     }
 
     textbox {
-        padding: 6px;
-        margin: 20px 0px 0px 20px;
-        text-color: @blue;
-        background-color: @bg-col-light;
+        padding:    8px 24px;
+    }
+
+    listview {
+        background-color:   transparent;
+
+        margin:     12px 0 0;
+        lines:      8;
+        columns:    1;
+
+        fixed-height: false;
+    }
+
+    element {
+        padding:        8px 16px;
+        spacing:        8px;
+        border-radius:  7px;
+    }
+
+    element normal active {
+        text-color: @text;
+    }
+
+    element alternate active {
+        text-color: @text;
+    }
+
+    element selected normal, element selected active {
+        background-color:   @subtext0;
+        text-color: @base;
+    }
+
+    element-icon {
+        size:           1em;
+        vertical-align: 0.5;
+    }
+
+    element-text {
+        text-color: inherit;
     }
   '';
 }

@@ -47,6 +47,7 @@ in
         "$mainMod,        k,   exec,   ${pkgs.keepassxc}/bin/keepassxc"
         "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"
         "$mainMod,        r,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
+        "$mainMod,        w,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show window -show-icons"
         "$mainMod,        m,   exec,   ${pkgs.spotify}/bin/spotify"
         "$mainMod,        x,   exec,   hyprlock" # Make sure you have Hyprlock installed. There's an official flake for it. See /flake.nix
         "$mainMod,   return,   exec,   wezterm start"
