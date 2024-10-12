@@ -20,8 +20,8 @@ c.front_end = "WebGpu"
 c.enable_wayland = false
 
 -- Appearance
-c.color_scheme = "Catppuccin Macchiato"
-local scheme = wez.color.get_builtin_schemes()["Catppuccin Macchiato"]
+c.color_scheme = "Catppuccin Mocha"
+local scheme = wez.color.get_builtin_schemes()["Catppuccin Mocha"]
 c.colors = {
 	split = scheme.ansi[2],
 }
