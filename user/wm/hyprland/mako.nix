@@ -10,7 +10,7 @@
   services.mako = {
     enable = true;
     font = "${settings.font}";
-    margin = "0,20,20";
+    margin = "0";
     padding = "10";
     borderSize = 2;
     borderRadius = 5;
