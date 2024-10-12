@@ -35,6 +35,7 @@
     mpv
     loupe
     protonvpn-gui
+    protonmail-desktop
   ];
 
   xdg.enable = true;

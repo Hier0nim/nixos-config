@@ -70,6 +70,7 @@
         PROMPT_COMMAND = ''""'';
         PROMPT_COMMAND_RIGHT = ''""'';
         DIRENV_LOG_FORMAT = ''""''; # make direnv quiet
+        EDITOR = ''"nvim"'';
         SHELL = ''"${pkgs.nushell}/bin/nu"'';
       };
 
@@ -127,6 +128,7 @@
             "nix"
             "man"
             "cargo"
+            "zellij"
           ]}
 
           def --env ff [...args] {
@@ -168,11 +170,7 @@
           def start_zellij [] {
             if 'ZELLIJ' not-in ($env | columns) {
               if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
-                try {
-                  zellij attach -c
-                } catch {
-                  return 0
-                }
+                ^zellij attach --create
               } else {
                 zellij
               }
