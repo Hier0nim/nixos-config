@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   ...
@@ -18,6 +17,7 @@ let
     inherit (pkgs.librewolf-unwrapped) extraPrefsFiles extraPoliciesFiles;
     wmClass = "LibreWolf";
     libName = "librewolf";
+    nativeMessagingHosts = with pkgs; [ tridactyl-native ];
 
     # Extra preferences for LibreWolf
     extraPrefs = # javascript
@@ -35,13 +35,8 @@ let
         pref("gfx.canvas.accelerated", true);
         pref("gfx.webrender.enabled", true);
         pref("middlemouse.paste", false);
-        pref("webgl.disabled", false);
 
         // Privacy-related preferences
-        pref("privacy.clearOnShutdown.cache", false);
-        pref("privacy.clearOnShutdown.cookies", false);
-        pref("privacy.clearOnShutdown.history", false);
-        pref("privacy.clearOnShutdown.sessions", false);
         pref("privacy.resistFingerprinting.exemptedDomains", "*.claude.ai");
       '';
 
@@ -67,5 +62,16 @@ in
   programs.librewolf = {
     enable = true;
     package = librewolf-custom;
+    settings = {
+      "webgl.disabled" = false;
+      "privacy.resistFingerprinting" = false;
+      "privacy.clearOnShutdown.history" = false;
+      "privacy.clearOnShutdown.cache" = false;
+      "privacy.clearOnShutdown.cookies" = false;
+      "privacy.clearOnShutdown.sessions" = false;
+      "network.cookie.lifetimePolicy" = 0;
+    };
   };
+
+  xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
 }

@@ -1,0 +1,29 @@
+" -*- tridactylrc -*-
+
+" This wipes all existing settings. This means that if a setting in this file is
+" removed, then it will return to default. In other words, this file serves as
+" as an enforced single point of truth for Tridactyl's configuration.
+sanitize tridactyllocal tridactylsync
+
+" Ctrl-F should use the browser's native 'find' functionality.
+unbind <C-f>
+
+" Tridactyl has an incomplete find mode
+bind / fillcmdline find
+bind ? fillcmdline find -?
+bind n findnext 1
+bind N findnext -1
+bind ,<Space> nohlsearch
+
+" case insensitive if lowercase, case sensitive if using some uppercase letters
+set findcase smart
+
+set modeindicatormodes {"ignore": "false"}
+
+" copy all the things
+set yankto both
+
+blacklistadd localhost
+blacklistadd netflix.com
+blacklistadd primevideo.com
+blacklistadd youtube.com
