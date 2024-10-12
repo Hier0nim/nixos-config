@@ -34,6 +34,7 @@
     gimp
     mpv
     loupe
+    protonvpn-gui
   ];
 
   xdg.enable = true;
