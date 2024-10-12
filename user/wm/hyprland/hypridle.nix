@@ -5,14 +5,7 @@
   ...
 }:
 let
-  suspendScript = pkgs.writeShellScript "suspend-script" ''
-    # check if any player has status "Playing"
-    ${lib.getExe pkgs.playerctl} -a status | ${lib.getExe pkgs.ripgrep} Playing -q
-    # only suspend if nothing is playing
-    if [ $? == 1 ]; then
-      ${pkgs.systemd}/bin/systemctl suspend
-    fi
-  '';
+  inherit (import ./scripts.nix { inherit pkgs; }) suspendScript;
 in
 {
   services.hypridle = {

@@ -1,23 +1,24 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
-  batteryNotificationScript = pkgs.writeShellScriptBin "script" ''
+  batteryNotificationScript = pkgs.writeShellScriptBin "battery-notification-script" ''
     percentage=$(cat /sys/class/power_supply/BAT0/capacity)
     if [ $percentage -ge 100 ]; then
-      ${pkgs.libnotify}/bin/notify-send "Battery Full" # My battery reports over 356% when full. It is broken.
+      ${pkgs.libnotify}/bin/notify-send "Battery Full" 
     else
       ${pkgs.libnotify}/bin/notify-send "Current battery: $percentage"
     fi
   '';
 
-  suspendScript = pkgs.writeShellScriptBin "script" ''
-    ${pkgs.pipewire}/bin/pw-cli i all 2>&1 | ${pkgs.ripgrep}/bin/rg running -q
-    # only suspend if audio isn't running
+  suspendScript = pkgs.writeShellScript "suspend-script" ''
+    # check if any player has status "Playing"
+    ${pkgs.lib.getExe pkgs.playerctl} -a status | ${pkgs.lib.getExe pkgs.ripgrep} Playing -q
+    # only suspend if nothing is playing
     if [ $? == 1 ]; then
       ${pkgs.systemd}/bin/systemctl suspend
     fi
   '';
 
-  rofiPowerMenuScript = pkgs.writeShellScriptBin "script" ''
+  rofiPowerMenuScript = pkgs.writeShellScriptBin "power-menu-script" ''
     lock="🔒️  Lock"
     logout="🏃  Log Out"
     shutdown="💡  Shut Down"
