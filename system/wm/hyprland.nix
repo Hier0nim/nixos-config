@@ -21,18 +21,23 @@ in
     enable = true;
     xwayland.enable = true;
   };
+  services = {
+    blueman.enable = true;
+    hypridle.enable = true;
 
-  services.greetd = {
-    enable = true;
-    settings = {
-      initial_session = {
-        command = "${session}";
-        user = "${settings.username}";
-      };
-      default_session = {
-        command = "${tuigreet} --greeting 'Welcome to NixOS!' --asterisks --remember --remember-user-session --time --cmd ${session}";
-        user = "greeter";
+    greetd = {
+      enable = true;
+      settings = {
+        initial_session = {
+          command = "${session}";
+          user = "${settings.username}";
+        };
+        default_session = {
+          command = "${tuigreet} --greeting 'Welcome to NixOS!' --asterisks --remember --remember-user-session --time --cmd ${session}";
+          user = "greeter";
+        };
       };
     };
+
   };
 }
