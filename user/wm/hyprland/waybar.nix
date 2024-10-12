@@ -3,34 +3,27 @@
   programs.waybar = {
     enable = true;
     settings.mainBar = {
-      position = "top";
+      reload_style_on_change = true;
       layer = "top";
-      height = 5;
-      margin-top = 0;
-      margin-bottom = 0;
+      position = "left";
+      # height = 5;
+      width = 50;
+      margin-top = 5;
+      margin-bottom = 5;
       margin-left = 0;
-      margin-right = 0;
+      margin-right = 5;
+      fix-centered = true;
       modules-left = [
         "custom/launcher"
-        "hyprland/workspaces"
+        "clock"
       ];
-      modules-center = [ "clock" ];
+      modules-center = [ "hyprland/workspaces" ];
       modules-right = [
-        "cpu"
-        "pulseaudio"
+        "group/brightness"
+        "group/audio"
+        "battery"
         "tray"
       ];
-
-      clock = {
-        calendar.format.today = "<span color='#b4befe'><b>{}</b></span>";
-        format = " {:%H:%M}";
-        tooltip = "true";
-        tooltip-format = ''
-          <big>{:%Y %B}</big>
-          <tt><small>{calendar}</small></tt>
-        '';
-        format-alt = " {:%d/%m}";
-      };
 
       "hyprland/workspaces" = {
         active-only = false;
@@ -46,10 +39,77 @@
           "6" = "6";
           "7" = "7";
           "8" = "8";
-          "9" = "chat";
-          "10" = "music";
+          "9" = "󰭻";
+          "10" = " ";
           sort-by-number = true;
         };
+      };
+
+      tray = {
+        icon-size = 21;
+        spacing = 10;
+      };
+
+      clock = {
+        format = "{:%H\n%M}";
+        tooltip-format = "<tt><small>{calendar}</small></tt>";
+        tooltip = "true";
+        calendar = {
+          mode = "month";
+          mode-mon-col = 3;
+          weeks-pos = "right";
+          on-scroll = 1;
+          on-click-right = "mode";
+          format = {
+            today = "<span color='#a6e3a1'><b><u>{}</u></b></span>";
+          };
+        };
+      };
+
+      "group/brightness" = {
+        orientation = "inherit";
+        drawer = {
+          transition-duration = 500;
+          transition-left-to-right = false;
+        };
+        modules = [
+          "backlight"
+          "backlight/slider"
+        ];
+      };
+
+      "backlight/slider" = {
+        min = 5;
+        max = 100;
+        orientation = "vertical";
+        device = "intel_backlight";
+      };
+
+      backlight = {
+        device = "intel_backlight";
+        format = "{icon}";
+        format-icons = [
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+        ];
+        on-scroll-down = "brightnessctl s 5%-";
+        on-scroll-up = "brightnessctl s +5%";
+        tooltip = true;
+        tooltip-format = "Brightness: {percent}% ";
+        smooth-scrolling-threshol = 1;
       };
 
       cpu = {
@@ -58,23 +118,68 @@
         interval = 1;
       };
 
-      tray = {
-        icon-size = 20;
-        spacing = 8;
+      "group/audio" = {
+        orientation = "inherit";
+        drawer = {
+          "transition-duration" = 500;
+          "transition-left-to-right" = false;
+        };
+        modules = [
+          "pulseaudio"
+          "pulseaudio/slider"
+        ];
       };
 
       pulseaudio = {
-        format = "{icon} {volume}%";
-        format-muted = "󰖁 ";
+        format = "{icon}";
+        format-bluetooth = "{icon}";
+        tooltip-forma = "{volume}% {icon} | {desc}";
+        format-muted = "󰖁";
         format-icons = {
-          default = [ " " ];
+          headphones = "󰋌";
+          handsfree = "󰋌";
+          headset = "󰋌";
+          phone = "";
+          portable = "";
+          car = " ";
+          default = [
+            "󰕿"
+            "󰖀"
+            "󰕾"
+          ];
         };
-        scroll-step = 5;
         on-click = "${pkgs.pavucontrol}/bin/pavucontrol";
       };
 
+      "pulseaudio/slider" = {
+        min = 0;
+        max = 140;
+        orientation = "vertical";
+      };
+
+      battery = {
+        rotate = 270;
+        states = {
+          good = 95;
+          warning = 30;
+          critical = 15;
+        };
+        format = "{icon}";
+        format-charging = "<b>{icon}</b>";
+        format-full = "<span color='#82A55F'><b>{icon}</b></span>";
+        format-icons = [
+          "󰁻"
+          "󰁼"
+          "󰁾"
+          "󰂀"
+          "󰂂"
+          "󰁹"
+        ];
+        tooltip-format = "{timeTo} {capacity} % | {power} W";
+      };
+
       "custom/launcher" = {
-        format = "";
+        format = " ";
         on-click = "pkill rofi || ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons";
         tooltip = "false";
       };
@@ -86,86 +191,121 @@
           font = "${settings.font}";
           font_size = "15px";
           font_weight = "bold";
-          text_color = "#cdd6f4";
-          secondary_accent = "89b4fa";
-          tertiary_accent = "f5f5f5";
-          background = "11111B";
-          opacity = "0.98";
         };
       in
       ''
         * {
-            border: none;
-            border-radius: 0px;
-            padding: 0;
-            margin: 0;
-            min-height: 0px;
-            font-family: ${custom.font};
-            font-weight: ${custom.font_weight};
-            opacity: ${custom.opacity};
+          font-family: ${custom.font};
+          font-size: ${custom.font_size};
+          font-weight: ${custom.font_weight};
+          min-height: 0;
         }
 
-        window#waybar {
-            background: none;
+        #waybar {
+          background: transparent;
+          color: @text;
+          background-color: @base;
+          border-radius: 7px;
+          /* border: 2px solid @blue; */
+          border: 2px solid @overlay1;
+          padding: 10px 0px;
         }
 
-        #workspaces {
-            font-size: ${custom.font_size};
-            padding-left: 15px;
+        #workspaces button{
+          color: @lavender;
+          transition: all 0.2s ease-out; /* Smooth transition for state changes */
         }
-        #workspaces button {
-            color: ${custom.text_color};
-            padding-left:  6px;
-            padding-right: 6px;
-        }
-        #workspaces button.empty {
-            color: #6c7086;
-        }
+
+        #workspaces button:hover,
         #workspaces button.active {
-            color: #b4befe;
+          box-shadow: inherit;
+          text-shadow: inherit;
+          color: @pink;
+          border: 2px solid @pink;
+          background: alpha(darker(@overlay1), 0.5);
+          padding: 8px 0px; /* Increase padding to enlarge the button */
         }
 
-        #tray, #pulseaudio, #network, #cpu, #disk, #clock {
-            font-size: ${custom.font_size};
-            color: ${custom.text_color};
+        .modules-left{
+          margin: 6px 6px 6px 6px;
+          border-radius: 4px;
+          background: alpha(darker(@overlay1), 0.3);
         }
 
-        #cpu {
-            font-size: ${custom.font_size};
-            padding-left: 9px;
-            padding-right: 9px;
-            margin-left: 7px;
+        .modules-right,
+        .modules-center {
+          margin: 6px 6px 6px 6px;
         }
 
-        #tray {
-            padding: 0 16px;
-            padding-right: 12px;
-            margin-left: 7px;
-        }
-
+        #tray,
+        #backlight,
+        #battery,
+        #workspaces button,
         #pulseaudio {
-            font-size: ${custom.font_size};
-            padding-left: 15px;
-            padding-right: 9px;
-            margin-left: 7px;
-        }
-        #network {
-            padding-left: 9px;
-            padding-right: 15px;
+          margin: 2px 2px 4px 2px;
+          padding: 4px 0px; /* Increase padding to enlarge the button */
+          color: @lavender;
+          border-radius: 4px;
+          background: alpha(darker(@overlay1), 0.3);
         }
 
-        #clock {
-            padding-left: 9px;
-            padding-right: 15px;
+        #battery {
+          padding: 4px 0px;
         }
 
+        #clock,
         #custom-launcher {
-            font-size: 18px;
-            color: #b4befe;
-            font-weight: ${custom.font_weight};
-            padding-left: 10px;
-            padding-right: 12px;
+          font-size: 1.6rem;
+          color: @lavender;
         }
+
+        #backlight-slider slider,
+        #pulseaudio-slider slider {
+          background-color: transparent;
+          box-shadow: none;
+        }
+
+        #backlight-slider trough,
+        #pulseaudio-slider trough {
+          margin-top: 4px;
+          min-width: 6px;
+          min-height: 60px;
+          border-radius: 8px;
+          background-color: alpha(@background, 0.6);
+        }
+
+        #backlight-slider highlight,
+        #pulseaudio-slider highlight {
+          border-radius: 8px;
+          background-color: lighter(@active);
+        }
+
+        @define-color rosewater #f5e0dc;
+        @define-color flamingo #f2cdcd;
+        @define-color pink #f5c2e7;
+        @define-color mauve #cba6f7;
+        @define-color red #f38ba8;
+        @define-color maroon #eba0ac;
+        @define-color peach #fab387;
+        @define-color yellow #f9e2af;
+        @define-color green #a6e3a1;
+        @define-color teal #94e2d5;
+        @define-color sky #89dceb;
+        @define-color sapphire #74c7ec;
+        @define-color blue #89b4fa;
+        @define-color lavender #b4befe;
+        @define-color text #cdd6f4;
+        @define-color subtext1 #bac2de;
+        @define-color subtext0 #a6adc8;
+        @define-color overlay2 #9399b2;
+        @define-color overlay1 #7f849c;
+        @define-color overlay0 #6c7086;
+        @define-color surface2 #585b70;
+        @define-color surface1 #45475a;
+        @define-color surface0 #313244;
+        @define-color base #1e1e2e;
+        @define-color mantle #181825;
+        @define-color crust #11111b;
       '';
   };
 }
