@@ -5,6 +5,6 @@
     ./nushell.nix
     ./starship.nix
     ./yazi.nix
-    ./zellij.nix
+    ./zellij/zellij.nix
   ];
 }
