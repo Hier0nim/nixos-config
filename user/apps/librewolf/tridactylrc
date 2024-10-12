@@ -29,7 +29,4 @@ set modeindicatormodes {"ignore": "false"}
 " copy all the things
 set yankto both
 
-blacklistadd localhost
-blacklistadd netflix.com
-blacklistadd primevideo.com
-blacklistadd youtube.com
+" blacklistadd localhost
