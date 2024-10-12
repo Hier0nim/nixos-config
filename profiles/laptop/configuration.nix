@@ -10,7 +10,11 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking = {
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      wifi.powersave = true;
+    };
+
     hostName = "${settings.hostname}";
   };
 
