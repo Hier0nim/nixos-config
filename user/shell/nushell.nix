@@ -70,7 +70,8 @@
         PROMPT_COMMAND = ''""'';
         PROMPT_COMMAND_RIGHT = ''""'';
         DIRENV_LOG_FORMAT = ''""''; # make direnv quiet
-        EDITOR = ''"nvim"'';
+        EDITOR = ''"${settings.editor}"'';
+        BROWSER = ''"${settings.browser}"'';
         SHELL = ''"${pkgs.nushell}/bin/nu"'';
       };
 

@@ -34,6 +34,7 @@
     gimp
     mpv
     loupe
+    evince
     protonvpn-gui
     protonmail-desktop
   ];
@@ -59,6 +60,7 @@
       br = "${settings.browser}.desktop";
       fm = "org.Nautilus.desktop";
       iv = "org.gnome.Loupe.desktop";
+      ev = "org.gnome.Evince.desktop";
       mp = "mpv.desktop";
       te = "neovim.desktop";
     in
@@ -67,7 +69,7 @@
       associations.added = defaultApplications;
       defaultApplications = {
         # Office documents.
-        "application/pdf" = br;
+        "application/pdf" = ev;
 
         "inode/directory" = fm;
 
@@ -114,7 +116,6 @@
     bat.catppuccin.enable = true;
     btop.catppuccin.enable = true;
     yazi.catppuccin.enable = true;
-    zellij.catppuccin.enable = true;
   };
 
   nix = {
