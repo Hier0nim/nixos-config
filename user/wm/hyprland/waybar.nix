@@ -167,11 +167,18 @@
         format = "{icon}";
         format-charging = "<b>{icon}</b>";
         format-full = "<span color='#82A55F'><b>{icon}</b></span>";
+        format-warning = "<span color='#FAB387'><b>{icon}</b></span>";
+        format-critical = "<span color='#F38BA8'><b>{icon}</b></span>";
         format-icons = [
+          "󰂃"
+          "󰁺"
           "󰁻"
           "󰁼"
+          "󰁽"
           "󰁾"
+          "󰁿"
           "󰂀"
+          "󰂁"
           "󰂂"
           "󰁹"
         ];
