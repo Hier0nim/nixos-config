@@ -6,6 +6,7 @@
       self,
       nixpkgs,
       home-manager,
+      nixvim,
       ...
     }@inputs:
     let
@@ -53,5 +54,7 @@
     };
 
     catppuccin.url = "github:catppuccin/nix";
+
+    nixvim.url = "github:Hier0nim/nixvim-config";
   };
 }

@@ -1,9 +1,1 @@
-{ ... }:
-{
-  imports = [
-    ./wezterm/wezterm.nix
-    ./neovim.nix
-    ./git.nix
-    ./librewolf
-  ];
-}
+{ ... }: { imports = [ ./wezterm/wezterm.nix ./git.nix ./librewolf ]; }

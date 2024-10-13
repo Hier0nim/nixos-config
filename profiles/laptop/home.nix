@@ -1,12 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  settings,
-  ...
-}:
-{
+{ pkgs, lib, config, inputs, settings, ... }: {
   imports = [
     ../../user/apps
     ../../user/shell
@@ -23,6 +15,7 @@
 
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
+    inputs.nixvim.packages.x86_64-linux.default
     sway-contrib.grimshot
     libreoffice-fresh
     obs-studio
@@ -35,6 +28,7 @@
     mpv
     loupe
     evince
+    lazygit
     protonvpn-gui
     protonmail-desktop
   ];
@@ -55,55 +49,53 @@
       XDG_BOOK_DIR = "${config.home.homeDirectory}/Media/Books";
     };
   };
-  xdg.mimeApps =
-    let
-      br = "${settings.browser}.desktop";
-      fm = "org.Nautilus.desktop";
-      iv = "org.gnome.Loupe.desktop";
-      ev = "org.gnome.Evince.desktop";
-      mp = "mpv.desktop";
-      te = "neovim.desktop";
-    in
-    rec {
-      enable = true;
-      associations.added = defaultApplications;
-      defaultApplications = {
-        # Office documents.
-        "application/pdf" = ev;
+  xdg.mimeApps = let
+    br = "${settings.browser}.desktop";
+    fm = "org.Nautilus.desktop";
+    iv = "org.gnome.Loupe.desktop";
+    ev = "org.gnome.Evince.desktop";
+    mp = "mpv.desktop";
+    te = "neovim.desktop";
+  in rec {
+    enable = true;
+    associations.added = defaultApplications;
+    defaultApplications = {
+      # Office documents.
+      "application/pdf" = ev;
 
-        "inode/directory" = fm;
+      "inode/directory" = fm;
 
-        # Web stuff.
-        "application/xhtml+xml" = br;
-        "text/html" = br;
-        "x-scheme-handler/http" = br;
-        "x-scheme-handler/https" = br;
+      # Web stuff.
+      "application/xhtml+xml" = br;
+      "text/html" = br;
+      "x-scheme-handler/http" = br;
+      "x-scheme-handler/https" = br;
 
-        # Images.
-        "image/avif" = iv;
-        "image/gif" = iv;
-        "image/jpeg" = iv;
-        "image/jpg" = iv;
-        "image/pjpeg" = iv;
-        "image/png" = iv;
-        "image/tiff" = iv;
-        "image/webp" = iv;
-        "image/x-bmp" = iv;
-        "image/x-gray" = iv;
-        "image/x-icb" = iv;
-        "image/x-ico" = iv;
-        "image/x-png" = iv;
+      # Images.
+      "image/avif" = iv;
+      "image/gif" = iv;
+      "image/jpeg" = iv;
+      "image/jpg" = iv;
+      "image/pjpeg" = iv;
+      "image/png" = iv;
+      "image/tiff" = iv;
+      "image/webp" = iv;
+      "image/x-bmp" = iv;
+      "image/x-gray" = iv;
+      "image/x-icb" = iv;
+      "image/x-ico" = iv;
+      "image/x-png" = iv;
 
-        # Plain text & code.
-        "application/x-shellscript" = te;
-        "text/plain" = te;
+      # Plain text & code.
+      "application/x-shellscript" = te;
+      "text/plain" = te;
 
-        # Videos.
-        "video/mkv" = mp;
-        "video/mp4" = mp;
-        "video/webm" = mp;
-      };
+      # Videos.
+      "video/mkv" = mp;
+      "video/mp4" = mp;
+      "video/webm" = mp;
     };
+  };
 
   home.sessionVariables = {
     EDITOR = settings.editor;
