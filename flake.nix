@@ -56,5 +56,10 @@
     catppuccin.url = "github:catppuccin/nix";
 
     nixvim.url = "github:Hier0nim/nixvim-config";
+
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }

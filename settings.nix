@@ -10,8 +10,6 @@ rec {
   gitname = "Hier0nim";
   gitmail = "hieronimdaniel@gmail.com";
   dotfilesDir = "/home/${username}/nixos-config";
-  theme = "catpuccin"; # Selected theme from themes directory (./themes/)
-  themeDetails = import (./. + "/themes/${theme}.nix") { dir = dotfilesDir; };
   wm = "hyprland";
 
   font = "Iosevka Nerd Font";
