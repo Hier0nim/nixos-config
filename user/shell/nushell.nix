@@ -14,12 +14,6 @@
 
     nushell = {
       enable = true;
-      loginFile.text = ''
-        if (tty) == "/dev/tty1" {
-          exec Hyprland
-        }
-      '';
-
       shellAliases =
         let
           g = lib.getExe pkgs.git;
@@ -65,14 +59,14 @@
         };
 
       environmentVariables = {
-        PROMPT_INDICATOR_VI_INSERT = ''"  "'';
-        PROMPT_INDICATOR_VI_NORMAL = ''"∙ "'';
-        PROMPT_COMMAND = ''""'';
-        PROMPT_COMMAND_RIGHT = ''""'';
-        DIRENV_LOG_FORMAT = ''""''; # make direnv quiet
-        EDITOR = ''"${settings.editor}"'';
-        BROWSER = ''"${settings.browser}"'';
-        SHELL = ''"${pkgs.nushell}/bin/nu"'';
+        PROMPT_INDICATOR_VI_INSERT = "  ";
+        PROMPT_INDICATOR_VI_NORMAL = "∙ ";
+        PROMPT_COMMAND = "";
+        PROMPT_COMMAND_RIGHT = "";
+        DIRENV_LOG_FORMAT = ""; # make direnv quiet
+        EDITOR = "${settings.editor}";
+        BROWSER = "${settings.browser}";
+        SHELL = "${pkgs.nushell}/bin/nu";
       };
 
       # See the Nushell docs for more options.
