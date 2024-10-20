@@ -16,6 +16,7 @@
     ./hyprland/settings.nix
     ./hyprland/vesktop-settings.nix
     ./hyprland/waybar.nix
+    ./hyprland/battery-low.nix
   ];
 
   wayland.windowManager.hyprland = {
