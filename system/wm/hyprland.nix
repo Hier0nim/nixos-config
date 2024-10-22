@@ -19,7 +19,6 @@ in
 
   programs.hyprland = {
     enable = true;
-    xwayland.enable = true;
   };
   services = {
     blueman.enable = true;
