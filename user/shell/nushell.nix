@@ -116,6 +116,7 @@
               ${prev}
               ${str}'') "" (map completion names);
         in
+        #nu
         ''
           $env.config = ${conf};
           ${completions [
