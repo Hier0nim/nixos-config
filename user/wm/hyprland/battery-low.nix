@@ -1,31 +1,30 @@
 { pkgs, ... }:
 let
-  # Define the battery notification script
-  batteryNotificationScript = pkgs.writeShellScriptBin "battery-low-notification" ''
-    acpi="${pkgs.acpi}/bin/acpi"
-    notify_send="${pkgs.libnotify}/bin/notify-send"
+  batteryNotificationScript =
+    pkgs.writeScriptBin "battery-low-notification"
+      #nu 
+      ''
+        #!${pkgs.nushell}/bin/nu
 
-    # Get the battery percentage (e.g., "85%")
-    battery_output=$($acpi -b)
-    battery_percentage=$(echo "$battery_output" | head -n1 | awk '{print $4}' | tr -d ',%')
+        let acpi = $"${pkgs.acpi}/bin/acpi"
+        let notify_send = $"${pkgs.libnotify}/bin/notify-send"
 
-    # Check if battery_percentage is not empty
-    if [[ -n "$battery_percentage" ]]; then
-      # Check if the battery percentage is less than or equal to 10%
-      if (( $battery_percentage <= 10 )); then
-        # Send a notification with urgency set to critical
-        $notify_send --urgency=critical "Low Battery" "Battery at $battery_percentage%"
-      fi
-    else
-      echo "Failed to get battery percentage."
-    fi
-  '';
+        # Get the battery percentage
+        let battery_output = (^$acpi | str trim)
+        let battery_percentage = ($battery_output | lines | first | split column " " | get column4 | str trim --char ',' | str trim --char '%').0
+
+        # Check if battery_percentage is not empty and less than or equal to 20%
+        if ($battery_percentage != "") and (($battery_percentage | into int) <= 20) {
+          ^$notify_send --urgency=critical "Low Battery" $"Battery at ($battery_percentage)%"
+        } else {
+          print "Failed to get battery percentage."
+        }
+      '';
 in
 {
-  # Define the systemd user service without the .service suffix
   systemd.user.services."battery-low" = {
     Unit = {
-      Description = "Notify user if battery is below 10%";
+      Description = "Notify user if battery is below 20%";
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
@@ -37,10 +36,9 @@ in
     };
   };
 
-  # Define the systemd user timer without the .timer suffix
   systemd.user.timers."battery-low" = {
     Timer = {
-      OnCalendar = "*:0/1"; # Runs every minute
+      OnCalendar = "*:0/5"; # Runs every 5 minutes
       Unit = "battery-low.service";
     };
     Install = {
