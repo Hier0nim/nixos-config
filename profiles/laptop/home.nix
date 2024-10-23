@@ -39,6 +39,7 @@
     lazygit
     protonvpn-gui
     protonmail-desktop
+    obsidian
   ];
 
   xdg.enable = true;
