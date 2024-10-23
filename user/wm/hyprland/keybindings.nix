@@ -22,9 +22,9 @@ in
     binde = [
       # Move windows.
       "$mainMod SHIFT, h, moveactive, -20 0"
-      "$mainMod SHIFT, l, moveactive, 20 0"
-      "$mainMod SHIFT, k, moveactive, 0 -20"
-      "$mainMod SHIFT, j, moveactive, 0 20"
+      "$mainMod SHIFT, semicolon, moveactive, 20 0"
+      "$mainMod SHIFT, l, moveactive, 0 -20"
+      "$mainMod SHIFT, k, moveactive, 0 20"
 
       # Control the volume.
       ",XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
@@ -32,10 +32,10 @@ in
       ",XF86AudioMute,        exec, wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle"
 
       # Resize windows.
-      "$mainMod CTRL, l, resizeactive, 30 0"
-      "$mainMod CTRL, h, resizeactive, -30 0"
-      "$mainMod CTRL, k, resizeactive, 0 -10"
-      "$mainMod CTRL, j, resizeactive, 0 10"
+      "$mainMod CTRL, p, resizeactive, 30 0"
+      "$mainMod CTRL, u, resizeactive, -30 0"
+      "$mainMod CTRL, o, resizeactive, 0 -10"
+      "$mainMod CTRL, i, resizeactive, 0 10"
     ];
 
     bind =
@@ -44,7 +44,6 @@ in
         "$mainMod,        b,   exec,   librewolf"
         "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
         "$mainMod,        e,   exec,   ${pkgs.nautilus}/bin/nautilus"
-        "$mainMod,        k,   exec,   ${pkgs.keepassxc}/bin/keepassxc"
         "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"
         "$mainMod,        r,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
         "$mainMod,        w,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show window -show-icons"
@@ -82,19 +81,19 @@ in
         "$mainMod SHIFT, f, fullscreen,"
 
         # Move focus from one window to another.
-        "$mainMod, h, movefocus, l"
-        "$mainMod, l, movefocus, r"
-        "$mainMod, k, movefocus, u"
-        "$mainMod, j, movefocus, d"
+        "$mainMod, j, movefocus, l"
+        "$mainMod, semicolon, movefocus, r"
+        "$mainMod, l, movefocus, u"
+        "$mainMod, k, movefocus, d"
 
-        "$mainMod CTRL, h, workspace, r-1"
-        "$mainMod CTRL, l, workspace, r+1"
+        "$mainMod CTRL, j, workspace, r-1"
+        "$mainMod CTRL, semicolon, workspace, r+1"
 
         # Move window to either the left, right, top, or bottom.
-        "$mainMod SHIFT,  h, movewindow, l"
-        "$mainMod SHIFT,  l, movewindow, r"
-        "$mainMod SHIFT,  k, movewindow, u"
-        "$mainMod SHIFT,  j, movewindow, d"
+        "$mainMod SHIFT,  j, movewindow, l"
+        "$mainMod SHIFT,  semicolon, movewindow, r"
+        "$mainMod SHIFT,  l, movewindow, u"
+        "$mainMod SHIFT,  k, movewindow, d"
 
         # Move to next monitor
         "$mainMod SHIFT, u, movecurrentworkspacetomonitor, l"
