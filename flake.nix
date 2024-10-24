@@ -11,7 +11,10 @@
     }@inputs:
     let
       settings = import (./. + "/settings.nix") { inherit pkgs; };
-      pkgs = import nixpkgs { system = settings.system; };
+      pkgs = import nixpkgs {
+        system = settings.system;
+        overlays = builtins.attrValues (import ./overlays);
+      };
     in
     {
       nixosConfigurations = {
@@ -28,7 +31,7 @@
 
       homeConfigurations = {
         ${settings.username} = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${settings.system};
+          pkgs = pkgs;
           modules = [
             (./. + "/profiles" + ("/" + settings.profile) + "/home.nix")
           ];
