@@ -25,6 +25,7 @@
           specialArgs = {
             inherit inputs;
             inherit settings;
+            inherit pkgs;
           };
         };
       };
