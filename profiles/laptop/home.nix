@@ -40,7 +40,6 @@
     protonvpn-gui
     protonmail-desktop
     obsidian
-    openvpn3
   ];
 
   xdg.enable = true;
