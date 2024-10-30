@@ -9,7 +9,8 @@ sanitize tridactyllocal tridactylsync
 colourscheme tridactyl-theme
 
 " Set newtab to ddg start page
-set newtab https://start.duckduckgo.com/
+" set newtab https://start.duckduckgo.com/
+set newtab about:blank
 
 " Ctrl-F should use the browser's native 'find' functionality.
 unbind <C-f>
