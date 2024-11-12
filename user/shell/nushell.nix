@@ -127,6 +127,10 @@
             "zellij"
           ]}
 
+          export def ii [ path ] {
+            let _ = /mnt/c/Windows/explorer.exe (wslpath -w $"($path | path expand)")
+          }
+
           def --env ff [...args] {
           	let tmp = (mktemp -t "yazi-cwd.XXXXX")
           	yazi ...$args --cwd-file $tmp
