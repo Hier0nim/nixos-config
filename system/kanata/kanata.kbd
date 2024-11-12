@@ -1,4 +1,4 @@
-(defcfg process-unmapped-keys no
+(defcfg process-unmapped-keys yes
 )
 (defsrc
   esc  1    2    3    4    5    6    7    8    9    0    -    =
@@ -60,8 +60,8 @@
   l     (tap-hold-release-keys $tap-time $hold-time (multi l @tap) lalt $right-hand-keys)
   ;     (tap-hold-release-keys $tap-time $hold-time (multi ; @tap) rmet $right-hand-keys)
   spc   (tap-hold-press $tap-time $hold-time (multi spc @tap) (layer-while-held space_layer))
-  n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held num_layer) $right-hand-keys)
-  m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held sym_layer) $right-hand-keys)
+  n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held sym_layer) $right-hand-keys)
+  m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held num_layer) $right-hand-keys)
   ,     (tap-hold-release-keys $tap-time $hold-time (multi , @tap) (layer-while-held fun_layer) $right-hand-keys)
 )
 

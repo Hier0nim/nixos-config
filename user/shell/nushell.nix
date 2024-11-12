@@ -168,7 +168,7 @@
               if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
                 ^zellij attach --create
               } else {
-                zellij
+                zellij -l welcome
               }
 
               if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {

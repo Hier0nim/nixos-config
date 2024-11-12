@@ -51,8 +51,8 @@ in
         "$mainMod,        x,   exec,   hyprlock" # Make sure you have Hyprlock installed. There's an official flake for it. See /flake.nix
         "$mainMod,   return,   exec,   wezterm start"
         "$mainMod SHIFT,  b,   exec,   ${batteryNotificationScript}/bin/script"
-        "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
-        "$mainMod,        a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod SHIFT,  a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave area ~/Media/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
+        "$mainMod,        a,   exec,   ${pkgs.grimblast}/bin/grimblast --notify copysave screen ~/Media/Pictures/Screenshots/$(date +'%Y-%m-%d-At-%Ih%Mm%Ss').png"
         "$mainMod,        v,   exec,   cliphist list | rofi -dmenu -p 'Cliphist' -theme-str 'listview { fixed-height: true; }' | cliphist decode | wl-copy"
 
         # Brightness control

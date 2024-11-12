@@ -3,6 +3,7 @@
   imports = [
     ../../system/security
     ../../system/hardware
+    ../../system/network
     ../../system/kanata
     ./hardware-configuration.nix
     (./. + "../../../system/wm" + ("/" + "${settings.wm}") + ".nix")

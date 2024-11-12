@@ -40,6 +40,7 @@
     protonvpn-gui
     protonmail-desktop
     obsidian
+    teams-for-linux
   ];
 
   xdg.enable = true;
