@@ -41,6 +41,7 @@
     protonmail-desktop
     obsidian
     teams-for-linux
+    remmina
   ];
 
   xdg.enable = true;
