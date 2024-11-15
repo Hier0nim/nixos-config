@@ -1,4 +1,9 @@
-{ pkgs, settings, ... }:
+{
+  pkgs,
+  lib,
+  settings,
+  ...
+}:
 let
   hyprpaperConf = pkgs.writeText "hyprpaper.conf" ''
     preload = ${settings.dotfilesDir}/user/wm/wallpapers/bkg1.png
@@ -6,6 +11,10 @@ let
   '';
 in
 {
+  home.activation.createScreenshotsDir = lib.hm.dag.entryAfter [ ] ''
+    mkdir -p ~/Media/Pictures/Screenshots
+  '';
+
   wayland.windowManager.hyprland.settings = {
     monitor = [
       "eDP-1, 1920x1080@144, 0x0, 1.25"
@@ -53,7 +62,7 @@ in
 
     decoration = {
       rounding = 5;
-      "col.shadow" = "rgba(1a1a1aee)";
+      shadow.color = "rgba(1a1a1aee)";
       active_opacity = 1.0;
       inactive_opacity = 1.0;
       fullscreen_opacity = 1.0;
