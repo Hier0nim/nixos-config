@@ -1,1 +1,10 @@
-{ ... }: { imports = [ ./wezterm/wezterm.nix ./git.nix ./librewolf ]; }
+{ ... }:
+{
+  imports = [
+    ./wezterm/wezterm.nix
+    ./git.nix
+    ./nemo.nix
+    ./librewolf
+    ./intellij
+  ];
+}

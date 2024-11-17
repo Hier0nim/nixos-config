@@ -39,7 +39,6 @@
     lazygit
     protonvpn-gui
     protonmail-desktop
-    obsidian
     teams-for-linux
     remmina
   ];
@@ -60,10 +59,11 @@
       XDG_BOOK_DIR = "${config.home.homeDirectory}/Media/Books";
     };
   };
+
   xdg.mimeApps =
     let
       br = "${settings.browser}.desktop";
-      fm = "org.Nautilus.desktop";
+      fm = "nemo.desktop";
       iv = "org.gnome.Loupe.desktop";
       ev = "org.gnome.Evince.desktop";
       mp = "mpv.desktop";
@@ -77,12 +77,18 @@
         "application/pdf" = ev;
 
         "inode/directory" = fm;
+        "application/x-gnome-saved-search" = fm;
 
-        # Web stuff.
-        "application/xhtml+xml" = br;
+        # Web stuff. 
+        "application/x-extension-htm" = br;
+        "application/x-extension-html" = br;
+        "application/x-extension-shtml" = br;
+        "application/x-extension-xht" = br;
+        "application/x-extension-xhtml" = br;
         "text/html" = br;
         "x-scheme-handler/http" = br;
         "x-scheme-handler/https" = br;
+        "x-scheme-handler/chrome" = br;
 
         # Images.
         "image/avif" = iv;

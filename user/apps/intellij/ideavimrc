@@ -1,0 +1,176 @@
+" ========================================
+" General Settings
+" ========================================
+
+" Set space as the leader key
+let mapleader = " "
+nnoremap <SPACE> <Nop>
+
+" Options for better editing experience
+set clipboard+=unnamedplus                  " integrate with system clipboard
+set hlsearch                                " highlight search occurrences
+set ignorecase                              " ignore case in search patterns
+set smartcase                               " no ignore case when pattern is uppercase
+set incsearch                               " show search results while typing
+
+set undolevels=10000                        " maximum number of changes that can be undone
+set number                                  " print the line number in front of each line
+set relativenumber                          " how the line number relative to the line with the cursor
+set scrolloff=8                             " minimum number of columns to scroll horizontally
+set sidescrolloff=8                         " min. number of columns to left and right of cursor
+set showmode                                " message on the status line to show current mode
+set visualbell                              " use visual bell instead of beeping
+set matchpairs                              " pairs of characters that % can match
+set wrap                                    " Enable soft-wraps.
+
+" Recommended IdeaVim settings
+set ideajoin
+set ideaput
+set ideamarks
+
+" Plugin settings
+set surround
+set NERDTree
+set highlightedyank
+set sneak
+set quickscope
+set commentary
+
+" ========================================
+" Navigation and Windows
+" ========================================
+
+" Tab navigation
+map <leader>g1 <action>(GoToTab1)
+map <leader>g2 <action>(GoToTab2)
+map <leader>g3 <action>(GoToTab3)
+map <leader>g4 <action>(GoToTab4)
+map <leader>g5 <action>(GoToTab5)
+map <leader>g6 <action>(GoToTab6)
+map <leader>g0 <action>(GoToLastTab)
+map <leader>tp <action>(PinActiveEditorTab)
+map <leader>tc <action>(CloseAllUnpinnedEditors)
+map <leader>tca <action>(CloseAllEditors)
+map <leader>tco <action>(CloseAllEditorsButActive)
+
+" Window navigation
+nmap <Leader>v :vsplit<CR>
+nmap <Leader>h :split<CR>
+nmap <C-q> :q<CR>
+nnoremap <C-j> <C-w>h
+nnoremap <C-k> <C-w>j
+nnoremap <C-l> <C-w>k
+nnoremap <C-;> <C-w>l
+
+" Code navigation
+nmap gd <Action>(GotoDeclaration)
+nmap gu <Action>(FindUsages)
+nmap gi <Action>(GotoImplementation)
+nmap go <Action>(GotoSuperMethod)
+map <Leader>e <Action>(GotoNextError)
+nmap <C-i> <Action>(Forward)
+nmap <C-o> <Action>(Back)
+
+" NERDTree
+nmap \ :NERDTreeFocus<CR>
+nmap | :NERDTreeToggle<CR>
+let g:NERDTreeMapCloseDir="h"
+let g:NERDTreeMapActivateNode="o"
+let g:NERDTreeMapQuit='\'
+
+" Access to other windows
+nmap <Leader>fs <Action>(FileStructurePopup)
+nmap <Leader>ff <Action>(RecentFiles)
+map <Leader><Leader> <Action>(SearchEverywhere)
+nmap <Leader>fg <Action>(FindInPath)
+nmap <Leader>fr <Action>(RecentFiles)
+nmap <Leader>fc <Action>(RecentChangedFiles)
+nmap <Leader>fl <Action>(RecentLocations)
+" nmap <Leader>r :registers<cr>
+nmap <Leader>wp <Action>(ActivateProblemsViewToolWindow)
+nmap <Leader>wr <Action>(ActivateRunToolWindow)
+nmap <Leader>wg <Action>(ActivateVersionControlToolWindow)
+nmap <leader>wt <Action>(ActivateTerminalToolWindow)
+nmap <Leader>wn <Action>(ClearAllNotifications)
+nmap <Leader>wv <Action>(VimActions)
+nmap <Leader>wb <Action>(ActivateBookmarksToolWindow)
+nmap <Leader>wm <Action>(MainToolBar)
+nmap <Leader>wf <Action>(ActivateFindToolWindow)
+
+" Perform actions in code
+nmap <Leader>a <Action>(ShowIntentionActions)
+nmap <Leader>cr <Action>(RenameElement)
+nmap <Leader>cf <Action>(ReformatCode)
+nmap <Leader>cg <Action>(Generate)
+vmap <Leader>cm <Action>(ExtractMethod)
+nmap <Leader>ce <Action>(ShowErrorDescription)
+nmap <Leader>ca <Action>(Annotate)
+
+" Bookmarks
+map <Leader>b <Action>(ShowBookmarks)
+
+" Save current file
+nmap <C-s> :w<CR>
+
+" Debugging
+nmap <Leader>db <Action>(ToggleLineBreakpoint)
+nmap <Leader>de <Action>(EditBreakpoint)
+nmap <Leader>dc <Action>(ForceRunToCursor)
+nmap <Leader>df <Action>(JumpToStatement)
+
+" Clear highlight on pressing ESC
+nnoremap <esc> :noh<return><esc>
+
+" Redefine undo/redo
+nmap U <C-r>
+
+" Move lines of code up and down
+nmap <S-j> :m .+1<CR>==
+nmap <S-k> :m .-2<CR>==
+vmap <S-j> :m '>+1<CR>gv=gv
+vmap <S-k> :m '<-2<CR>gv=gv
+
+" Keep selection after indenting
+vmap < <gv^
+vmap > >gv^
+
+" Insert blank line
+map <Enter> o<ESC>
+map <S-Enter> O<ESC>
+
+" Reload .ideavimrc
+nmap <Leader>ir <Action>(IdeaVim.ReloadVimRc.reload)
+
+" REPL
+map <Leader>rr <Action>(Run)
+map <Leader>rm <Action>(RunMenu)
+map <Leader>rd <Action>(Debug)
+map <Leader>rb <Action>(build)
+map <Leader>rc <Action>(RiderDebuggerApplyEncChagnes)
+
+" Find
+nmap <Leader>fg <Action>(FindInPath)
+
+" Inspect Code
+map <Leader>ic <Action>(InspectCode)
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+" GUI controls
+map <Leader>tb <Action>(ViewStatusBar)
+map <Leader>td <Action>(ToggleDistractionFreeMode)
+map <leader>tv <Action>(ToggleFullScreen)
+map <leader>ti <Action>(EditorToggleShowIndentLines)
+
+map <Leader>tt <Action>(ToolWindowsGroup)
+map <Leader>ge <Action>(EditorPopupMenu)
+map <leader>ti <Action>(EditorToggleShowIndentLines)
+
+" replace currently selected text with default register
+" without yanking it
+vnoremap <leader>p "_dP
+
+" delete without yanking
+nnoremap <leader>x "_d
+vnoremap <leader>x "_d

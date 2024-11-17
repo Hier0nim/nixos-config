@@ -43,7 +43,7 @@ in
         # Launch apps
         "$mainMod,        b,   exec,   librewolf"
         "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
-        "$mainMod,        e,   exec,   ${pkgs.nautilus}/bin/nautilus"
+        "$mainMod,        e,   exec,   nemo"
         "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"
         "$mainMod,        r,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
         "$mainMod,        w,   exec,   ${pkgs.rofi-wayland}/bin/rofi -show window -show-icons"
