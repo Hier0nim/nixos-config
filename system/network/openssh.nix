@@ -1,4 +1,3 @@
-{ settings }:
 {
   services.openssh = {
     enable = true;
