@@ -8,6 +8,7 @@
 {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
+    ../../system/network/openssh.nix
   ];
 
   wsl = {
