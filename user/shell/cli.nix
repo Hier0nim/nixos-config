@@ -7,10 +7,12 @@
         rounded_corners = true;
       };
     };
+    btop.catppuccin.enable = true;
 
     bat = {
       enable = true;
     };
+    bat.catppuccin.enable = true;
 
     cava = {
       enable = true;

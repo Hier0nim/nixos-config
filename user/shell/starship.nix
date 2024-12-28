@@ -32,4 +32,6 @@
       };
     };
   };
+
+  programs.starship.catppuccin.enable = true;
 }
