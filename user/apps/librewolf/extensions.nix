@@ -24,4 +24,19 @@
     install_url = "https://addons.mozilla.org/firefox/downloads/file/3990315/catppuccin_mocha_lavender_git-latest.xpi";
     installation_mode = "force_installed";
   };
+  # GPThemes
+  "gpthemes@itsmarta" = {
+    install_url = "https://addons.mozilla.org/firefox/downloads/file/4384792/gpthemes-latest.xpi";
+    installation_mode = "force_installed";
+  };
+  # SideBerry
+  "{3c078156-979c-498b-8990-85f7987dd929}" = {
+    install_url = "https://addons.mozilla.org/firefox/downloads/file/4246774/sidebery-latest.xpi";
+    installation_mode = "force_installed";
+  };
+  # Userchrome Toggle Extended
+  "userchrome-toggle-extended@n2ezr.ru" = {
+    install_url = "https://addons.mozilla.org/firefox/downloads/file/4341014/userchrome_toggle_extended-latest.xpi";
+    installation_mode = "force_installed";
+  };
 }

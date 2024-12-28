@@ -56,6 +56,13 @@ let
       };
     };
   };
+
+  shyfoxRepo = pkgs.fetchFromGitHub {
+    owner = "Naezr";
+    repo = "ShyFox";
+    rev = "dd4836fb6f93267de6a51489d74d83d570f0280d";
+    sha256 = "sha256-7H+DU4o3Ao8qAgcYDHVScR3pDSOpdETFsEMiErCQSA8=";
+  };
 in
 {
   # Use Home Manager to manage LibreWolf
@@ -70,9 +77,17 @@ in
       "privacy.clearOnShutdown.cookies" = false;
       "privacy.clearOnShutdown.sessions" = false;
       "network.cookie.lifetimePolicy" = 0;
+
+      # ShyFox settings
+      "shyfox.remove.window.controls" = true;
     };
   };
 
   xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
   xdg.configFile."tridactyl/themes/tridactyl-theme.css".source = ./tridactyl-theme.css;
+
+  home.file = {
+    ".librewolf/gzqxztri.default/chrome".source = shyfoxRepo + "/chrome";
+    ".librewolf/gzqxztri.default/user.js".source = shyfoxRepo + "/user.js";
+  };
 }
