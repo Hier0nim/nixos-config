@@ -40,7 +40,7 @@
       "networkmanager"
       "wheel"
     ];
-    hashedPassword = "$y$j9T$bIyZhxYrycF/ATJIjJjfe0$a6Mr8P598yR/ngzdvTbjr.krh/Tx0Fnj0nUC6gkLEJ8";
+    hashedPassword = "$y$j9T$A393jWCF3yvUwEwDdalP9/$9JAJVGgOujBcX/SMg8zRuuagNfWH9y6aochFeAsEOC1";
     shell = pkgs.nushell;
   };
 
@@ -61,6 +61,7 @@
     wget
     git
     vim
+    unzip
   ];
 
   # A lot of mpris packages require it.
