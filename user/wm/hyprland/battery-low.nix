@@ -10,8 +10,8 @@ let
         let notify_send = $"${pkgs.libnotify}/bin/notify-send"
 
         # Get the battery percentage
-        let battery_output = (^$acpi | str trim)
-        let battery_percentage = ($battery_output | lines | first | split column " " | get column4 | str trim --char ',' | str trim --char '%').0
+        let battery_output = (^$acpi | str trim | lines | where ( $it !~ " 0%"))
+        let battery_percentage = ($battery_output | split column " " | get column4 | str trim --char ',' | str trim --char '%').0
 
         # Check if battery_percentage is not empty and less than or equal to 20%
         if ($battery_percentage != "") and (($battery_percentage | into int) <= 20) {
