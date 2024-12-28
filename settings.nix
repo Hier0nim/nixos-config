@@ -13,14 +13,10 @@ rec {
   wm = "hyprland";
 
   font = "Iosevka Nerd Font";
-  fontPkg = (
-    pkgs.nerdfonts.override {
-      fonts = [
-        "Iosevka"
-        "JetBrainsMono"
-      ];
-    }
-  );
+  fontPkg = [
+    pkgs.nerd-fonts.iosevka
+    pkgs.nerd-fonts.jetbrains-mono
+  ];
   fontSize = 12;
 
   # Session variables.

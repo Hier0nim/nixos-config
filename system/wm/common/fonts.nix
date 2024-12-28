@@ -7,8 +7,6 @@
       sansSerif = [ "${settings.font}" ];
       serif = sansSerif;
     };
-    packages = [
-      settings.fontPkg
-    ];
+    packages = settings.fontPkg;
   };
 }
