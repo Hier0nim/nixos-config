@@ -51,11 +51,9 @@
     EDITOR = settings.editor;
   };
 
-  programs = {
-    starship.catppuccin.enable = true;
-    bat.catppuccin.enable = true;
-    btop.catppuccin.enable = true;
-    yazi.catppuccin.enable = true;
+  wezterm = {
+    enable = true;
+    package = inputs.wezterm.packages.${pkgs.system}.default;
   };
 
   nix = {

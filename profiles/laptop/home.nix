@@ -41,6 +41,7 @@
     protonmail-desktop
     teams-for-linux
     remmina
+    oath-toolkit
   ];
 
   xdg.enable = true;
@@ -116,6 +117,20 @@
       };
     };
 
+  home.file.".local/share/applications/neovim.desktop" = {
+    text = ''
+      [Desktop Entry]
+      Name=Neovim (WezTerm)
+      Comment=Edit text files with Neovim in WezTerm
+      Exec=wezterm start -- nvim %f
+      Icon=utilities-terminal
+      Terminal=false
+      Type=Application
+      Categories=Utility;TextEditor;
+      MimeType=text/plain;
+    '';
+  };
+
   home.sessionVariables = {
     EDITOR = settings.editor;
     TERM = settings.term;
@@ -123,11 +138,9 @@
   };
 
   programs = {
-    starship.catppuccin.enable = true;
-    bat.catppuccin.enable = true;
-    btop.catppuccin.enable = true;
-    yazi.catppuccin.enable = true;
+    wezterm.enable = true;
   };
+  nemo.enable = true;
 
   nix = {
     # Keep build-time dependencies around to be able to rebuild while being offline.
