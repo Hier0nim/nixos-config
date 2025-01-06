@@ -41,7 +41,7 @@ in
     bind =
       [
         # Launch apps
-        "$mainMod,        b,   exec,   librewolf"
+        "$mainMod,        b,   exec,   firefox"
         "$mainMod,        d,   exec,   ${pkgs.vesktop}/bin/vesktop"
         "$mainMod,        e,   exec,   nemo"
         "$mainMod,        p,   exec,   ${rofiPowerMenuScript}/bin/script"

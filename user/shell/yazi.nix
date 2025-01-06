@@ -38,7 +38,7 @@
     };
   };
 
-  programs.yazi.catppuccin.enable = true;
+  catppuccin.yazi.enable = true;
 
   home.packages = with pkgs; [
     exiftool # To get exif data of files.

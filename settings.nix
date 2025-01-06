@@ -21,7 +21,7 @@ rec {
 
   # Session variables.
   editor = "nvim";
-  browser = "librewolf";
+  browser = "firefox";
   term = "wezterm";
 
   # Do not modify the variable below.

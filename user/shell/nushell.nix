@@ -148,11 +148,17 @@
 
               if ($ssh_agent_file | path exists) {
                   let ssh_agent_env = open ($ssh_agent_file)
-                  if ($"/proc/($ssh_agent_env.SSH_AGENT_PID)" | path exists) {
+                  echo $"Loaded SSH agent environment from file: ($ssh_agent_env)"
+
+                  # Check if SSH agent process is running
+                  let is_running = (^ps -p $ssh_agent_env.SSH_AGENT_PID | lines | length) > 1
+                  if ($is_running) {
                       load-env $ssh_agent_env
+                      echo "SSH agent is running. Environment variables loaded."
                       ^ssh-add -q
                       return
                   } else {
+                      echo "SSH agent process not found. Removing stale file."
                       rm $ssh_agent_file
                   }
               }
@@ -163,8 +169,20 @@
                   | parse "setenv {name} {value};"
                   | transpose --header-row
                   | into record
+
+              echo $"Parsed SSH agent environment: ($ssh_agent_env)"
+
+              # Clean up old socket if necessary
+              if ($env.SSH_AUTH_SOCK | path exists) {
+                  echo "Removing stale socket file..."
+                  rm $env.SSH_AUTH_SOCK
+              }
+
               load-env $ssh_agent_env
               $ssh_agent_env | save --force $ssh_agent_file
+              echo $"SSH agent environment saved to ($ssh_agent_file)."
+
+              ^ssh-add -q
           }
 
           def start_zellij [] {

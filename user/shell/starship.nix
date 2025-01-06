@@ -33,5 +33,5 @@
     };
   };
 
-  programs.starship.catppuccin.enable = true;
+  catppuccin.starship.enable = true;
 }

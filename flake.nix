@@ -67,5 +67,15 @@
       url = "github:nbfc-linux/nbfc-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    arkenfox-userjs = {
+      url = "github:arkenfox/user.js";
+      flake = false;
+    };
   };
 }
