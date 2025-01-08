@@ -122,12 +122,13 @@ in
           installation_mode = "force_installed";
         };
       };
-
     };
+    nativeMessagingHosts = with pkgs; [ tridactyl-native ];
     profiles = {
       private = {
         id = 0;
         search.default = "DuckDuckGo";
+        search.force = true;
         extraConfig = sharedExtraConfig;
         extensions = commonExtensions;
         bookmarks = sharedBookmarks;
@@ -135,6 +136,7 @@ in
       work = {
         id = 1;
         search.default = "DuckDuckGo";
+        search.force = true;
         extraConfig = sharedExtraConfig;
         extensions = commonExtensions;
         bookmarks = sharedBookmarks;
