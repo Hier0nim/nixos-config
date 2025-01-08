@@ -6,5 +6,6 @@
     ./bluetooth.nix
     ./power.nix
     ./fan_control.nix
+    ./razer.nix
   ];
 }
