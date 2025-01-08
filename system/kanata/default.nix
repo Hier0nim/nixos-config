@@ -1,6 +1,7 @@
+{ lib, ... }:
 {
   services.kanata = {
-    enable = true;
+    enable = lib.mkDefault true;
     keyboards = {
       internalKeyboard = {
         devices = [
