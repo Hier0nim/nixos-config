@@ -5,6 +5,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-stable,
       home-manager,
       nixvim,
       ...
@@ -15,6 +16,10 @@
         system = settings.system;
         overlays = builtins.attrValues (import ./overlays);
       };
+
+      pkgs-stable = import nixpkgs-stable {
+        system = settings.system;
+      };
     in
     {
       nixosConfigurations = {
@@ -23,9 +28,8 @@
             (./. + "/profiles" + ("/" + settings.profile) + "/configuration.nix")
           ];
           specialArgs = {
-            inherit inputs;
-            inherit settings;
-            inherit pkgs;
+            inherit inputs settings pkgs-stable;
+            nixpkgs.pkgs = nixpkgs.nixosModules.pkgsReadOnly;
           };
         };
       };
@@ -37,8 +41,7 @@
             (./. + "/profiles" + ("/" + settings.profile) + "/home.nix")
           ];
           extraSpecialArgs = {
-            inherit inputs;
-            inherit settings;
+            inherit inputs settings pkgs-stable;
           };
         };
       };
@@ -46,6 +49,7 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "nixpkgs/nixos-24.11";
 
     home-manager = {
       url = "github:nix-community/home-manager";
