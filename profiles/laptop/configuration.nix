@@ -32,6 +32,9 @@
     LC_ALL = settings.locale;
   };
 
+  # Virtualization
+  virtualisation.libvirtd.enable = true;
+
   # Users.
   users.users.${settings.username} = {
     isNormalUser = true;
@@ -93,7 +96,44 @@
     };
   };
 
-  nixpkgs.config.allowUnfree = true;
+  # Specializations
+  specialisation = {
+    gaming = {
+      configuration = {
+        services.kanata.enable = false;
 
+        # Gaming packages and tools
+        environment.systemPackages = with pkgs; [
+          lutris
+          wine
+          mangohud
+          protonup
+        ];
+
+        # Enable GPU support
+        hardware.graphics = {
+          enable = true;
+          enable32Bit = true;
+        };
+
+        # Enable performance tools
+        programs.gamemode.enable = true;
+
+        programs.steam.enable = true;
+        programs.steam.gamescopeSession.enable = true;
+
+        environment.sessionVariables = {
+          STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
+        };
+      };
+    };
+  };
+
+  hardware.openrazer = {
+    enable = true;
+    users = [ settings.username ];
+  };
+
+  nixpkgs.config.allowUnfree = true;
   system.stateVersion = "${settings.stateVersion}";
 }
