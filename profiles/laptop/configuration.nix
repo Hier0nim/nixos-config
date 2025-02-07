@@ -4,7 +4,7 @@
     ../../system/security
     ../../system/hardware
     ../../system/network
-    ../../system/kanata
+    ../../system/input-devices
     ./hardware-configuration.nix
     (./. + "../../../system/wm" + ("/" + "${settings.wm}") + ".nix")
   ];
@@ -34,6 +34,8 @@
 
   # Virtualization
   virtualisation.libvirtd.enable = true;
+  virtualisation.spiceUSBRedirection.enable = true;
+  services.spice-vdagentd.enable = true;
 
   # Users.
   users.users.${settings.username} = {
@@ -42,6 +44,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "plugdev"
     ];
     hashedPassword = "$y$j9T$A393jWCF3yvUwEwDdalP9/$9JAJVGgOujBcX/SMg8zRuuagNfWH9y6aochFeAsEOC1";
     shell = pkgs.nushell;
@@ -127,11 +130,6 @@
         };
       };
     };
-  };
-
-  hardware.openrazer = {
-    enable = true;
-    users = [ settings.username ];
   };
 
   nixpkgs.config.allowUnfree = true;

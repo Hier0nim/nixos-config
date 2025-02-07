@@ -60,7 +60,7 @@
 
     catppuccin.url = "github:catppuccin/nix";
 
-    nixvim.url = "github:Hier0nim/nixvim-config";
+    nixvim.url = "github:Hier0nim/nvim";
 
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";

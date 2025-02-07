@@ -116,11 +116,6 @@ in
           install_url = "https://addons.mozilla.org/firefox/downloads/file/3990315/catppuccin_mocha_lavender_git-latest.xpi";
           installation_mode = "force_installed";
         };
-        # GPThemes
-        "gpthemes@itsmarta" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/4384792/gpthemes-latest.xpi";
-          installation_mode = "force_installed";
-        };
       };
     };
     nativeMessagingHosts = with pkgs; [ tridactyl-native ];

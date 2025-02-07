@@ -41,7 +41,7 @@
     protonmail-desktop
     teams-for-linux
     remmina
-    oath-toolkit
+    chromium
   ];
 
   xdg.enable = true;
@@ -80,7 +80,7 @@
         "inode/directory" = fm;
         "application/x-gnome-saved-search" = fm;
 
-        # Web stuff. 
+        # Web stuff.
         "application/x-extension-htm" = br;
         "application/x-extension-html" = br;
         "application/x-extension-shtml" = br;
@@ -141,6 +141,7 @@
     wezterm.enable = true;
   };
   nemo.enable = true;
+  quickemu.enable = true;
 
   nix = {
     # Keep build-time dependencies around to be able to rebuild while being offline.
