@@ -3,7 +3,7 @@ rec {
   system = "x86_64-linux";
   hostname = "NixOS";
   username = "hieronim";
-  profile = "laptop";
+  profile = "g14";
   timezone = "Europe/Warsaw";
   locale = "en_US.UTF-8";
   layout = "pl";

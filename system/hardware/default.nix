@@ -4,7 +4,7 @@
     ./boot.nix
     ./sound.nix
     ./bluetooth.nix
-    ./power.nix
-    ./fan_control.nix
+    # ./power.nix
+    # ./fan_control.nix
   ];
 }

@@ -17,7 +17,7 @@ in
   wayland.windowManager.hyprland.xwayland.enable = true;
   wayland.windowManager.hyprland.settings = {
     monitor = [
-      "eDP-1, 1920x1080@144, 0x0, 1.25"
+      "eDP-1, 2560x1600@60, 0x0, 1.25"
       ",preferred,auto,1"
     ];
 
@@ -110,11 +110,12 @@ in
     gestures.workspace_swipe = true;
 
     exec-once = [
-      "hyprlock"
       "${pkgs.hyprpaper}/bin/hyprpaper -c ${hyprpaperConf}"
       "${pkgs.waybar}/bin/waybar"
+      "hyprlock"
       "wl-paste --type text --watch cliphist store"
       "wl-paste --type image --watch cliphist store"
+      "rog-control-center"
     ];
   };
 }

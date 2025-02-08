@@ -6,6 +6,7 @@
       self,
       nixpkgs,
       nixpkgs-stable,
+      nixos-hardware,
       home-manager,
       nixvim,
       ...
@@ -26,6 +27,7 @@
         ${settings.hostname} = nixpkgs.lib.nixosSystem {
           modules = [
             (./. + "/profiles" + ("/" + settings.profile) + "/configuration.nix")
+            nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
           ];
           specialArgs = {
             inherit inputs settings pkgs-stable;
@@ -50,6 +52,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "nixpkgs/nixos-24.11";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     home-manager = {
       url = "github:nix-community/home-manager";
