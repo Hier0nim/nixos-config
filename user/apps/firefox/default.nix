@@ -37,6 +37,11 @@ let
 
     # Use native file picker instead of GTK file picker
     "widget.use-xdg-desktop-portal.file-picker" = 1;
+
+    # Vertical tabs
+    "sidebar.revamp" = true;
+    "sidebar.verticalTabs" = true;
+    "sidebar.revamp.round-content-area" = true;
   };
 
   # Function to convert a preference value into a JSON-compatible string
