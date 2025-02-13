@@ -1,63 +1,42 @@
 {
-  description = "Hier0nim's NixOS Configuration.";
+  description = "NixOS and Home Manager Flake";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-stable,
-      nixos-hardware,
-      home-manager,
-      nixvim,
-      ...
-    }@inputs:
-    let
-      settings = import (./. + "/settings.nix") { inherit pkgs; };
-      pkgs = import nixpkgs {
-        system = settings.system;
-        overlays = builtins.attrValues (import ./overlays);
-      };
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = import inputs.systems;
 
-      pkgs-stable = import nixpkgs-stable {
-        system = settings.system;
-      };
-    in
-    {
-      nixosConfigurations = {
-        ${settings.hostname} = nixpkgs.lib.nixosSystem {
-          modules = [
-            (./. + "/profiles" + ("/" + settings.profile) + "/configuration.nix")
-            nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
-          ];
-          specialArgs = {
-            inherit inputs settings pkgs-stable;
-            nixpkgs.pkgs = nixpkgs.nixosModules.pkgsReadOnly;
-          };
-        };
-      };
-
-      homeConfigurations = {
-        ${settings.username} = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgs;
-          modules = [
-            (./. + "/profiles" + ("/" + settings.profile) + "/home.nix")
-          ];
-          extraSpecialArgs = {
-            inherit inputs settings pkgs-stable;
-          };
-        };
-      };
+      imports = [
+        ./flake
+        ./hosts
+      ];
     };
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "nixpkgs/nixos-24.11";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    systems.url = "github:nix-systems/default-linux";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    pre-commit-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     wezterm.url = "github:wez/wezterm/main?dir=nix";
 
