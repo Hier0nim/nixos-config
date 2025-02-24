@@ -2,16 +2,16 @@
   inputs,
   self,
   ...
-}:
-let
-  specialArgs = { inherit inputs self; };
+}: let
+  specialArgs = {inherit inputs self;};
 
   sharedModules = [
     ./modules/theme
   ];
-in
-{
+in {
   home-manager = {
+    backupFileExtension = "backup";
+
     # Extra `specialArgs` passed to home-manager
     extraSpecialArgs = specialArgs;
 
@@ -30,18 +30,20 @@ in
     };
 
     # Extra modules added to all users
-    sharedModules = [
-      {
-        # Let home-manager install and manage itself
-        programs.home-manager.enable = true;
+    sharedModules =
+      [
+        {
+          # Let home-manager install and manage itself
+          programs.home-manager.enable = true;
 
-        # Avoid installing multiple variants of the home-manager manual to save space
-        manual = {
-          html.enable = false;
-          json.enable = false;
-          manpages.enable = false;
-        };
-      }
-    ] ++ sharedModules;
+          # Avoid installing multiple variants of the home-manager manual to save space
+          manual = {
+            html.enable = false;
+            json.enable = false;
+            manpages.enable = false;
+          };
+        }
+      ]
+      ++ sharedModules;
   };
 }

@@ -4,9 +4,7 @@
   lib,
   ...
 }:
-
-with lib;
-let
+with lib; let
   firefox-addons = inputs.firefox-addons.packages.${pkgs.system};
   arkenfoxConfig = builtins.readFile "${inputs.arkenfox-userjs}/user.js";
 
@@ -45,23 +43,26 @@ let
   };
 
   # Function to convert a preference value into a JSON-compatible string
-  userPrefValue =
-    pref:
-    # Use builtins.toJSON to serialize the value
-    # - If the value is a boolean, integer, or string, it converts directly to JSON
-    # - For more complex types, it double-encodes as JSON for safety
-    builtins.toJSON (if isBool pref || isInt pref || isString pref then pref else builtins.toJSON pref);
+  userPrefValue = pref:
+  # Use builtins.toJSON to serialize the value
+  # - If the value is a boolean, integer, or string, it converts directly to JSON
+  # - For more complex types, it double-encodes as JSON for safety
+    builtins.toJSON (
+      if isBool pref || isInt pref || isString pref
+      then pref
+      else builtins.toJSON pref
+    );
 
   # Function to generate a Firefox user.js configuration string from a set of preferences
-  mkConfig =
-    prefs:
-    # Map over the preferences attribute set, converting each key-value pair
+  mkConfig = prefs:
+  # Map over the preferences attribute set, converting each key-value pair
     concatStrings (
       # `mapAttrsToList` applies a function to each key-value pair in the attribute set
       mapAttrsToList (name: value: ''
         # Format each preference as a `user_pref("key", value);` entry
         user_pref("${name}", ${userPrefValue value});
-      '') prefs
+      '')
+      prefs
     );
 
   # use extraConfig to load arkenfox user.js before settings
@@ -106,8 +107,7 @@ let
       ];
     }
   ];
-in
-{
+in {
   programs.firefox = {
     enable = true;
     policies = {
@@ -123,14 +123,14 @@ in
         };
       };
     };
-    nativeMessagingHosts = with pkgs; [ tridactyl-native ];
+    nativeMessagingHosts = with pkgs; [tridactyl-native];
     profiles = {
       private = {
         id = 0;
         search.default = "DuckDuckGo";
         search.force = true;
         extraConfig = sharedExtraConfig;
-        extensions = commonExtensions;
+        extensions.packages = commonExtensions;
         bookmarks = sharedBookmarks;
       };
       work = {
@@ -138,56 +138,52 @@ in
         search.default = "DuckDuckGo";
         search.force = true;
         extraConfig = sharedExtraConfig;
-        extensions = commonExtensions;
+        extensions.packages = commonExtensions;
         bookmarks = sharedBookmarks;
       };
     };
   };
 
-  home.packages =
-    let
-      makeFirefoxProfileBin =
-        args@{ profile, ... }:
-        let
-          name = "firefox-${profile}";
-          scriptBin = pkgs.writeScriptBin name ''
-            firefox -P "${profile}" --name="${name}" $@
-          '';
-          desktopFile = pkgs.makeDesktopItem (
-            (removeAttrs args [ "profile" ])
-            // {
-              inherit name;
-              exec = "${scriptBin}/bin/${name} %U";
-              extraConfig.StartupWMClass = name;
-              genericName = "Web Browser";
-              mimeTypes = [
-                "text/html"
-                "text/xml"
-                "application/xhtml+xml"
-                "application/vnd.mozilla.xul+xml"
-                "x-scheme-handler/http"
-                "x-scheme-handler/https"
-              ];
-              categories = [
-                "Network"
-                "WebBrowser"
-              ];
-            }
-          );
-        in
-        pkgs.runCommand name { } ''
-          mkdir -p $out/{bin,share}
-          cp -r ${scriptBin}/bin/${name} $out/bin/${name}
-          cp -r ${desktopFile}/share/applications $out/share/applications
-        '';
+  home.packages = let
+    makeFirefoxProfileBin = args @ {profile, ...}: let
+      name = "firefox-${profile}";
+      scriptBin = pkgs.writeScriptBin name ''
+        firefox -P "${profile}" --name="${name}" $@
+      '';
+      desktopFile = pkgs.makeDesktopItem (
+        (removeAttrs args ["profile"])
+        // {
+          inherit name;
+          exec = "${scriptBin}/bin/${name} %U";
+          extraConfig.StartupWMClass = name;
+          genericName = "Web Browser";
+          mimeTypes = [
+            "text/html"
+            "text/xml"
+            "application/xhtml+xml"
+            "application/vnd.mozilla.xul+xml"
+            "x-scheme-handler/http"
+            "x-scheme-handler/https"
+          ];
+          categories = [
+            "Network"
+            "WebBrowser"
+          ];
+        }
+      );
     in
-    [
-      (makeFirefoxProfileBin {
-        profile = "work";
-        desktopName = "Firefox (Work)";
-        icon = "firefox";
-      })
-    ];
+      pkgs.runCommand name {} ''
+        mkdir -p $out/{bin,share}
+        cp -r ${scriptBin}/bin/${name} $out/bin/${name}
+        cp -r ${desktopFile}/share/applications $out/share/applications
+      '';
+  in [
+    (makeFirefoxProfileBin {
+      profile = "work";
+      desktopName = "Firefox (Work)";
+      icon = "firefox";
+    })
+  ];
 
   xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
   xdg.configFile."tridactyl/themes/tridactyl-theme.css".source = ./tridactyl-theme.css;

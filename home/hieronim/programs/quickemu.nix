@@ -3,9 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-{
-
+}: {
   options = {
     quickemu = {
       enable = lib.mkEnableOption {
@@ -15,7 +13,7 @@
     };
   };
 
-  config = lib.mkIf (config.quickemu.enable) {
+  config = lib.mkIf config.quickemu.enable {
     home.packages = with pkgs; [
       quickemu
       # quickgui

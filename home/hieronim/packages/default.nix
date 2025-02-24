@@ -3,8 +3,7 @@
   self,
   inputs,
   ...
-}:
-{
+}: {
   home.packages = with pkgs; [
     self.packages.${pkgs.system}.lightctl
     self.packages.${pkgs.system}.networkctl
@@ -29,5 +28,9 @@
     zathura
     loupe
     spotify
+    teams-for-linux
+    proton-pass
+    protonmail-desktop
+    remmina
   ];
 }

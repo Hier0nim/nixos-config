@@ -1,7 +1,5 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   imports = [
-
     # TODO: add disco support
     # ./disk-configuration.nix
 
@@ -40,6 +38,7 @@
       enableUserService = true;
     };
   };
+
   # programs.rog-control-center = {
   #   enable = true;
   #   autoStart = true;
