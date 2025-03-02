@@ -3,9 +3,11 @@
   pkgs,
   lib,
   ...
-}: let
+}:
+let
   cfg = config.autoLogin;
-in {
+in
+{
   # Declare custom options for conditionally enabling auto login
   options.autoLogin = {
     enable = lib.mkEnableOption "Enable automatic login";
@@ -24,8 +26,15 @@ in {
       restart = true;
       settings = {
         default_session = {
-          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --asterisks --time --time-format '%I:%M %p | %a • %h | %F' --cmd Hyprland";
-          user = "ta";
+          command = lib.concatStringsSep " " [
+            (lib.getExe pkgs.greetd.tuigreet)
+            "--cmd '${lib.getExe config.programs.hyprland.package}'"
+            "--remember"
+            "--remember-session"
+            "--asterisks"
+            "--time"
+          ];
+          user = "greeter";
         };
 
         initial_session = lib.mkIf cfg.enable {

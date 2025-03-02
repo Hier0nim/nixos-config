@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   imports = [
     # TODO: add disco support
     # ./disk-configuration.nix
@@ -7,6 +8,7 @@
     ./power-management.nix
 
     ../users/hieronim
+    ../users/gaming
 
     ../common/optional/hardware/bluetooth.nix
     ../common/optional/input-devices/default.nix
@@ -63,11 +65,11 @@
     };
   };
 
-  # programs.rog-control-center = {
-  #   enable = true;
-  #   autoStart = true;
-  # };
+  programs.rog-control-center = {
+    enable = true;
+    autoStart = true;
+  };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "24.05";
+  system.stateVersion = "25.05";
 }
