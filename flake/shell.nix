@@ -1,29 +1,28 @@
 {
-  perSystem =
-    {
-      config,
-      pkgs,
-      ...
-    }:
-    {
-      devShells.default = pkgs.mkShell {
-        name = "yuki";
+  perSystem = {
+    config,
+    pkgs,
+    ...
+  }: {
+    devShells.default = pkgs.mkShell {
+      shellHook = ''
+        ${config.pre-commit.installationScript}
+      '';
 
-        shellHook = ''
-          ${config.pre-commit.installationScript}
-        '';
+      DIRENV_LOG_FORMAT = "";
 
-        DIRENV_LOG_FORMAT = "";
-
-        packages = with pkgs; [
-          alejandra
-          deadnix
-          git
-          nil
-          statix
-        ];
-      };
-
-      formatter = pkgs.alejandra;
+      packages = with pkgs; [
+        git
+        nil
+        statix
+        nix
+        home-manager
+        nh
+        git
+        deadnix
+      ];
     };
+
+    formatter = pkgs.nixfmt-rfc-style;
+  };
 }

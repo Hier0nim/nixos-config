@@ -1,5 +1,0 @@
-{
-  virtualisation.containers = {
-    enable = true;
-  };
-}

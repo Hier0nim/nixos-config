@@ -1,9 +1,8 @@
 {
   description = "NixOS and Home Manager Flake";
 
-  outputs =
-    inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       systems = import inputs.systems;
 
       imports = [
@@ -63,5 +62,7 @@
       url = "github:arkenfox/user.js";
       flake = false;
     };
+
+    stylix.url = "github:danth/stylix/release-24.11";
   };
 }
