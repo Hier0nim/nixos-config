@@ -173,7 +173,7 @@
               echo $"Parsed SSH agent environment: ($ssh_agent_env)"
 
               # Clean up old socket if necessary
-              if ($env.SSH_AUTH_SOCK | path exists) {
+              if ($env.SSH_AUTH_SOCK? | is-not-empty) {
                   echo "Removing stale socket file..."
                   rm $env.SSH_AUTH_SOCK
               }
