@@ -1,8 +1,9 @@
 {
   description = "NixOS and Home Manager Flake";
 
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+  outputs =
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
 
       imports = [
