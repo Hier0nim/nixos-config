@@ -25,6 +25,7 @@
       BROWSER = "firefox";
       SHELL = "nu";
       FLAKE = "$HOME/nixos-config";
+      USERNAME = "hieronim";
     };
 
     preferXdgDirectories = true; # whether to make programs use XDG directories whenever supported
