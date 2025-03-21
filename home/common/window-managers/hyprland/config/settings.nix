@@ -97,6 +97,7 @@
       };
 
       misc = {
+        vrr = 1;
         enable_swallow = true;
         force_default_wallpaper = 0;
         new_window_takes_over_fullscreen = 2;

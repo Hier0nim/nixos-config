@@ -9,7 +9,6 @@ in
         defaultApp =
           type: "${pkgs.gtk3}/bin/gtk-launch $(${pkgs.xdg-utils}/bin/xdg-mime query default ${type})";
         browser = defaultApp "x-scheme-handler/https";
-        editor = defaultApp "text/plain";
         fileManager = defaultApp "inode/directory";
       in
       [

@@ -25,6 +25,7 @@ in
             "docker"
             "git"
             "networkmanager"
+            "input"
           ])
         ];
         hashedPassword = "$y$j9T$A393jWCF3yvUwEwDdalP9/$9JAJVGgOujBcX/SMg8zRuuagNfWH9y6aochFeAsEOC1";

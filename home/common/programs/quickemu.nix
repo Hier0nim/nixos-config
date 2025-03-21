@@ -3,7 +3,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   options = {
     quickemu = {
       enable = lib.mkEnableOption {

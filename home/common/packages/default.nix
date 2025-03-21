@@ -3,7 +3,8 @@
   self,
   inputs,
   ...
-}: {
+}:
+{
   home.packages = with pkgs; [
     self.packages.${pkgs.system}.lightctl
     self.packages.${pkgs.system}.networkctl
@@ -32,5 +33,8 @@
     proton-pass
     protonmail-desktop
     remmina
+    qbittorrent
+    libreoffice
+    protonvpn-gui
   ];
 }

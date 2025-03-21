@@ -2,7 +2,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   # Augment the existing programs.wezterm
   config = {
     programs = {

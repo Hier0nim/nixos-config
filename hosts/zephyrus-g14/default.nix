@@ -20,8 +20,9 @@
     ../common/optional/services/gvfs.nix
     ../common/optional/services/greetd.nix
     ../common/optional/boot/plymouth.nix
+    ../common/optional/boot/usbcore.nix
     ../common/optional/desktop-environment/hyprland.nix
-    ../common/optional/gaming.nix
+    ../common/optional/gaming
     ../common/optional/fonts
   ];
 
