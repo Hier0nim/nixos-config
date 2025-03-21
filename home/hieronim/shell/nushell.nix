@@ -66,6 +66,7 @@
         DIRENV_LOG_FORMAT = ""; # make direnv quiet
         EDITOR = "${config.home.sessionVariables.EDITOR}";
         BROWSER = "${config.home.sessionVariables.BROWSER}";
+        USERNAME = "${config.home.sessionVariables.USERNAME}";
         SHELL = "${pkgs.nushell}/bin/nu";
       };
 
@@ -136,56 +137,37 @@
           	yazi ...$args --cwd-file $tmp
           	let cwd = (open $tmp)
           	if $cwd != "" and $cwd != $env.PWD {
-          		cd $cwd
+              cd $cwd
           	}
           	rm -fp $tmp
           }
 
           do --env {
-              let ssh_agent_file = (
-                  $nu.temp-path | path join $"ssh-agent-($env.USER?).nuon"
-              )
+            let ssh_agent_file = (
+              $nu.temp-path | path join $"ssh-agent-($env.USER? | default $env.USERNAME?).nuon"
+            )
 
-              if ($ssh_agent_file | path exists) {
-                  let ssh_agent_env = open ($ssh_agent_file)
-                  echo $"Loaded SSH agent environment from file: ($ssh_agent_env)"
-
-                  # Check if SSH agent process is running
-                  let is_running = (^ps -p $ssh_agent_env.SSH_AGENT_PID | lines | length) > 1
-                  if ($is_running) {
-                      load-env $ssh_agent_env
-                      echo "SSH agent is running. Environment variables loaded."
-                      ^ssh-add -q
-                      return
-                  } else {
-                      echo "SSH agent process not found. Removing stale file."
-                      rm $ssh_agent_file
-                  }
+            if ($ssh_agent_file | path exists) {
+              let ssh_agent_env = open ($ssh_agent_file)
+              if ($"/proc/($ssh_agent_env.SSH_AGENT_PID)" | path exists) {
+                load-env $ssh_agent_env
+                return
+              } else {
+                rm $ssh_agent_file
               }
+            }
 
-              let ssh_agent_env = ^ssh-agent -c
-                  | lines
-                  | first 2
-                  | parse "setenv {name} {value};"
-                  | transpose --header-row
-                  | into record
-
-              echo $"Parsed SSH agent environment: ($ssh_agent_env)"
-
-              # Clean up old socket if necessary
-              if ($env.SSH_AUTH_SOCK? | is-not-empty) {
-                  echo "Removing stale socket file..."
-                  rm $env.SSH_AUTH_SOCK
-              }
-
-              load-env $ssh_agent_env
-              $ssh_agent_env | save --force $ssh_agent_file
-              echo $"SSH agent environment saved to ($ssh_agent_file)."
-
-              ^ssh-add -q
+            let ssh_agent_env = ^ssh-agent -c
+              | lines
+              | first 2
+              | parse "setenv {name} {value};"
+              | transpose --header-row
+              | into record
+            load-env $ssh_agent_env
+            $ssh_agent_env | save --force $ssh_agent_file
           }
 
-          def start_zellij [] {
+          do --env {
             if 'ZELLIJ' not-in ($env | columns) {
               if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
                 ^zellij attach --create
@@ -199,7 +181,6 @@
             }
           }
 
-          start_zellij
           # source ~/.local/cache/zoxide/init.nu
         '';
     };

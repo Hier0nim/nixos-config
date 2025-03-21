@@ -25,6 +25,7 @@
     unzip
     zip
     wget
+    wl-clipboard
   ];
 
   home = {
@@ -37,6 +38,7 @@
       BROWSER = "firefox";
       SHELL = "nu";
       FLAKE = "$HOME/nixos-config";
+      USERNAME = "hieronim";
     };
   };
 }
