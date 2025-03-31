@@ -7,11 +7,11 @@
   imports = [
     inputs.catppuccin.homeManagerModules.catppuccin
 
-    ./programs/git.nix
-    ./programs/lazygit.nix
-    ./programs/fastfetch.nix
-    ./programs/ssh.nix
-    ./shell
+    ../common/programs/git.nix
+    ../common/programs/lazygit.nix
+    ../common/programs/fastfetch.nix
+    ../common/programs/ssh.nix
+    ../common/shell
   ];
   home.packages = with pkgs; [
     inputs.nixvim.packages.x86_64-linux.default
