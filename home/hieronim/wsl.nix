@@ -5,7 +5,7 @@
 }:
 {
   imports = [
-    inputs.catppuccin.homeManagerModules.catppuccin
+    inputs.catppuccin.homeModules.catppuccin
 
     ../common/programs/git.nix
     ../common/programs/lazygit.nix
