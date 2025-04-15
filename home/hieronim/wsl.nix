@@ -13,6 +13,7 @@
     ../common/programs/ssh.nix
     ../common/shell
   ];
+
   home.packages = with pkgs; [
     inputs.nixvim.packages.x86_64-linux.default
 
@@ -25,7 +26,7 @@
     unzip
     zip
     wget
-    wl-clipboard
+    xclip
   ];
 
   home = {
