@@ -9,7 +9,7 @@ in
     configuration{
       modi: "";
       show-icons: true;
-      terminal: "wezterm";
+      terminal: "ghostty";
       drun-display-format: "{icon} {name}";
       location: 0;
       disable-history: false;

@@ -2,7 +2,6 @@
   imports = [
     ./firefox
     ./intellij
-    ./wezterm
 
     ./fastfetch.nix
     ./git.nix
@@ -12,5 +11,6 @@
     ./obs-studio.nix
     ./ssh.nix
     ./vesktop.nix
+    ./ghostty.nix
   ];
 }

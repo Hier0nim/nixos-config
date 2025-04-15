@@ -17,6 +17,7 @@ c.scrollback_lines = 3000
 c.default_workspace = "main"
 c.status_update_interval = 2000
 c.front_end = "WebGpu"
+c.webgpu_power_preference = "LowPower"
 c.enable_wayland = true
 
 -- Appearance
@@ -26,23 +27,15 @@ c.colors = {
 	split = scheme.ansi[2],
 }
 c.inactive_pane_hsb = { brightness = 0.9 }
-c.window_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = 0 }
-c.window_decorations = "NONE"
+c.window_padding = { left = "0.2cell", right = "0.2cell", top = "0.2cell", bottom = 0 }
+c.window_decorations = "RESIZE"
 
 -- Bar settings
 c.show_new_tab_button_in_tab_bar = false
 c.hide_tab_bar_if_only_one_tab = true
 c.use_fancy_tab_bar = false
 
--- Font settings
-c.font = wez.font("JetBrains Mono", { weight = "Medium" })
-c.font_rules = {
-	{
-		italic = true,
-		intensity = "Half",
-		font = wez.font("JetBrains Mono", { weight = "Medium", italic = true }),
-	},
-}
+c.font = wez.font("JetBrainsMono Nerd Font Mono", { weight = "Medium", italic = false })
 c.font_size = 12
 
 -- Keybindings

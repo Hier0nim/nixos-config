@@ -60,7 +60,7 @@ in
         "SUPER_ALT, bracketright, movecurrentworkspacetomonitor, r"
 
         # Application Shortcuts
-        "SUPER, Return, exec, wezterm"
+        "SUPER, Return, exec, ghostty"
         "SUPER, B, exec, ${browser}"
         "SUPER, E, exec, ${fileManager}"
         # "SUPER, N, exec, ${fileManager}"

@@ -35,7 +35,7 @@
     stateVersion = "25.05";
     sessionVariables = {
       EDITOR = "nvim";
-      TERM = "wezterm";
+      TERM = "ghostty";
       BROWSER = "firefox";
       SHELL = "nu";
       FLAKE = "$HOME/nixos-config";

@@ -15,8 +15,8 @@
     };
 
     settings."org/cinnamon/desktop/applications/terminal" = {
-      exec = "wezterm start --cwd .";
-      exec-arg = "start -e ";
+      exec = "ghostty";
+      exec-arg = "--";
     };
   };
 }
