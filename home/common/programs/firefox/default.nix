@@ -77,34 +77,37 @@ let
   ];
 
   # use extraConfig to load arkenfox user.js before settings
-  sharedBookmarks = [
-    {
-      name = "Nix sites";
-      toolbar = true;
-      bookmarks = [
-        {
-          name = "homepage";
-          url = "https://nixos.org/";
-        }
-        {
-          name = "wiki";
-          tags = [
-            "wiki"
-            "nix"
-          ];
-          url = "https://wiki.nixos.org/";
-        }
-        {
-          name = "Nixpkgs";
-          url = "https://search.nixos.org/";
-        }
-        {
-          name = "Home-manager";
-          url = "https://home-manager-options.extranix.com/";
-        }
-      ];
-    }
-  ];
+  sharedBookmarks = {
+    force = true;
+    settings = [
+      {
+        name = "Nix sites";
+        toolbar = true;
+        bookmarks = [
+          {
+            name = "homepage";
+            url = "https://nixos.org/";
+          }
+          {
+            name = "wiki";
+            tags = [
+              "wiki"
+              "nix"
+            ];
+            url = "https://wiki.nixos.org/";
+          }
+          {
+            name = "Nixpkgs";
+            url = "https://search.nixos.org/";
+          }
+          {
+            name = "Home-manager";
+            url = "https://home-manager-options.extranix.com/";
+          }
+        ];
+      }
+    ];
+  };
 in
 {
   programs.firefox = {
@@ -126,7 +129,7 @@ in
     profiles = {
       private = {
         id = 0;
-        search.default = "DuckDuckGo";
+        search.default = "ddg";
         search.force = true;
         extraConfig = sharedExtraConfig;
         extensions.packages = commonExtensions;
@@ -134,7 +137,7 @@ in
       };
       work = {
         id = 1;
-        search.default = "DuckDuckGo";
+        search.default = "ddg";
         search.force = true;
         extraConfig = sharedExtraConfig;
         extensions.packages = commonExtensions;
