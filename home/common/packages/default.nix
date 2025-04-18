@@ -36,5 +36,6 @@
     qbittorrent
     libreoffice
     protonvpn-gui
+    nwg-displays
   ];
 }
