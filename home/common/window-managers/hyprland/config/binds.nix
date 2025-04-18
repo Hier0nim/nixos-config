@@ -75,6 +75,7 @@ in
         # Menus
         "SUPER, P, exec, ${rofiPowerMenuScript.outPath}"
         "SUPER, R, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
+        "SUPER, W, exec, ${pkgs.rofi-wayland}/bin/rofi -show window -show-icons"
         "SUPER, V, exec, cliphist list | rofi -dmenu -p 'Cliphist' -theme-str 'listview { fixed-height: true; }' | cliphist decode | wl-copy"
       ]
       ++ builtins.concatLists (
