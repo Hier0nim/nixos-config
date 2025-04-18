@@ -18,7 +18,7 @@
         audioPlayer = [ "io.bassi.Amberol" ];
         videoPlayer = [ "io.github.celluloid_player.Celluloid" ];
         webBrowser = [ "firefox" ];
-        documentViewer = [ "org.gnome.Evince.desktop" ];
+        documentViewer = [ "org.gnome.Evince" ];
 
         xdgAssociations =
           type: program: list:
