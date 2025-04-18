@@ -1,42 +1,47 @@
 {
   wayland.windowManager.hyprland.settings = {
     windowrulev2 = [
-      "dimaround, class:^(gcr-prompter)$"
-      "dimaround, class:^(polkit-gnome-authentication-agent-1)$"
-      "dimaround, class:^(xdg-desktop-portal-gtk)$"
+      # ─── TAG ASSIGNMENTS ────────────────────────────────────────────────────────
+      "tag +system,      class:^(gcr-prompter|polkit-gnome-authentication-agent-1|xdg-desktop-portal-gtk)$"
+      "tag +network,     class:^(blueman-manager|nm-applet|nm-connection-editor)$"
+      "tag +media,       class:^(com.saivert.pwvucontrol|io.bassi.Amberol|io.github.celluloid_player.Celluloid|mpv)$"
+      "tag +file-manager, class:^(nemo)$"
+      "tag +dialogs,     title:^(File Upload|Library|Open File|Open Folder|Save As|Select a File)(.*)$"
+      "tag +pip,         title:^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+      "tag +tools,       class:^(org.gnome.Calculator|org.gnome.Loupe)$"
+      "tag +settings,    class:^(nwg-displays)$"
 
-      "float, class:^(blueman-manager)$"
-      "float, class:^(com.saivert.pwvucontrol)$"
-      "float, class:^(io.bassi.Amberol)$"
-      "float, class:^(io.github.celluloid_player.Celluloid)$"
-      "float, class:^(mpv)$"
-      "float, class:^(nm-applet)$"
-      "float, class:^(nm-connection-editor)$"
-      "float, class:^(org.gnome.Calculator)$"
-      "float, class:^(org.gnome.Loupe)$"
-      "float, class:^(nemo)$"
-      "float, class:^(xdg-desktop-portal-gtk)$"
+      # ─── BEHAVIOR RULES (by tag) ────────────────────────────────────────────────
+      # dim the background for system‑level dialogs
+      "dimaround,           tag:system*"
+      # float all small utilities and pop‑ups
+      "float,               tag:network*"
+      "float,               tag:media*"
+      "float,               tag:file-manager*"
+      "float,               tag:dialogs*"
+      "float,               tag:pip*"
+      "float,               tag:settings*"
+      # keep PiP always on top
+      "pin,                 tag:pip*"
+      # float simple tools like calculators
+      "float,               tag:tools*"
 
-      "float, title:^(File Upload)(.*)$"
-      "float, title:^(Library)(.*)$"
-      "float, title:^(Open File)(.*)$"
-      "float, title:^(Open Folder)(.*)$"
-      "float, title:^(Save As)(.*)$"
-      "float, title:^(Select a File)(.*)$"
-
-      "float, title:^([Pp]icture[-\s]?[Ii]n[-\s]?[Pp]icture)(.*)$"
-      "pin, title:^([Pp]icture[-\s]?[Ii]n[-\s]?[Pp]icture)(.*)$"
-
+      # ─── IDLE‑INHIBIT RULES ─────────────────────────────────────────────────────
+      # prevent screen sleeping/locking when any app goes fullscreen
       "idleinhibit fullscreen, class:^(.*)$"
       "idleinhibit fullscreen, title:^(.*)$"
       "idleinhibit fullscreen, fullscreen:1"
 
+      # ─── SUPPRESSION RULES ──────────────────────────────────────────────────────
+      # ignore all client-initiated maximize requests
       "suppressevent maximize, class:.*"
     ];
 
     workspace = [
+      # ─── SMART‑GAPS: no gaps when exactly one tiled window is present
       "w[tv1], gapsout:0, gapsin:0"
-      "f[1], gapsout:0, gapsin:0"
+      # ─── SMART‑GAPS: no gaps when exactly one floating window is present
+      "f[1],   gapsout:0, gapsin:0"
     ];
   };
 }
