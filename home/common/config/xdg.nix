@@ -18,7 +18,7 @@
         audioPlayer = [ "io.bassi.Amberol" ];
         videoPlayer = [ "io.github.celluloid_player.Celluloid" ];
         webBrowser = [ "firefox" ];
-        documentViewer = [ "org.gnome.Evince" ];
+        documentViewer = [ "org.gnome.Papers" ];
 
         xdgAssociations =
           type: program: list:
@@ -67,7 +67,7 @@
         associations = builtins.mapAttrs (_: v: (map (e: "${e}.desktop") v)) (
           {
             "text/html" = webBrowser;
-            "text/plain" = [ "codium" ];
+            "text/plain" = [ "ghostty -e nvim" ];
             "inode/directory" = [ "nemo" ];
             "application/x-gnome-saved-search" = [ "nemo" ];
             "application/pdf" = documentViewer;

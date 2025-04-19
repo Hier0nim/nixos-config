@@ -25,7 +25,7 @@
     zip
     wget
     wl-clipboard
-    evince
+    papers
     zathura
     loupe
     spotify
