@@ -623,11 +623,11 @@
         "plugins-rzls-nvim": "plugins-rzls-nvim"
       },
       "locked": {
-        "lastModified": 1744717752,
-        "narHash": "sha256-PKHYsMk8DDYHu7rx1PdaybdbHE1J89UT3U+O6Ww31P8=",
+        "lastModified": 1745098693,
+        "narHash": "sha256-/keY2cv/zSG/RNbBAXLU7TbRcTtDQy+WeoJFtxBaldM=",
         "owner": "Hier0nim",
         "repo": "nvim",
-        "rev": "82088f3ce6e0e1375be39598565a8b56e9dff203",
+        "rev": "2992bb22fd99dc6e399238e9521007bb59e36d95",
         "type": "github"
       },
       "original": {
