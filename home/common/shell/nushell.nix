@@ -4,134 +4,143 @@
   config,
   ...
 }:
+
+let
+  git = lib.getExe pkgs.git;
+in
 {
   programs = {
+    # ───────── Direnv ─────────
     direnv = {
       enable = true;
       enableNushellIntegration = true;
       nix-direnv.enable = true;
     };
 
+    # # ───────── Zoxide ─────────
+    # zoxide = {
+    #   enable = true;
+    #   enableNushellIntegration = true;
+    #   options = [
+    #     "--cmd cd"
+    #   ];
+    # };
+
+    # ───────── Carapace (external completions) ─────────
+    # carapace = {
+    #   enable = true;
+    #   # enableNushellIntegration = true;
+    # };
+
+    # ───────── Nushell ─────────
     nushell = {
       enable = true;
-      shellAliases =
-        let
-          g = lib.getExe pkgs.git;
-          c = "cargo";
-        in
-        {
-          # Cargo
-          cb = "${c} build";
-          cc = "${c} check";
-          cn = "${c} new";
-          cr = "${c} run";
-          cs = "${c} search";
-          ct = "${c} test";
 
-          # Git
-          ga = "${g} add";
-          gc = "${g} commit";
-          gd = "${g} diff";
-          gl = "${g} log";
-          gs = "${g} status";
-          gp = "${g} push origin main";
+      ## 1. Core settings
+      settings = {
+        show_banner = false;
+        edit_mode = "vi";
 
-          # ETC.
-          c = "clear";
-          f = "${pkgs.yazi-unwrapped}/bin/yazi";
-          la = "ls -la";
-          ll = "ls -l";
-          n = "${pkgs.nitch}/bin/nitch";
-          nv = "nvim";
+        ls.clickable_links = true;
+        rm.always_trash = true;
 
-          # Nix
-          # ns = "sudo sh -c 'nixos-rebuild switch --flake ${settings.dotfilesDir}/.# |& ${pkgs.nix-output-monitor}/bin/nom'";
-          # hs = "home-manager switch --flake ${settings.dotfilesDir}";
-          nd = "nix develop -c $env.SHELL";
-          nlu = "nix flake lock --update-input";
-
-          # Modern unix
-          cat = "${pkgs.bat}/bin/bat";
-          df = "${pkgs.duf}/bin/duf";
-          find = "${pkgs.fd}/bin/fd";
-          grep = "${pkgs.ripgrep}/bin/rg";
-          tree = "${pkgs.eza}/bin/eza --git --icons --tree";
+        table = {
+          mode = "rounded";
+          index_mode = "always";
+          header_on_separator = false;
         };
 
+        cursor_shape = {
+          vi_insert = "line";
+          vi_normal = "block";
+        };
+
+        # completions.external = {
+        #   enable = true;
+        #   max_results = 200;
+        # };
+      };
+
+      ## 2. Aliases
+      shellAliases = {
+        # Cargo
+        cb = "cargo build";
+        cc = "cargo check";
+        cn = "cargo new";
+        cr = "cargo run";
+        cs = "cargo search";
+        ct = "cargo test";
+
+        # Git
+        ga = "${git} add";
+        gc = "${git} commit";
+        gd = "${git} diff";
+        gl = "${git} log";
+        gs = "${git} status";
+        gp = "${git} push origin main";
+
+        # Misc
+        c = "clear";
+        f = "${pkgs.yazi-unwrapped}/bin/yazi";
+        la = "ls -la";
+        ll = "ls -l";
+        n = "${pkgs.nitch}/bin/nitch";
+        nv = "nvim";
+
+        # Nix
+        nd = "nix develop -c $env.SHELL";
+        nlu = "nix flake lock --update-input";
+
+        # Modern-Unix goodies
+        cat = "${pkgs.bat}/bin/bat";
+        df = "${pkgs.duf}/bin/duf";
+        find = "${pkgs.fd}/bin/fd";
+        grep = "${pkgs.ripgrep}/bin/rg";
+        tree = "${pkgs.eza}/bin/eza --git --icons --tree";
+      };
+
+      ## 3. Simple env vars
       environmentVariables = {
         PROMPT_INDICATOR_VI_INSERT = "  ";
         PROMPT_INDICATOR_VI_NORMAL = "∙ ";
         PROMPT_COMMAND = "";
         PROMPT_COMMAND_RIGHT = "";
-        DIRENV_LOG_FORMAT = ""; # make direnv quiet
-        EDITOR = "${config.home.sessionVariables.EDITOR}";
-        BROWSER = "${config.home.sessionVariables.BROWSER}";
-        USERNAME = "${config.home.sessionVariables.USERNAME}";
+        DIRENV_LOG_FORMAT = "";
+        inherit (config.home.sessionVariables)
+          EDITOR
+          BROWSER
+          USERNAME
+          ;
         SHELL = "${pkgs.nushell}/bin/nu";
       };
 
-      # See the Nushell docs for more options.
+      ## 4. Everything else (functions, sources, login magic)
       extraConfig =
         let
-          conf = builtins.toJSON {
-            show_banner = false;
-            edit_mode = "vi";
-            ls.clickable_links = true;
-            rm.always_trash = true;
-
-            table = {
-              mode = "rounded";
-              index_mode = "always";
-              header_on_separator = false;
-            };
-
-            cursor_shape = {
-              vi_insert = "line";
-              vi_normal = "block";
-            };
-
-            menus = [
-              {
-                name = "completion_menu";
-                only_buffer_difference = false;
-                marker = "? ";
-                type = {
-                  layout = "columnar"; # list, description
-                  columns = 4;
-                  col_padding = 2;
-                };
-                style = {
-                  text = "magenta";
-                  selected_text = "blue_reverse";
-                  description_text = "yellow";
-                };
-              }
-            ];
-          };
-          completion = name: ''
-            source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/${name}/${name}-completions.nu
-          '';
-          completions =
-            names:
-            builtins.foldl' (prev: str: ''
-              ${prev}
-              ${str}'') "" (map completion names);
+          nuScripts = "${pkgs.nu_scripts}/share/nu_scripts/custom-completions";
+          src = name: "source ${nuScripts}/${name}/${name}-completions.nu";
+          sources = lib.concatStringsSep "\n" (
+            map src [
+              "git"
+              "nix"
+              "man"
+              "cargo"
+              "zellij"
+              "zoxide"
+            ]
+          );
         in
         #nu
         ''
-          $env.config = ${conf};
-          ${completions [
-            "git"
-            "nix"
-            "man"
-            "cargo"
-            "zellij"
-          ]}
+          # ── Extra completions from nu_scripts ──
+          ${sources}
 
+          # ---- Windows explorer helper (WSL) ----
           export def ii [ path ] {
             let _ = /mnt/c/Windows/explorer.exe (wslpath -w $"($path | path expand)")
           }
 
+          # ---- yazi + cwd transfer ----
           def --env ff [...args] {
           	let tmp = (mktemp -t "yazi-cwd.XXXXX")
           	yazi ...$args --cwd-file $tmp
@@ -142,6 +151,7 @@
           	rm -fp $tmp
           }
 
+          # ---- ssh-agent bootstrap ----
           do --env {
             let ssh_agent_file = (
               $nu.temp-path | path join $"ssh-agent-($env.USER? | default $env.USERNAME?).nuon"
@@ -167,6 +177,7 @@
             $ssh_agent_env | save --force $ssh_agent_file
           }
 
+          # ---- zellij autostart ----
           do --env {
             if 'ZELLIJ' not-in ($env | columns) {
               if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
@@ -181,7 +192,8 @@
             }
           }
 
-          # source ~/.local/cache/zoxide/init.nu
+          # # ── zoxide init ──
+          # source $"($nu.home-path)/.local/cache/zoxide/init.nu"
         '';
     };
   };

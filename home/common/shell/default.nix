@@ -9,6 +9,5 @@
     ./nushell.nix
     ./starship.nix
     ./yazi.nix
-    ./zoxide.nix
   ];
 }
