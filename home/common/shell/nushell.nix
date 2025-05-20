@@ -177,20 +177,20 @@ in
             $ssh_agent_env | save --force $ssh_agent_file
           }
 
-          # ---- zellij autostart ----
-          do --env {
-            if 'ZELLIJ' not-in ($env | columns) {
-              if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
-                ^zellij attach --create
-              } else {
-                zellij -l welcome
-              }
-
-              if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
-                exit
-              }
-            }
-          }
+          # # ---- zellij autostart ----
+          # do --env {
+          #   if 'ZELLIJ' not-in ($env | columns) {
+          #     if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+          #       ^zellij attach --create
+          #     } else {
+          #       zellij -l welcome
+          #     }
+          #
+          #     if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+          #       exit
+          #     }
+          #   }
+          # }
 
           # # ── zoxide init ──
           # source $"($nu.home-path)/.local/cache/zoxide/init.nu"

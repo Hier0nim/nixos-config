@@ -61,6 +61,7 @@ in
 
         # Application Shortcuts
         "SUPER, Return, exec, ghostty"
+        "SUPER Shift, Return, exec, ghostty -e 'zellij -l welcome'"
         "SUPER, B, exec, ${browser}"
         "SUPER, E, exec, ${fileManager}"
         # "SUPER, N, exec, ${fileManager}"
