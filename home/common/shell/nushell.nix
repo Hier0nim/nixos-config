@@ -112,6 +112,7 @@ in
           USERNAME
           ;
         SHELL = "${pkgs.nushell}/bin/nu";
+        ZELLIJ_AUTO_START = lib.mkDefault false;
       };
 
       ## 4. Everything else (functions, sources, login magic)
@@ -177,20 +178,22 @@ in
             $ssh_agent_env | save --force $ssh_agent_file
           }
 
-          # # ---- zellij autostart ----
-          # do --env {
-          #   if 'ZELLIJ' not-in ($env | columns) {
-          #     if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
-          #       ^zellij attach --create
-          #     } else {
-          #       zellij -l welcome
-          #     }
-          #
-          #     if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
-          #       exit
-          #     }
-          #   }
-          # }
+          # ---- zellij autostart ----
+          if ($env.ZELLIJ_AUTO_START == true) {
+            do --env {
+              if 'ZELLIJ' not-in ($env | columns) {
+                if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+                  ^zellij attach --create
+                } else {
+                  zellij -l welcome
+                }
+
+                if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+                  exit
+                }
+              }
+            }
+          }
 
           # # ── zoxide init ──
           # source $"($nu.home-path)/.local/cache/zoxide/init.nu"

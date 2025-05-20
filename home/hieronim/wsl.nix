@@ -29,6 +29,8 @@
     xclip
   ];
 
+  programs.nushell.environmentVariables.ZELLIJ_AUTO_START = true;
+
   home = {
     username = "hieronim";
     homeDirectory = "/home/hieronim";
