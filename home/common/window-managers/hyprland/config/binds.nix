@@ -52,12 +52,12 @@ in
         "SUPER, bracketright, workspace, m+1"
 
         # Cycle monitors
-        "SUPER_SHIFT, bracketleft, focusmonitor, l"
-        "SUPER_SHIFT, bracketright, focusmonitor, r"
+        "SUPER_SHIFT, bracketleft, focusmonitor, -1"
+        "SUPER_SHIFT, bracketright, focusmonitor, +1"
 
         # Send focused workspace to left/right monitors
-        "SUPER_ALT, bracketleft, movecurrentworkspacetomonitor, l"
-        "SUPER_ALT, bracketright, movecurrentworkspacetomonitor, r"
+        "SUPER_ALT, bracketleft, movecurrentworkspacetomonitor, -1"
+        "SUPER_ALT, bracketright, movecurrentworkspacetomonitor, +1"
 
         # Application Shortcuts
         "SUPER, Return, exec, ghostty"

@@ -78,12 +78,4 @@
 
     wallpaper = ../common/wallpapers/flamingo.png;
   };
-
-  wayland.windowManager.hyprland.settings = {
-    monitor = [
-      # name, resolution@refresh-rate, position, scale
-      "eDP-1, 2560x1600@165.00Hz, auto, 1.333333"
-      ",preferred, auto, auto"
-    ];
-  };
 }

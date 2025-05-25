@@ -67,12 +67,4 @@
 
     wallpaper = ../common/wallpapers/bkg1.png;
   };
-
-  wayland.windowManager.hyprland.settings = {
-    monitor = [
-      # name, resolution@refresh-rate, position, scale
-      "eDP-1, 2560x1600@60.00Hz, auto, 1.333333"
-      ",preferred, auto, auto"
-    ];
-  };
 }
