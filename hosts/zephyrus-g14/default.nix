@@ -19,6 +19,8 @@
     ../common/optional/services/gnome-keyring.nix
     ../common/optional/services/gvfs.nix
     ../common/optional/services/greetd.nix
+    ../common/optional/services/printing.nix
+    ../common/optional/services/logind.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
     ../common/optional/desktop-environment/hyprland.nix
