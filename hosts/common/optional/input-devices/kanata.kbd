@@ -1,4 +1,6 @@
-(defcfg process-unmapped-keys yes
+(defcfg
+  process-unmapped-keys yes
+  windows-altgr add-lctl-release
 )
 (defsrc
   esc  1    2    3    4    5    6    7    8    9    0    -    =
@@ -23,11 +25,16 @@
     n m , . /
     spc
   )
+  right-hand-keys-no-space (
+    y u i o p
+    h j k l ;
+    n m , . /
+  )
 )
 (deflayer base
   esc  1    2    3    4    5    6    7    8    9    0    -    =
   tab  q    w    e    r    t    y    u    i    o    p    [
-  lctl @a   @s   @d   @f   g    h    @j   @k   @l   @;   '
+  esc  @a   @s   @d   @f   g    h    @j   @k   @l   @;   '
   lsft z    @x   c    v    b    @n   @m   @,   @.   /    rsft
   lctl lmet lalt           @spc                rmet cmp  rctl
 
@@ -36,7 +43,7 @@
 (deflayer nomods
   esc  1    2    3    4    5    6    7    8    9    0    -    =
   tab  q    w    e    r    t    y    u    i    o    p    [
-  caps a    s    d    f    g    h    j    k    l    ;    '
+  esc  a    s    d    f    g    h    j    k    l    ;    '
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
   lctl lmet lalt           spc                 rmet cmp  rctl
 )
@@ -60,9 +67,9 @@
   l     (tap-hold-release-keys $tap-time $hold-time (multi l @tap) lalt $right-hand-keys)
   ;     (tap-hold-release-keys $tap-time $hold-time (multi ; @tap) rmet $right-hand-keys)
   spc   (tap-hold-press $tap-time $hold-time (multi spc @tap) (layer-while-held space_layer))
-  n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held sym_layer) $right-hand-keys)
-  m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held num_layer) $right-hand-keys)
-  ,     (tap-hold-release-keys $tap-time $hold-time (multi , @tap) (layer-while-held fun_layer) $right-hand-keys)
+  n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held sym_layer) $right-hand-keys-no-space)
+  m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held num_layer) $right-hand-keys-no-space)
+  ,     (tap-hold-release-keys $tap-time $hold-time (multi , @tap) (layer-while-held fun_layer) $right-hand-keys-no-space)
 )
 
 (deflayer space_layer
