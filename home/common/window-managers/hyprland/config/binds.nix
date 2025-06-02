@@ -44,8 +44,8 @@ in
         "ALT, Tab, bringactivetotop"
 
         # Special workspaces
-        "SUPER, grave, togglespecialworkspace, magic"
-        "SUPER_SHIFT, grave, movetoworkspace, special:magic"
+        "SUPER, Escape, togglespecialworkspace, magic"
+        "SUPER_SHIFT, Escape, movetoworkspace, special:magic"
 
         # Cycle workspaces
         "SUPER, bracketleft, workspace, m-1"
