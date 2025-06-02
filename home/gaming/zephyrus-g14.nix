@@ -9,11 +9,9 @@
     inputs.catppuccin.homeModules.catppuccin
 
     ../common/programs
-    ../common/config
     ../common/packages
-    ../common/services
     ../common/shell
-    ../common/window-managers/hyprland
+    ../common/window-managers/cosmic
   ];
 
   home = {

@@ -5,7 +5,7 @@
     # ./disk-configuration.nix
 
     ./hardware-configuration.nix
-    ./power-management.nix
+    # ./power-management.nix
 
     ../users/hieronim
     ../users/gaming
@@ -15,15 +15,15 @@
     ../common/optional/programs/neovim.nix
     ../common/optional/services/openssh.nix
     ../common/optional/services/openvpn3.nix
-    ../common/optional/services/dbus.nix
-    ../common/optional/services/gnome-keyring.nix
-    ../common/optional/services/gvfs.nix
-    ../common/optional/services/greetd.nix
+    # ../common/optional/services/dbus.nix
+    # ../common/optional/services/gnome-keyring.nix
+    # ../common/optional/services/gvfs.nix
+    # ../common/optional/services/greetd.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/logind.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
-    ../common/optional/desktop-environment/hyprland.nix
+    ../common/optional/desktop-environment/cosmic.nix
     ../common/optional/gaming
     ../common/optional/fonts
   ];
@@ -54,10 +54,10 @@
     tmp.cleanOnBoot = true;
   };
 
-  services = {
-    fwupd.enable = true;
-    hardware.bolt.enable = true;
-  };
+  # services = {
+  #   fwupd.enable = true;
+  #   hardware.bolt.enable = true;
+  # };
 
   # Asus specific services
   services.supergfxd.enable = true;

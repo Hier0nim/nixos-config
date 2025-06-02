@@ -64,6 +64,8 @@ in
             ;
         }
       )
+
+      inputs.cosmic-manager.homeManagerModules.cosmic-manager
     ];
   };
 }

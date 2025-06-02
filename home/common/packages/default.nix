@@ -37,5 +37,7 @@
     libreoffice
     protonvpn-gui
     nwg-displays
+    devenv
+    brightnessctl
   ];
 }

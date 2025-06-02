@@ -64,6 +64,14 @@
       flake = false;
     };
 
+    cosmic-manager = {
+      url = "github:HeitorAugustoLN/cosmic-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
+
     stylix.url = "github:danth/stylix/release-24.11";
   };
 }

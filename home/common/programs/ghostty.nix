@@ -8,6 +8,7 @@
       font-size = 12;
       theme = "catppuccin-mocha";
       resize-overlay = "never";
+      window-decoration = "none";
     };
   };
 }
