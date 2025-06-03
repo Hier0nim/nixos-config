@@ -1,6 +1,11 @@
 _: {
   environment = {
-    sessionVariables.COSMIC_DATA_CONTROL_ENABLED = 1;
+    sessionVariables = {
+      # to make Clipboard Manager work
+      COSMIC_DATA_CONTROL_ENABLED = 1;
+      # enable Ozone Wayland support in Chromium and Electron
+      NIXOS_OZONE_WL = "1";
+    };
 
     # cosmic.excludePackages = with pkgs; [
     #   cosmic-edit

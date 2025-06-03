@@ -6,7 +6,7 @@
     settings = {
       font-family = "JetBrainsMono Nerd Font Mono";
       font-size = 12;
-      theme = "catppuccin-mocha";
+      theme = "Kanagawa Wave";
       resize-overlay = "never";
       window-decoration = "none";
     };

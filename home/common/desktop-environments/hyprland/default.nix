@@ -14,6 +14,7 @@
     ./services/polkit-agent.nix
     ./services/rog-control-center.nix
     ./services/battery-low.nix
+    ./services/kanshi.nix
   ];
 
   wayland.windowManager.hyprland = {
