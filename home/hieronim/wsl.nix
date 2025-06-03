@@ -27,6 +27,11 @@
     zip
     wget
     xclip
+    dos2unix
+    devenv
+
+    # webkit debugging
+    epiphany
   ];
 
   programs.nushell.environmentVariables.ZELLIJ_AUTO_START = true;

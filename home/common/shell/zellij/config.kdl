@@ -258,12 +258,25 @@ load_plugins {
     black "#181825" // Mantle
     white "#cdd6f4" // Text
   }
+  kanagawa {
+    bg "#DCD7BA"
+    fg "#1F1F28"
+    white "#090618"
+    black "#dcd6ba"
+    red "#e82424"
+    green "#98bb6c"
+    yellow "#e6c384"
+    blue "#7fb4ca"
+    magenta "#938aa9"
+    cyan "#7aa89f"
+    orange "#FFA066"
+  }
 }
 
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-theme "catppuccin-mocha"
+theme "kanagawa"
 
 // Choose the base input mode of zellij.
 // Default: normal
