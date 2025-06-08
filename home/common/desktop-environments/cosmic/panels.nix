@@ -31,7 +31,7 @@ in
         ]
       );
 
-      size = mkRON "enum" "S";
+      size = mkRON "enum" "XS";
     }
   ];
 }

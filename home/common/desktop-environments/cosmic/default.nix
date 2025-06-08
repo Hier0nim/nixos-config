@@ -8,6 +8,7 @@
     ./compositor.nix
     ./panels.nix
     ./shortcuts.nix
+    ./input.nix
     ./theme
   ];
 
@@ -18,5 +19,6 @@
 
   home.packages = with pkgs; [
     brightnessctl
+    wl-clipboard
   ];
 }

@@ -10,6 +10,7 @@ in
     autotile_behavior = mkRON "enum" "PerWorkspace";
     descale_xwayland = false;
     focus_follows_cursor = true;
+    focus_follows_cursor_delay = 0;
 
     input_default = {
       acceleration = mkRON "optional" {
