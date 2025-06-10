@@ -1,4 +1,5 @@
-_: {
+{ pkgs, ... }:
+{
   environment = {
     sessionVariables = {
       # to make Clipboard Manager work
@@ -7,12 +8,11 @@ _: {
       NIXOS_OZONE_WL = "1";
     };
 
-    # cosmic.excludePackages = with pkgs; [
-    #   cosmic-edit
-    #   cosmic-player
-    #   cosmic-store
-    #   cosmic-term
-    # ];
+    cosmic.excludePackages = with pkgs; [
+      cosmic-edit
+      cosmic-store
+      cosmic-term
+    ];
   };
 
   services = {
