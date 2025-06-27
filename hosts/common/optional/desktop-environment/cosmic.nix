@@ -9,7 +9,7 @@
     };
 
     cosmic.excludePackages = with pkgs; [
-      cosmic-edit
+      # cosmic-edit
       cosmic-store
       cosmic-term
     ];
@@ -18,5 +18,20 @@
   services = {
     desktopManager.cosmic.enable = true;
     displayManager.cosmic-greeter.enable = true;
+  };
+
+  security.pam.services = {
+    cosmic-greeter.enableGnomeKeyring = true;
+  };
+  programs.seahorse.enable = true;
+
+  networking.firewall = rec {
+    allowedTCPPortRanges = [
+      {
+        from = 1714;
+        to = 1764;
+      }
+    ];
+    allowedUDPPortRanges = allowedTCPPortRanges;
   };
 }
