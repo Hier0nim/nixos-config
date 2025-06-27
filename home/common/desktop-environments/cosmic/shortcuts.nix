@@ -12,4 +12,16 @@ in
       }
     ]
   );
+
+  wayland.desktopManager.cosmic.shortcuts = [
+    {
+      action = cosmicLib.cosmic.mkRON "enum" {
+        value = [
+          (cosmicLib.cosmic.mkRON "enum" "Screenshot")
+        ];
+        variant = "System";
+      };
+      key = "Super+Shift+S";
+    }
+  ];
 }

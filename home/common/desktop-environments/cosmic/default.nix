@@ -14,11 +14,12 @@
 
   wayland.desktopManager.cosmic = {
     enable = true;
-    resetFiles = false;
+    resetFiles = true;
   };
 
   home.packages = with pkgs; [
     brightnessctl
     wl-clipboard
+    valent
   ];
 }

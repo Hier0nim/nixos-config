@@ -54,8 +54,10 @@ in
 
         # Always quote the path string:
         source = mkRON "enum" {
-          value = [ "../../wallpapers/bkg1.png" ];
           variant = "Path";
+          value = [
+            "${config.home.homeDirectory}/nixos-config/home/common/desktop-environments/wallpapers/ghibli.jpg"
+          ];
         };
       }
     ];
