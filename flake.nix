@@ -73,5 +73,7 @@
     };
 
     stylix.url = "github:danth/stylix/release-24.11";
+
+    nixpkgs-howdy.url = "github:fufexan/nixpkgs/howdy";
   };
 }
