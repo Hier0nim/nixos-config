@@ -72,8 +72,18 @@
       };
     };
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
+
     stylix.url = "github:danth/stylix/release-24.11";
 
     nixpkgs-howdy.url = "github:fufexan/nixpkgs/howdy";
+
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
   };
 }
