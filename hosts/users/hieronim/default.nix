@@ -26,6 +26,7 @@ in
             "git"
             "networkmanager"
             "input"
+            "dialout" # Allow access to serial device (for Arduino dev)
           ])
         ];
         hashedPassword = "$y$j9T$A393jWCF3yvUwEwDdalP9/$9JAJVGgOujBcX/SMg8zRuuagNfWH9y6aochFeAsEOC1";
