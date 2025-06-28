@@ -10,7 +10,7 @@
     ../common/programs
     ../common/packages/media.nix
     ../common/shell
-    ../common/desktop-environments/cosmic
+    ../common/desktop-environments/kde
   ];
 
   home = {

@@ -1,10 +1,11 @@
-{ pkgs, ... }:
+{ ... }:
 {
   imports = [
     # TODO: add disco support
     # ./disk-configuration.nix
 
     ./hardware-configuration.nix
+    ./asus-kernel.nix
     # ./power-management.nix
 
     ../users/hieronim
@@ -16,19 +17,19 @@
     ../common/optional/services/openssh.nix
     ../common/optional/services/openvpn3.nix
     # ../common/optional/services/dbus.nix
-    # ../common/optional/services/gnome-keyring.nix
     # ../common/optional/services/gvfs.nix
     # ../common/optional/services/greetd.nix
+    # ../common/optional/services/gnome-keyring.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/logind.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
-    ../common/optional/desktop-environment/cosmic.nix
+    ../common/optional/desktop-environment/kde.nix
     ../common/optional/gaming
     ../common/optional/fonts
   ];
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
 
   boot = {
     initrd = {
@@ -52,25 +53,6 @@
     };
 
     tmp.cleanOnBoot = true;
-  };
-
-  # services = {
-  #   fwupd.enable = true;
-  #   hardware.bolt.enable = true;
-  # };
-
-  # Asus specific services
-  services.supergfxd.enable = true;
-  services = {
-    asusd = {
-      enable = true;
-      enableUserService = true;
-    };
-  };
-
-  programs.rog-control-center = {
-    enable = true;
-    autoStart = true;
   };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion

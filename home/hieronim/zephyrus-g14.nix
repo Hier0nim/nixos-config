@@ -12,7 +12,7 @@
     ../common/packages/dev.nix
     ../common/packages/media.nix
     ../common/shell
-    ../common/desktop-environments/cosmic
+    ../common/desktop-environments/kde
     ../common/config/cursor.nix
   ];
 

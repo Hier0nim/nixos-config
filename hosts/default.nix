@@ -15,6 +15,7 @@
       nixosModules = [
         inputs.disko.nixosModules.default
         inputs.home-manager.nixosModules.default
+        inputs.chaotic.nixosModules.default
       ];
 
       # Common configuration shared across all systems
