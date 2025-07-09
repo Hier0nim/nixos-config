@@ -1,8 +1,5 @@
-{pkgs, ...}: {
-  environment.systemPackages = with pkgs; [
-    bluez
-    bluez-tools
-  ];
+{ pkgs, ... }:
+{
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = false;
@@ -13,9 +10,5 @@
         FastConnectable = true;
       };
     };
-  };
-
-  services.blueman = {
-    enable = true;
   };
 }
