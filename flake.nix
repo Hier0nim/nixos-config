@@ -1,17 +1,6 @@
 {
   description = "NixOS and Home Manager Flake";
 
-  outputs =
-    inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
-
-      imports = [
-        ./flake
-        ./hosts
-      ];
-    };
-
   inputs = {
     systems.url = "github:nix-systems/default-linux";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -86,4 +75,52 @@
 
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
   };
+
+  outputs =
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+
+      systems = import inputs.systems;
+
+      imports = [
+        inputs.pre-commit-hooks.flakeModule
+        ./hosts
+      ];
+
+      perSystem =
+        { pkgs, config, ... }:
+        {
+
+          pre-commit = {
+            check.enable = true;
+            settings = {
+              excludes = [ "flake.lock" ];
+              hooks = {
+                nixfmt-rfc-style.enable = true;
+                deadnix.enable = true;
+                nil.enable = true;
+                statix.enable = true;
+              };
+            };
+          };
+
+          devShells.default = pkgs.mkShell {
+            shellHook = ''
+              ${config.pre-commit.installationScript}
+            '';
+            DIRENV_LOG_FORMAT = "";
+            packages = with pkgs; [
+              git
+              nil
+              statix
+              nix
+              home-manager
+              nh
+              deadnix
+            ];
+          };
+
+          formatter = pkgs.nixfmt-rfc-style;
+        };
+    };
 }
