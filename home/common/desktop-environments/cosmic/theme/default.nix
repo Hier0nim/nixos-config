@@ -56,7 +56,7 @@ in
         source = mkRON "enum" {
           variant = "Path";
           value = [
-            "${config.home.homeDirectory}/nixos-config/home/common/desktop-environments/wallpapers/ghibli.jpg"
+            "${config.home.homeDirectory}/Projects/nixos-config/home/common/desktop-environments/wallpapers/ghibli.jpg"
           ];
         };
       }
