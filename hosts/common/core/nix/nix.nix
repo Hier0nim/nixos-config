@@ -49,6 +49,6 @@
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 20d --keep 20";
-    flake = "/home/hieronim/nixos-config";
+    flake = "/home/hieronim/Projects/nixos-config";
   };
 }
