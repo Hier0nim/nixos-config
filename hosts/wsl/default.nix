@@ -20,6 +20,8 @@
     useWindowsDriver = true;
     wslConf.automount.options = "metadata,uid=1000,gid=1000";
   };
+  services.openssh.ports = [ 443 ];
+
   programs.xwayland.enable = true;
   programs.dconf.enable = true;
 
