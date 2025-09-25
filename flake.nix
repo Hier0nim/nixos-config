@@ -1,56 +1,110 @@
 {
   description = "NixOS and Home Manager Flake";
 
+  outputs =
+    {
+      self,
+      nixpkgs,
+      ...
+    }@inputs:
+    let
+      inherit (self) outputs;
+
+      forAllSystems = nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+      ];
+
+      # ========== Extend lib with lib.custom ==========
+      # NOTE: This approach allows lib.custom to propagate into hm
+      # see: https://github.com/nix-community/home-manager/pull/3454
+      lib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
+
+    in
+    {
+      # ========= Host Configurations =========
+      nixosConfigurations = builtins.listToAttrs (
+        map (host: {
+          name = host;
+          value = nixpkgs.lib.nixosSystem {
+            specialArgs = {
+              inherit inputs outputs lib;
+            };
+            modules = [
+              inputs.determinate.nixosModules.default
+              inputs.disko.nixosModules.default
+              inputs.home-manager.nixosModules.default
+              inputs.nixpkgs-cosmic-unstable.nixosModules.default
+
+              ./hosts/${host}
+            ];
+          };
+        }) (builtins.attrNames (builtins.readDir ./hosts))
+      );
+
+      # ========= Formatting =========
+      # Nix formatter available through 'nix fmt' https://github.com/NixOS/nixfmt
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+
+      # Pre-commit checks
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        import ./checks.nix { inherit inputs system pkgs; }
+      );
+
+      # ========= DevShell =========
+      # Custom shell for bootstrapping on new hosts, modifying nix-config, and secrets management
+      devShells = forAllSystems (
+        system:
+        import ./shell.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+          checks = self.checks.${system};
+        }
+      );
+    };
+
   inputs = {
-    systems.url = "github:nix-systems/default-linux";
+    # ========= Official NixOS, and HM Package Sources =========
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
 
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-
+    nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    pre-commit-hooks = {
-      url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-
-    wezterm.url = "github:wez/wezterm/main?dir=nix";
-
-    catppuccin.url = "github:catppuccin/nix";
-
-    nixvim.url = "github:Hier0nim/nvim";
 
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nbfc-linux = {
-      url = "github:nbfc-linux/nbfc-linux";
+    nixpkgs-cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
+
+    # ========= Utilities =========
+    # Declarative partitioning and formatting
+    disko = {
+      url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    firefox-addons = {
-      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+    # Secrets management.
+    sops-nix = {
+      url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    arkenfox-userjs = {
-      url = "github:arkenfox/user.js";
-      flake = false;
+    # Declarative vms using libvirt
+    nixvirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Pre-commit
+    pre-commit-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     cosmic-manager = {
@@ -61,66 +115,24 @@
       };
     };
 
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        home-manager.follows = "home-manager";
-      };
+    # Addons for firefox
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    stylix.url = "github:danth/stylix/release-24.11";
+    # Hardened firefox
+    arkenfox-userjs = {
+      url = "github:arkenfox/user.js";
+      flake = false;
+    };
 
-    nixpkgs-howdy.url = "github:fufexan/nixpkgs/howdy";
-
+    # CachyOS kernel with asus patches
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-  };
 
-  outputs =
-    inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-
-      systems = import inputs.systems;
-
-      imports = [
-        inputs.pre-commit-hooks.flakeModule
-        ./hosts
-      ];
-
-      perSystem =
-        { pkgs, config, ... }:
-        {
-
-          pre-commit = {
-            check.enable = true;
-            settings = {
-              excludes = [ "flake.lock" ];
-              hooks = {
-                nixfmt-rfc-style.enable = true;
-                deadnix.enable = true;
-                nil.enable = true;
-                statix.enable = true;
-              };
-            };
-          };
-
-          devShells.default = pkgs.mkShell {
-            shellHook = ''
-              ${config.pre-commit.installationScript}
-            '';
-            DIRENV_LOG_FORMAT = "";
-            packages = with pkgs; [
-              git
-              nil
-              statix
-              nix
-              home-manager
-              nh
-              deadnix
-            ];
-          };
-
-          formatter = pkgs.nixfmt-rfc-style;
-        };
+    nixCats = {
+      url = "github:Hier0nim/nvim";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+  };
 }

@@ -9,7 +9,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    (catppuccin-papirus-folders.override { inherit (config.catppuccin) flavor accent; })
     inter
     nerd-fonts.iosevka
     nerd-fonts.jetbrains-mono

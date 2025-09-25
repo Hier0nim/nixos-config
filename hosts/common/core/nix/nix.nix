@@ -7,14 +7,8 @@
 }:
 {
   nix = {
-    package = pkgs.lix;
-
-    # Pin the registry to avoid downloading and evaling a new nixpkgs version every time
-    registry =
-      let
-        flakeInputs = lib.filterAttrs (_: v: lib.isType "flake" v) inputs;
-      in
-      lib.mapAttrs (_: v: { flake = v; }) flakeInputs;
+    # This will add each flake input as a registry
+    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
 
     # This will add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
@@ -28,6 +22,7 @@
       max-free = 1000000000; # 1GB
 
       trusted-users = [ "@wheel" ];
+
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
       warn-dirty = false;
@@ -39,6 +34,15 @@
         "flakes"
       ];
     };
+  };
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+
+    overlays = [
+    ];
   };
 
   # We need git for flakes

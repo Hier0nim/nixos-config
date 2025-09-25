@@ -1,5 +1,5 @@
 {
-  services.logind = {
+  services.logind.settings.Login = {
     # On battery: suspend
     lidSwitch = "suspend";
 

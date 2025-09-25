@@ -5,9 +5,6 @@
 " as an enforced single point of truth for Tridactyl's configuration.
 sanitize tridactyllocal tridactylsync
 
-" Add my custom tridactyl theme
-colourscheme tridactyl-theme
-
 " Set newtab to ddg start page
 " set newtab https://start.duckduckgo.com/
 set newtab about:blank

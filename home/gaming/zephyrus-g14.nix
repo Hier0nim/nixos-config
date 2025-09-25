@@ -1,16 +1,14 @@
 {
-  inputs,
   pkgs,
   ...
 }:
 {
   imports = [
-    inputs.catppuccin.homeModules.catppuccin
-
     ../common/programs
     ../common/packages/media.nix
     ../common/shell
-    ../common/desktop-environments/kde
+    ../common/desktop-environments/cosmic
+    ../common/services/suspend.nix
   ];
 
   home = {

@@ -118,9 +118,9 @@ in
       # Valid strings for installation_mode are "allowed", "blocked",
       # "force_installed" and "normal_installed".
       ExtensionSettings = {
-        # Catppuccin mocha
-        "{8446b178-c865-4f5c-8ccc-1d7887811ae3}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/3990315/catppuccin_mocha_lavender_git-latest.xpi";
+        # Kanagawa
+        "{26690e10-862d-456f-8bf2-50117a3cb206}" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4453995/kanagawa_theme-latest.xpi";
           installation_mode = "force_installed";
         };
       };
@@ -135,62 +135,8 @@ in
         extensions.packages = commonExtensions;
         bookmarks = sharedBookmarks;
       };
-      work = {
-        id = 1;
-        search.default = "ddg";
-        search.force = true;
-        extraConfig = sharedExtraConfig;
-        extensions.packages = commonExtensions;
-        bookmarks = sharedBookmarks;
-      };
     };
   };
 
-  home.packages =
-    let
-      makeFirefoxProfileBin =
-        args@{ profile, ... }:
-        let
-          name = "firefox-${profile}";
-          scriptBin = pkgs.writeScriptBin name ''
-            firefox -P "${profile}" --name="${name}" $@
-          '';
-          desktopFile = pkgs.makeDesktopItem (
-            (removeAttrs args [ "profile" ])
-            // {
-              inherit name;
-              exec = "${scriptBin}/bin/${name} %U";
-              extraConfig.StartupWMClass = name;
-              genericName = "Web Browser";
-              mimeTypes = [
-                "text/html"
-                "text/xml"
-                "application/xhtml+xml"
-                "application/vnd.mozilla.xul+xml"
-                "x-scheme-handler/http"
-                "x-scheme-handler/https"
-              ];
-              categories = [
-                "Network"
-                "WebBrowser"
-              ];
-            }
-          );
-        in
-        pkgs.runCommand name { } ''
-          mkdir -p $out/{bin,share}
-          cp -r ${scriptBin}/bin/${name} $out/bin/${name}
-          cp -r ${desktopFile}/share/applications $out/share/applications
-        '';
-    in
-    [
-      (makeFirefoxProfileBin {
-        profile = "work";
-        desktopName = "Firefox (Work)";
-        icon = "firefox";
-      })
-    ];
-
   xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
-  xdg.configFile."tridactyl/themes/tridactyl-theme.css".source = ./tridactyl-theme.css;
 }

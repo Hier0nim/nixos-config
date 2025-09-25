@@ -3,7 +3,6 @@
     ./firefox
     ./intellij
 
-    ./fastfetch.nix
     ./git.nix
     ./lazygit.nix
     ./obs-studio.nix
@@ -11,8 +10,5 @@
     ./vesktop.nix
     ./ghostty.nix
     ./nvim.nix
-
-    # ./mpv.nix
-    # ./nemo.nix
   ];
 }

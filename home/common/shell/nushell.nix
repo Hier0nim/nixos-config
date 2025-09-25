@@ -10,29 +10,6 @@ let
 in
 {
   programs = {
-    # ───────── Direnv ─────────
-    direnv = {
-      enable = true;
-      enableNushellIntegration = true;
-      nix-direnv.enable = true;
-    };
-
-    # # ───────── Zoxide ─────────
-    # zoxide = {
-    #   enable = true;
-    #   enableNushellIntegration = true;
-    #   options = [
-    #     "--cmd cd"
-    #   ];
-    # };
-
-    # ───────── Carapace (external completions) ─────────
-    # carapace = {
-    #   enable = true;
-    #   # enableNushellIntegration = true;
-    # };
-
-    # ───────── Nushell ─────────
     nushell = {
       enable = true;
 
@@ -54,11 +31,6 @@ in
           vi_insert = "line";
           vi_normal = "block";
         };
-
-        # completions.external = {
-        #   enable = true;
-        #   max_results = 200;
-        # };
       };
 
       ## 2. Aliases
@@ -194,9 +166,6 @@ in
               }
             }
           }
-
-          # # ── zoxide init ──
-          # source $"($nu.home-path)/.local/cache/zoxide/init.nu"
         '';
     };
   };
