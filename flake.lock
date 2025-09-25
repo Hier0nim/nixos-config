@@ -498,14 +498,15 @@
           "nixpkgs"
         ],
         "plugins-continue-nvim": "plugins-continue-nvim",
+        "plugins-hlargs": "plugins-hlargs",
         "plugins-log-highlight-nvim": "plugins-log-highlight-nvim"
       },
       "locked": {
-        "lastModified": 1754424813,
-        "narHash": "sha256-K+fTyXPk6o4JF8l/Ewk4EpJC/fR5quDrag3PTdk0Ip0=",
+        "lastModified": 1758833051,
+        "narHash": "sha256-xM8/f8d0gk4Rd+/dn35VAFjRy2+7RYmOXcCRKiN2DBo=",
         "owner": "Hier0nim",
         "repo": "nvim",
-        "rev": "8b1c3cb0bd07913681ca891641078eb258d172cc",
+        "rev": "6fa3803d80111dba3aa3fead6797be39ae187f55",
         "type": "github"
       },
       "original": {
@@ -516,11 +517,11 @@
     },
     "nixCats_2": {
       "locked": {
-        "lastModified": 1753170780,
-        "narHash": "sha256-rxnjPhOu7kr3REU8AhbKwRYnXHWlRXBqgWOO9MD0HyY=",
+        "lastModified": 1756502529,
+        "narHash": "sha256-IPhN1a/DecHCJKugq51TnPqcMkwHU7qrQXagR2k1KwA=",
         "owner": "BirdeeHub",
         "repo": "nixCats-nvim",
-        "rev": "e0c3fd5c218c808ce31e29caa91df43c65d7dfc6",
+        "rev": "b262211fc80bf5909f9b6642a7930fee907e3e8d",
         "type": "github"
       },
       "original": {
@@ -743,14 +744,30 @@
         "type": "github"
       }
     },
+    "plugins-hlargs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1750096091,
+        "narHash": "sha256-PEYo4tcawKgqATbKw46BIus+D0afP6Q0YSrlJ0WHAA4=",
+        "owner": "m-demare",
+        "repo": "hlargs.nvim",
+        "rev": "ce8d705866dae44513ff48613d5e37e4da524d70",
+        "type": "github"
+      },
+      "original": {
+        "owner": "m-demare",
+        "repo": "hlargs.nvim",
+        "type": "github"
+      }
+    },
     "plugins-log-highlight-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1754416814,
-        "narHash": "sha256-vQfqi4WerKh1nUSt9GZNb6NeZwgQXwBSvuqurOOv7f8=",
+        "lastModified": 1756820067,
+        "narHash": "sha256-yD1K4k6tymurbjYUt9zrIwsTcQit1mhKAY9toF1I/Jk=",
         "owner": "fei6409",
         "repo": "log-highlight.nvim",
-        "rev": "7c07e0e76998a9a651ac69c8f625d5acf1a4c6e8",
+        "rev": "3d49e92d763518a9f301b2deb604d5cc3f2ac995",
         "type": "github"
       },
       "original": {
