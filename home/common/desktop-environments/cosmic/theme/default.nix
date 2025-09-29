@@ -9,7 +9,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    (catppuccin-papirus-folders.override { inherit (config.catppuccin) flavor accent; })
     inter
     nerd-fonts.iosevka
     nerd-fonts.jetbrains-mono
@@ -56,7 +55,7 @@ in
         source = mkRON "enum" {
           variant = "Path";
           value = [
-            "${config.home.homeDirectory}/Projects/nixos-config/home/common/desktop-environments/wallpapers/ghibli.jpg"
+            "${config.home.homeDirectory}/Projects/nixos-config/home/common/desktop-environments/wallpapers/fear-samori.png"
           ];
         };
       }

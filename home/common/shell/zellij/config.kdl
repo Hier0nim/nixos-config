@@ -132,7 +132,7 @@ keybinds clear-defaults=true {
                 move_to_focused_tab true
                 cwd "/"
                 root_dirs "/home/hieronim/Projects"
-                session_layout ":default"
+                session_layout ":compact"
             }; SwitchToMode "Locked";
         }
         bind "s" {
@@ -168,6 +168,14 @@ keybinds clear-defaults=true {
         bind "Alt ;" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
+        bind "Alt s" { LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-sessionizer.wasm" {
+                floating true
+                move_to_focused_tab true
+                cwd "/"
+                root_dirs "/home/hieronim/Projects"
+                session_layout ":compact"
+            }; SwitchToMode "Locked";
+        }
     }
     shared_except "locked" "renametab" "renamepane" {
         bind "Ctrl g" { SwitchToMode "locked"; }
@@ -271,19 +279,6 @@ load_plugins {
 // Once these themes are defined, one of them should to be selected in the "theme" section of this file
 //
  themes {
-  catppuccin-mocha {
-    bg "#585b70" // Surface2
-    fg "#cdd6f4" // Text
-    red "#f38ba8"
-    green "#a6e3a1"
-    blue "#89b4fa"
-    yellow "#f9e2af"
-    magenta "#f5c2e7" // Pink
-    orange "#fab387" // Peach
-    cyan "#89dceb" // Sky
-    black "#181825" // Mantle
-    white "#cdd6f4" // Text
-  }
   kanagawa {
     bg "#DCD7BA"
     fg "#1F1F28"

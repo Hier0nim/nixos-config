@@ -5,17 +5,14 @@
 }:
 {
   imports = [
-    inputs.catppuccin.homeModules.catppuccin
-
     ../common/programs/git.nix
     ../common/programs/lazygit.nix
-    ../common/programs/fastfetch.nix
     ../common/programs/ssh.nix
     ../common/shell
   ];
 
   home.packages = with pkgs; [
-    inputs.nixvim.packages.x86_64-linux.default
+    inputs.nixCats.packages.x86_64-linux.default
 
     gcc
     gnumake

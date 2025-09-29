@@ -20,10 +20,12 @@ in
           [ "com.system76.CosmicAppletTime" ]
           [
             "com.system76.CosmicAppletStatusArea"
+            "io.github.cosmic_utils.cosmic-ext-applet-clipboard-manager"
             "com.system76.CosmicAppletTiling"
             "com.system76.CosmicAppletAudio"
             "com.system76.CosmicAppletNetwork"
             "com.system76.CosmicAppletBluetooth"
+            "com.system76.CosmicAppletNetwork"
             "com.system76.CosmicAppletNotifications"
             "com.system76.CosmicAppletBattery"
             "com.system76.CosmicAppletPower"

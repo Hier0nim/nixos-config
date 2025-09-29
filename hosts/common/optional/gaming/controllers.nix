@@ -9,5 +9,5 @@
   '';
 
   environment.systemPackages = [ pkgs.oversteer ];
-  # hardware.new-lg4ff.enable = true;
+  hardware.new-lg4ff.enable = true;
 }

@@ -1,6 +1,7 @@
 (defcfg
   process-unmapped-keys yes
   windows-altgr add-lctl-release
+  concurrent-tap-hold yes
 )
 (defsrc
   esc  1    2    3    4    5    6    7    8    9    0    -    =
@@ -70,6 +71,11 @@
   n     (tap-hold-release-keys $tap-time $hold-time (multi n @tap) (layer-while-held sym_layer) $right-hand-keys-no-space)
   m     (tap-hold-release-keys $tap-time $hold-time (multi m @tap) (layer-while-held num_layer) $right-hand-keys-no-space)
   ,     (tap-hold-release-keys $tap-time $hold-time (multi , @tap) (layer-while-held fun_layer) $right-hand-keys-no-space)
+)
+
+(defchordsv2
+  (q o) (layer-switch nomods) 300 all-released ()
+  (q p) (layer-switch base) 300 all-released ()
 )
 
 (deflayer space_layer
