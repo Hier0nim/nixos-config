@@ -11,12 +11,10 @@
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.chaotic.nixosModules.default
 
-    ../common/core
-
     ./hardware-configuration.nix
 
+    ../common/core
     ../users/hieronim
-    ../users/gaming
 
     ../common/optional/hardware/bluetooth.nix
     ../common/optional/input-devices/default.nix

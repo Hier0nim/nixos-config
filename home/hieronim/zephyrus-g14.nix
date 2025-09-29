@@ -8,6 +8,7 @@
     ../common/packages/archive.nix
     ../common/packages/dev.nix
     ../common/packages/media.nix
+    ../common/programs/gaming.nix
     ../common/shell
     ../common/desktop-environments/cosmic
     ../common/config/cursor.nix
