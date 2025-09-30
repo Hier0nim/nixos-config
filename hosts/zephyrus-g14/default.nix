@@ -5,12 +5,11 @@
 }:
 {
   imports = [
-    # TODO: add disco support
-    # ./disk-configuration.nix
-
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.chaotic.nixosModules.default
+    inputs.disko.nixosModules.disko
 
+    ./disko-config.nix
     ./hardware-configuration.nix
 
     ../common/core
