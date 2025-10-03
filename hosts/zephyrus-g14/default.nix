@@ -16,6 +16,7 @@
     ../users/hieronim
 
     ../common/optional/hardware/bluetooth.nix
+    ../common/optional/hardware/suspend-and-hibernate.nix
     ../common/optional/input-devices/default.nix
     ../common/optional/programs/neovim.nix
     ../common/optional/services/openssh.nix
