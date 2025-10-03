@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   xdg = {
     enable = true;
@@ -7,76 +7,52 @@
       enable = true;
       createDirectories = true;
       extraConfig = {
-        XDG_DEV_DIR = "${config.home.homeDirectory}/Dev";
         XDG_SCREENSHOTS_DIR = "${config.xdg.userDirs.pictures}/Screenshots";
-        XDG_WALLPAPERS_DIR = "${config.xdg.userDirs.pictures}/Wallpapers";
       };
     };
     mimeApps =
       let
         imageViewer = [ "org.gnome.Loupe" ];
-        audioPlayer = [ "io.bassi.Amberol" ];
-        videoPlayer = [ "io.github.celluloid_player.Celluloid" ];
+        mediaPlayer = [ "com.system76.CosmicPlayer" ];
+        fileBrowser = [ "com.system76.CosmicFiles" ];
         webBrowser = [ "firefox" ];
         documentViewer = [ "org.gnome.Papers" ];
+        editor = [ "ghostty -e nvim" ];
 
-        xdgAssociations =
-          type: program: list:
-          builtins.listToAttrs (
-            map (e: {
-              name = "${type}/${e}";
-              value = program;
-            }) list
-          );
+        media = [
+          "video/*"
+          "audio/*"
+        ];
 
-        image = xdgAssociations "image" imageViewer [
-          "png"
-          "svg"
-          "jpeg"
-          "gif"
-        ];
-        audio = xdgAssociations "audio" audioPlayer [
-          "mp3"
-          "flac"
-          "wav"
-          "aac"
-        ];
-        video = xdgAssociations "video" videoPlayer [
-          "mp4"
-          "avi"
-          "mkv"
-        ];
-        browser =
-          (xdgAssociations "application" webBrowser [
-            "json"
-            "x-extension-htm"
-            "x-extension-html"
-            "x-extension-shtml"
-            "x-extension-xht"
-            "x-extension-xhtml"
-          ])
-          // (xdgAssociations "x-scheme-handler" webBrowser [
-            "about"
-            "ftp"
-            "http"
-            "https"
-            "unknown"
-          ]);
+        images = [ "image/*" ];
 
+        browser = [
+          "text/html"
+          "application/pdf"
+          "x-scheme-handler/http"
+          "x-scheme-handler/https"
+          "x-scheme-handler/ftp"
+          "x-scheme-handler/about"
+          "x-scheme-handler/unknown"
+        ];
+
+        code = [
+          "application/json"
+          "text/english"
+          "text/plain"
+        ];
         # XDG MIME types
-        associations = builtins.mapAttrs (_: v: (map (e: "${e}.desktop") v)) (
-          {
-            "text/html" = webBrowser;
-            "text/plain" = [ "ghostty -e nvim" ];
-            "inode/directory" = [ "nemo" ];
-            "application/x-gnome-saved-search" = [ "nemo" ];
+        associations =
+          (lib.genAttrs code (_: editor))
+          // (lib.genAttrs media (_: mediaPlayer))
+          // (lib.genAttrs images (_: imageViewer))
+          // (lib.genAttrs browser (_: webBrowser))
+          // {
+            "x-scheme-handler/spotify" = [ "spotify.desktop" ];
+            "x-scheme-handler/discord" = [ "vesktop.desktop" ];
+            "inode/directory" = fileBrowser;
             "application/pdf" = documentViewer;
-          }
-          // image
-          // audio
-          // video
-          // browser
-        );
+          };
       in
       {
         enable = true;
