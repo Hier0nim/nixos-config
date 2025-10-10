@@ -36,7 +36,7 @@
     proton-pass
     remmina
     qbittorrent
-    libreoffice
+    # libreoffice
     protonvpn-gui
     protonmail-desktop
   ];

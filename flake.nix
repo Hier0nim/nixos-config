@@ -69,6 +69,7 @@
     # ========= Official NixOS, and HM Package Sources =========
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-howdy.url = "github:fufexan/nixpkgs/howdy";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 

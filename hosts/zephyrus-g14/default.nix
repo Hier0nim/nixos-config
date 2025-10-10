@@ -24,6 +24,7 @@
     ../common/optional/services/gnome-keyring.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/logind.nix
+    ../common/optional/services/howdy.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
     ../common/optional/desktop-environment/cosmic.nix

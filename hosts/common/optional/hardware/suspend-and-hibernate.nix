@@ -8,7 +8,9 @@ let
     HIBERNATE_SECONDS = "600";
     HIBERNATE_LOCK = "/var/run/autohibernate.lock";
   };
-in {
+in
+{
+  boot.kernelParams = [ "mem_sleep_default=deep" ];
 
   systemd.services."awake-after-suspend-for-a-time" = {
     description = "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
