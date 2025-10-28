@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 {
   imports = [
     inputs.cosmic-manager.homeManagerModules.cosmic-manager
@@ -22,4 +27,8 @@
     wl-clipboard
     valent
   ];
+
+  home.activation.resetPanels = lib.hm.dag.entryAfter [ "configureCosmic" ] ''
+    exec ${pkgs.procps}/bin/pkill cosmic-panel
+  '';
 }
