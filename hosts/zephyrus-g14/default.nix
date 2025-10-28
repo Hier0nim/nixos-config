@@ -25,6 +25,7 @@
     ../common/optional/services/printing.nix
     ../common/optional/services/logind.nix
     ../common/optional/services/howdy.nix
+    ../common/optional/services/winboat.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
     ../common/optional/desktop-environment/cosmic.nix
@@ -70,6 +71,7 @@
     asusd = {
       enable = true;
       enableUserService = true;
+      asusdConfig.source = ./asusd.ron;
     };
   };
 
@@ -77,6 +79,8 @@
     enable = true;
     autoStart = true;
   };
+
+  custom.programs.winboat.enable = true;
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";
