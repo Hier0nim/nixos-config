@@ -33,7 +33,6 @@
               inputs.determinate.nixosModules.default
               inputs.disko.nixosModules.default
               inputs.home-manager.nixosModules.default
-              inputs.nixpkgs-cosmic-unstable.nixosModules.default
 
               ./hosts/${host}
             ];
