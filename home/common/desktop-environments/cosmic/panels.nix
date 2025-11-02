@@ -20,7 +20,7 @@ in
           [ "com.system76.CosmicAppletTime" ]
           [
             "com.system76.CosmicAppletStatusArea"
-            "io.github.cosmic_utils.cosmic-ext-applet-clipboard-manager"
+            # "io.github.cosmic_utils.cosmic-ext-applet-clipboard-manager"
             "com.system76.CosmicAppletTiling"
             "com.system76.CosmicAppletAudio"
             "com.system76.CosmicAppletNetwork"

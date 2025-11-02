@@ -39,5 +39,7 @@
     # libreoffice
     protonvpn-gui
     protonmail-desktop
+    vlc
+    comma
   ];
 }

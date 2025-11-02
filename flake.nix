@@ -83,7 +83,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpkgs-cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
+    # nixpkgs-cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
 
     # ========= Utilities =========
     # Declarative partitioning and formatting

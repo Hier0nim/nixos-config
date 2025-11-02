@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 with lib;
@@ -23,8 +22,7 @@ with lib;
 
       systemPackages = with pkgs; [
         wl-clipboard
-        inputs.nixpkgs-cosmic-unstable.packages.${pkgs.system}.cosmic-ext-applet-clipboard-manager
-        cosmic-ext-applet-external-monitor-brightness
+        # cosmic-ext-applet-external-monitor-brightness
         cosmic-ext-tweaks
         gnome-keyring
       ];
