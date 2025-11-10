@@ -12,6 +12,8 @@ set newtab about:blank
 " Ctrl-F should use the browser's native 'find' functionality.
 unbind <C-f>
 
+unbind <C-a>
+
 " Tridactyl has an incomplete find mode
 bind / fillcmdline find
 bind ? fillcmdline find -?
