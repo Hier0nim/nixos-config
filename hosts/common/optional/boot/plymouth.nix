@@ -1,17 +1,21 @@
 {
   boot = {
     kernelParams = [
-      "quiet" # shut up kernel output prior to prompts
+      # "quiet"
     ];
     plymouth = {
-      enable = true;
+      enable = false;
       # theme = lib.mkForce "hexagon_hud";
       # themePackages = [
       #   (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "hexagon_hud" ]; })
       # ];
 
       theme = "bgrt";
+      #
+      # extraConfig = ''
+      #   ShowDelay=5
+      # '';
     };
-    consoleLogLevel = 0;
   };
+  # services.hardware.bolt.enable = true;
 }
