@@ -2,7 +2,7 @@
   programs.ssh.matchBlocks."*" = {
     enable = true;
     includes = [
-      "~/.ssh/config.d/*.config"
+      "~/.ssh/config.d/*.conf"
     ];
     addKeysToAgent = "yes";
     serverAliveInterval = 3600;
