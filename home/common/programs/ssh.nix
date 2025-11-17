@@ -1,5 +1,5 @@
 {
-  programs.ssh.matchBlocks."*" = {
+  programs.ssh = {
     enable = true;
     includes = [
       "~/.ssh/config.d/*.conf"
