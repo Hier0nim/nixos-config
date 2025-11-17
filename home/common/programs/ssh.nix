@@ -10,4 +10,6 @@
     controlPath = "~/.ssh/ctrl-%r@%h:%p";
     controlPersist = "15m";
   };
+
+  services.ssh-agent.enable = true;
 }
