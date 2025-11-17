@@ -19,13 +19,12 @@
 
   wayland.desktopManager.cosmic = {
     enable = true;
-    resetFiles = true;
+    resetFiles = false;
   };
 
   home.packages = with pkgs; [
     brightnessctl
     wl-clipboard
-    valent
   ];
 
   home.activation.resetPanels = lib.hm.dag.entryAfter [ "configureCosmic" ] ''

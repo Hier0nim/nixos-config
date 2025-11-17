@@ -7,6 +7,7 @@ in
     {
       anchor = mkRON "enum" "Left";
       anchor_gap = true;
+      margin = 4;
       autohide = mkRON "optional" null;
       background = mkRON "enum" "ThemeDefault";
       expand_to_edges = true;
