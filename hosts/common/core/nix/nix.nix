@@ -42,6 +42,11 @@
     };
 
     overlays = [
+      # (final: prev: {
+      #   cosmic-comp = prev.cosmic-comp.overrideAttrs (old: {
+      #     patches = [ ./../../../../patches/no_ssd.patch ];
+      #   });
+      # })
     ];
   };
 
