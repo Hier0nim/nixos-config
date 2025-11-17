@@ -37,9 +37,9 @@
     remmina
     qbittorrent
     # libreoffice
-    protonvpn-gui
+    # protonvpn-gui
     protonmail-desktop
-    vlc
+    celluloid
     comma
   ];
 }

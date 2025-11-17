@@ -13,7 +13,7 @@
     mimeApps =
       let
         imageViewer = [ "org.gnome.Loupe" ];
-        mediaPlayer = [ "com.system76.CosmicPlayer" ];
+        mediaPlayer = [ "io.github.celluloid_player.Celluloid" ];
         fileBrowser = [ "com.system76.CosmicFiles" ];
         webBrowser = [ "firefox" ];
         documentViewer = [ "org.gnome.Papers" ];
