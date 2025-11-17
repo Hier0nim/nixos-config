@@ -9,6 +9,7 @@
     ../common/packages/dev.nix
     ../common/packages/media.nix
     ../common/programs/gaming.nix
+    ../common/programs/ssh.nix
     ../common/shell
     ../common/desktop-environments/cosmic
     ../common/config/cursor.nix
