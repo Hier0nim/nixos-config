@@ -33,6 +33,7 @@
               inputs.determinate.nixosModules.default
               inputs.disko.nixosModules.default
               inputs.home-manager.nixosModules.default
+              inputs.asus-px-keyboard-tool.nixosModules.default
 
               ./hosts/${host}
             ];
@@ -129,6 +130,8 @@
 
     # CachyOS kernel with asus patches
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+
+    asus-px-keyboard-tool.url = "github:a-chaudhari/asus-px-keyboard-tool";
 
     nixCats = {
       url = "github:Hier0nim/nvim";

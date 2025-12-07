@@ -81,7 +81,44 @@
     autoStart = true;
   };
 
+  # services.auto-cpufreq = {
+  #   enable = true;
+  #   settings = {
+  #     battery = {
+  #       governor = "powersave";
+  #       turbo = "never";
+  #       platform_profile = "low-power";
+  #     };
+  #     charger = {
+  #       governor = "performance";
+  #       turbo = "auto";
+  #       platform_profile = "balanced";
+  #     };
+  #   };
+  # };
+  # services.power-profiles-daemon.enable = false;
+
+  # Optional: override defaults written to /etc/asus-px-keyboard-tool.conf
+  # Note: Nix integers are decimal; convert hex (e.g. 0x7e) to decimal (126).
+  services.asus-px-keyboard-tool = {
+    enable = true;
+    settings = {
+      kb_brightness_cycle = {
+        enabled = true;
+        keycode = "KEY_PROG3";
+      };
+    };
+
+  };
+  powerManagement.powertop.enable = true;
   custom.programs.winboat.enable = false;
+
+  environment.systemPackages = [
+    pkgs.stress-ng
+    pkgs.mprime
+    pkgs.glmark2
+    pkgs.lm_sensors
+  ];
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";
