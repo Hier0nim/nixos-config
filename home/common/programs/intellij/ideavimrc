@@ -6,29 +6,29 @@
 " General Settings & Editor Options
 " ========================================
 
-" Leader key -------------------------------------------------
+" Set leader key
 let mapleader = " "
 nnoremap <SPACE> <Nop>
 
-" Clipboard & Search ----------------------------------------
-set clipboard=ideaput         " dont't integrate system clipboard
-set hlsearch                  " highlight search matches
-set incsearch                 " live-update search
-set ignorecase                " case-insensitive unless caps
-set smartcase
+" Clipboard & Search Settings
+set clipboard+=unnamedplus    " Integrate with system clipboard
+set hlsearch                  " Highlight search occurrences
+set incsearch                 " Show search results while typing
+set ignorecase                " Case insensitive search...
+set smartcase                 " ...unless uppercase is used
 
-" Undo, Display & Wrapping ----------------------------------
-set undolevels=10000          " deep undo tree
-set number                    " absolute line numbers
-set relativenumber            " relative numbers
-set scrolloff=8               " vertical context
-set sidescrolloff=8           " horizontal context
-set showmode                  " show -- INSERT -- etc.
-set visualbell                " visual instead of beep
-set matchpairs                " % jumps for (), {}, []
-set wrap                      " soft-wrap lines
+" Undo, Display & Wrapping
+set undolevels=10000          " Maximum undo levels
+set number                    " Show absolute line numbers
+set relativenumber            " Show relative line numbers
+set scrolloff=8               " Vertical scroll offset
+set sidescrolloff=8           " Horizontal scroll offset
+set showmode                  " Display current mode on the status line
+set visualbell                " Use visual bell instead of beeping
+set matchpairs                " Define matching pairs for %
+set wrap                      " Enable soft-wrapping of lines
 
-" IdeaVim plugin helpers ------------------------------------
+" IdeaVim Recommended Settings & Plugin Integrations
 set ideajoin
 set ideaput
 set ideamarks
@@ -36,506 +36,199 @@ set ideamarks
 set surround
 set NERDTree
 set highlightedyank
+set sneak
 set quickscope
 set commentary
-set easymotion
-set mini-ai                   " Provides additional text object motions for handling quotes and brackets
-set multiple-cursors
-set peekaboo
 
 " ========================================
-" Which-Key Core Settings
-" ========================================
-set which-key                 " turn popup on
-set timeoutlen=5000
-" set notimeout
-
-let g:WhichKey_FontFamily    = "JetBrains Mono"
-let g:WhichKey_FontSize      = 12
-let g:WhichKey_PrefixColor   = "#D27E99"
-let g:WhichKey_CommandColor  = "#E6C384"/
-let g:WhichKey_SortOrder     = "by_key_prefix_first"
-
-" ========================================
-" Split & Window Navigation
+" Window & Tab Navigation
 " ========================================
 
+" Tab Navigation Shortcuts
+map <leader>tc <action>(CloseAllUnpinnedEditors)
+map <leader>tca <action>(CloseAllEditors)
+map <leader>tco <action>(CloseAllEditorsButActive)
+
+" Split Window Navigation
 nmap <Leader>v :vsplit<CR>
-let g:WhichKeyDesc__leader_v = "<leader>v   vertical split"
-
 nmap <Leader>h :split<CR>
-let g:WhichKeyDesc__leader_h = "<leader>h   horizontal split"
-
 nmap <C-q> :q<CR>
-let g:WhichKeyDesc__c_q = "<C-q>       quit window"
-
-nnoremap <C-h> <C-w>h
-let g:WhichKeyDesc__c_h = "<C-j>       focus left split"
-
-nnoremap <C-j> <C-w>j
-let g:WhichKeyDesc__c_j = "<C-k>       focus below split"
-
-nnoremap <C-k> <C-w>k
-let g:WhichKeyDesc__c_k = "<C-l>       focus above split"
-
-nnoremap <C-l> <C-w>l
-let g:WhichKeyDesc__c_semicolon = "<C-l>      focus right split"
-
-" maximise & stretch ----------------------------------------
-nmap <C-w>= <Action>(MaximizeEditorInSplit)
-let g:WhichKeyDesc__c_w_equal = "<C-w>=     maximise split"
-
-nmap <C-w><Down>  <Action>(StretchSplitToBottom)
-let g:WhichKeyDesc__c_w_down = "<C-w><Down> stretch down"
-
-nmap <C-w><Left>  <Action>(StretchSplitToLeft)
-let g:WhichKeyDesc__c_w_left = "<C-w><Left> stretch left"
-
-nmap <C-w><Right> <Action>(StretchSplitToRight)
-let g:WhichKeyDesc__c_w_right = "<C-w><Right>stretch right"
-
-nmap <C-w><Up>    <Action>(StretchSplitToTop)
-let g:WhichKeyDesc__c_w_up = "<C-w><Up>   stretch up"
+nnoremap <C-j> <C-w>h
+nnoremap <C-k> <C-w>j
+nnoremap <C-l> <C-w>k
+nnoremap <C-;> <C-w>l
 
 " ========================================
 " Code Navigation & Actions
 " ========================================
-nmap K :action com.github.vsuhanov.fastpeek.peek<CR>
-let g:WhichKeyDesc_K = "K           quickpeek"
 
+" Code Navigation
 nmap gd <Action>(GotoDeclaration)
-let g:WhichKeyDesc_gd = "gd           goto declaration"
-
 nmap gu <Action>(FindUsages)
-let g:WhichKeyDesc_gu = "gu           find usages"
-
 nmap gi <Action>(GotoImplementation)
-let g:WhichKeyDesc_gi = "gi           goto implementation"
-
 nmap go <Action>(GotoSuperMethod)
-let g:WhichKeyDesc_go = "go           goto super method"
-
 nmap <C-i> <Action>(Forward)
-let g:WhichKeyDesc__c_i = "<C-i>       forward nav"
-
 nmap <C-o> <Action>(Back)
-let g:WhichKeyDesc__c_o = "<C-o>       back nav"
-
 imap <C-y> <Action>(EditorChooseLookupItem)
-let g:WhichKeyDesc__c_y = "<C-y>       accept completion"
 
-
-" -- Code actions / refactor (prefix <leader> a / c) ---------
-
+" Code Actions / Refactoring
 nmap <Leader>a <Action>(ShowIntentionActions)
-let g:WhichKeyDesc__leader_a = "<leader>a  intention actions"
-
-let g:WhichKeyDesc__leader_c  = "<leader>c  code"
-
 nmap <Leader>cr <Action>(RenameElement)
-let g:WhichKeyDesc__leader_cr = "<leader>cr rename element"
-
 nmap <Leader>cf <Action>(ReformatCode)
-let g:WhichKeyDesc__leader_cf = "<leader>cf reformat code"
-
 nmap <Leader>cg <Action>(Generate)
-let g:WhichKeyDesc__leader_cg = "<leader>cg generate code"
-
 vmap <Leader>cm <Action>(ExtractMethod)
-let g:WhichKeyDesc__leader_cm = "<leader>cm extract method"
-
 nmap <Leader>ce <Action>(ShowErrorDescription)
-let g:WhichKeyDesc__leader_ce = "<leader>ce error description"
-
 nmap <Leader>ca <Action>(Annotate)
-let g:WhichKeyDesc__leader_ca = "<leader>ca annotate"
-
 nmap <Leader>n <Action>(GotoNextError)
-let g:WhichKeyDesc__leader_n = "<leader>n  next error"
-
-nmap <Leader>cd <Action>(ToggleRenderedDocPresentation)
-let g:WhichKeyDesc__leader_cd = "<leader>cd render comment"
-
-nmap <Leader>cD <Action>(ToggleRenderedDocPresentationForAll)
-let g:WhichKeyDesc__leader_cD = "<leader>cD render all comments"
-
-nmap <Leader>cb <Action>(Tool_External Tools_TSVN Blame)
-let g:WhichKeyDesc__leader_cb = "<leader>cb tsvn blame file"
-
-nmap <Leader>cl <Action>(Tool_External Tools_TSVN Log)
-let g:WhichKeyDesc__leader_cr = "<leader>cl tsvn log file"
-
-vmap <Leader>cy <Action>(CopyWithProblems)
-let g:WhichKeyDesc__leader_cy = "<leader>cy copy with problems"
+" Also map Q to reformat code
+map Q <Action>(ReformatCode)
 
 " ========================================
-" File & Project Navigation  (prefix <leader>f)
+" File & Project Navigation
 " ========================================
-let g:WhichKeyDesc__leader_f = "<leader>f  files & search"
 
-nmap - <Action>(ActivateStructureToolWindow)
-let g:WhichKeyDesc_backslash = "-          Structure tool window"
-
+" NERDTree File Explorer
 nmap \ :NERDTreeFocus<CR>
-let g:WhichKeyDesc_backslash = "\\          NERDTree focus"
-
-"nmap <Leader>e :NERDTreeToggle<CR>
-nmap <Leader>e :NERDTreeFocus<CR>
-let g:WhichKeyDesc__leader_e = "<leader>e  NERDTree toggle"
-
+nmap <Leader>e :NERDTreeToggle<CR>
 let g:NERDTreeMapCloseDir = "h"
 let g:NERDTreeMapActivateNode = "o"
+let g:NERDTreeMapQuit = '\'
 
+" Project Navigation Shortcuts
 nmap <Leader>fs <Action>(FileStructurePopup)
-let g:WhichKeyDesc__leader_fs = "<leader>fs file structure"
-
-map <Leader>ff <Action>(SearchEverywhere)
-let g:WhichKeyDesc__leader_ff = "<leader>ff search everywhere"
-
+map <Leader><Leader> <Action>(SearchEverywhere)
 nmap <Leader>fg <Action>(FindInPath)
-let g:WhichKeyDesc__leader_fg = "<leader>fg find in path"
-
 nmap <Leader>fr <Action>(RecentFiles)
-let g:WhichKeyDesc__leader_fr = "<leader>fr recent files"
-
 nmap <Leader>fc <Action>(RecentChangedFiles)
-let g:WhichKeyDesc__leader_fc = "<leader>fc recent changed"
-
 nmap <Leader>fl <Action>(RecentLocations)
-let g:WhichKeyDesc__leader_fl = "<leader>fl recent locations"
-
-nmap <Leader>fy <Action>(SourceClipboardExport.DumpFolderContents)
-let g:WhichKeyDesc__leader_fy = "<leader>fy copy file content to clipboard"
-
-nmap <Leader>fn <Action>(NewElement)
-let g:WhichKeyDesc__leader_fn = "<leader>fn create new element"
-
-nmap <Leader>fo <Action>(RiderFileOpenGroup)
-let g:WhichKeyDesc__leader_fo = "<leader>fo open solution"
 
 " ========================================
-" Tool Windows & Misc  (prefix <leader>w)
+" Tool Windows & Miscellaneous Actions
 " ========================================
-let g:WhichKeyDesc__leader_w = "<leader>w  tool windows"
 
-map Q <Action>(HideAllWindows)
-let g:WhichKeyDesc_Q = "Q hide all windows"
-
-map <Leader>ww <Action>(ToolWindowsGroup)
-let g:WhichKeyDesc__leader_ww = "<leader>ww toggle tool windows"
-
+" Activate Various Tool Windows
 nmap <Leader>wp <Action>(ActivateProblemsViewToolWindow)
-let g:WhichKeyDesc__leader_wp = "<leader>wp problems view"
-
 nmap <Leader>wr <Action>(ActivateRunToolWindow)
-let g:WhichKeyDesc__leader_wr = "<leader>wr run window"
-
 nmap <Leader>wg <Action>(ActivateVersionControlToolWindow)
-let g:WhichKeyDesc__leader_wg = "<leader>wg VCS window"
-
-nmap <Leader>wj <Action>(com.sburlyaev.cmd.plugin.actions.OpenTerminal)
-let g:WhichKeyDesc__leader_wj; = "<leader>wj terminal"
-
+nmap <Leader>wt <Action>(com.sburlyaev.cmd.plugin.actions.OpenTerminal)
 nmap <Leader>; <Action>(com.sburlyaev.cmd.plugin.actions.OpenInTerminal)
-let g:WhichKeyDesc__leader_semicolon = "<leader>; external terminal"
-
 nmap <Leader>wn <Action>(ClearAllNotifications)
-let g:WhichKeyDesc__leader_wn = "<leader>wn clear notifications"
-
+nmap <Leader>wv <Action>(VimActions)
 nmap <Leader>wb <Action>(ActivateBookmarksToolWindow)
-let g:WhichKeyDesc__leader_wb = "<leader>wb bookmarks window"
-
 nmap <Leader>wm <Action>(MainToolBar)
-let g:WhichKeyDesc__leader_wm = "<leader>wm main toolbar"
-
 nmap <Leader>wf <Action>(ActivateFindToolWindow)
-let g:WhichKeyDesc__leader_wf = "<leader>wf find window"
 
-nmap <Leader>wt <Action>(ActivateUnitTestsToolWindow)
-let g:WhichKeyDesc__leader_wt = "<leader>wt test window"
-
-" Bookmarks --------------------------------------------------
+" Bookmarks
 map <Leader>b <Action>(ShowBookmarks)
-let g:WhichKeyDesc__leader_b = "<leader>b  bookmarks popup"
 
-" ========================================
-" IdeaVim  (prefix <leader>i)
-" ========================================
-let g:WhichKeyDesc__leader_i = "<leader>i  ideavim"
-
+" Reload IdeaVim Config
 nmap <Leader>ir <Action>(IdeaVim.ReloadVimRc.reload)
-let g:WhichKeyDesc__leader_ir = "<leader>ir reload .ideavimrc"
-
-nmap <Leader>iw <Action>(VimActions)
-let g:WhichKeyDesc__leader_iw = "<leader>iw Vim actions"
 
 " ========================================
-" Debugging  (prefix <leader>d)
+" Debugging & REPL
 " ========================================
-let g:WhichKeyDesc__leader_d = "<leader>d  debug"
 
+" Debugging Shortcuts
 nmap <Leader>db <Action>(ToggleLineBreakpoint)
-let g:WhichKeyDesc__leader_db = "<leader>db toggle breakpoint"
-
 nmap <Leader>de <Action>(EditBreakpoint)
-let g:WhichKeyDesc__leader_de = "<leader>de edit breakpoint"
-
 nmap <Leader>dc <Action>(ForceRunToCursor)
-let g:WhichKeyDesc__leader_dc = "<leader>dc run to cursor"
-
 nmap <Leader>df <Action>(JumpToStatement)
-let g:WhichKeyDesc__leader_df = "<leader>df jump to statement"
 
-nmap <Leader>dr <Action>(ShowExecutionPoint)
-let g:WhichKeyDesc__leader_dr = "<leader>dr show execution point"
-
-nmap <Leader>dx <Action>(EvaluateExpression)
-vmap <Leader>dx <Action>(EvaluateExpression)
-let g:WhichKeyDesc__leader_dx = "<leader>dx evaulate expression"
-
-" ========================================
-" Run (prefix <leader>r)
-" ========================================
-let g:WhichKeyDesc__leader_r = "<leader>r  run"
-
+" REPL / Run Actions
 map <Leader>rr <Action>(Run)
-let g:WhichKeyDesc__leader_rr = "<leader>rr run"
-
 map <Leader>rs <Action>(Stop)
-let g:WhichKeyDesc__leader_rs = "<leader>rs stop"
-
 map <Leader>rm <Action>(RunMenu)
-let g:WhichKeyDesc__leader_rm = "<leader>rm run menu"
-
 map <Leader>rd <Action>(Debug)
-let g:WhichKeyDesc__leader_rd = "<leader>rd debug"
-
 map <Leader>rb <Action>(build)
-let g:WhichKeyDesc__leader_rb = "<leader>rb build"
-
 map <Leader>rc <Action>(RiderDebuggerApplyEncChagnes)
-let g:WhichKeyDesc__leader_rc = "<leader>rc apply changes"
-
-" ========================================
-" GUI & Layout  (prefix <leader>u)
-" ========================================
-let g:WhichKeyDesc__leader_u = "<leader>u  GUI & layout"
-
-map <Leader>ub <Action>(ViewStatusBar)
-let g:WhichKeyDesc__leader_ub = "<leader>ub status bar"
-
-map <Leader>ud <Action>(ToggleDistractionFreeMode)
-let g:WhichKeyDesc__leader_ud = "<leader>ud distraction-free"
-
-map <Leader>uv <Action>(ToggleFullScreen)
-let g:WhichKeyDesc__leader_uv = "<leader>uv full screen"
-
-map <Leader>ui <Action>(EditorToggleShowIndentLines)
-let g:WhichKeyDesc__leader_ui = "<leader>ui indent guides"
-
-map <Leader>ue <Action>(EditorPopupMenu)
-let g:WhichKeyDesc__leader_ge = "<leader>ge editor popup menu"
-
-map <Leader>uc <Action>(ChangeLaf)
-let g:WhichKeyDesc__leader_uc = "<leader>uc change colorscheme"
-
-map <Leader>up <Action>(TogglePresentationMode)
-let g:WhichKeyDesc__leader_up = "<leader>up presentation"
-
-map <Leader>ul <Action>(chylex.InspectionLens.ToggleLensVisibility)
-let g:WhichKeyDesc__leader_ul = "<leader>ul toggle inspection lens"
-
-
-" ========================================
-" Continue Plugin (prefix <leader>c > co…)
-" ========================================
-let g:WhichKeyDesc__leader_co = "<leader>co continue actions"
-
-map <Leader>cof <Action>(continue.focusContinueInput)
-let g:WhichKeyDesc__leader_cof = "<leader>cof focus input"
-
-map <Leader>coF <Action>(continue.focusContinueInputWithoutClear)
-let g:WhichKeyDesc__leader_coF = "<leader>coF focus no clear"
-
-map <Leader>coi <Action>(continue.inlineEdit)
-let g:WhichKeyDesc__leader_coi = "<leader>coi inline edit"
-
-map <Leader>con <Action>(continue.newContinueSession)
-let g:WhichKeyDesc__leader_con = "<leader>con new session"
-
-map <Leader>cou <Action>(continue.openAccountDialog)
-let g:WhichKeyDesc__leader_cou = "<leader>cou account dialog"
-
-map <Leader>coc <Action>(continue.openConfigPage)
-let g:WhichKeyDesc__leader_coc = "<leader>coc config page"
-
-map <Leader>com <Action>(continue.openMorePage)
-let g:WhichKeyDesc__leader_com = "<leader>com more page"
-
-map <Leader>coh <Action>(continue.viewHistory)
-let g:WhichKeyDesc__leader_coh = "<leader>coh view history"
-
-map <Leader>cos <Action>(ContinueSidebarActionsGroup)
-let g:WhichKeyDesc__leader_cos = "<leader>cos sidebar actions"
-
-map <Leader>cot <Action>(ActivateContinueToolWindow)
-let g:WhichKeyDesc__leader_cot = "<leader>cot tool window"
 
 " ========================================
 " Editing Enhancements
 " ========================================
 
-" Yank to system clipboard
-nnoremap <silent> <leader>y "+y
-vnoremap <silent> <leader>y "+y
-xnoremap <silent> <leader>y "+y
-let g:WhichKeyDesc__leader_y = "<leader>y  yank to clipboard"
+" Replace selected text with default register (without yanking)
+vnoremap <leader>p "_dP
 
-" Yank whole line to clipboard
-nnoremap <silent> <leader>Y "+yy
-vnoremap <silent> <leader>Y "+yy
-xnoremap <silent> <leader>Y "+yy
-let g:WhichKeyDesc__leader_Y = "<leader>Y  yank line to clipboard"
-
-" Paste from system clipboard
-nnoremap <silent> <leader>p "+p
-vnoremap <silent> <leader>p "+p
-xnoremap <silent> <leader>p "+p
-let g:WhichKeyDesc__leader_p = "<leader>p  paste from clipboard"
-
-" Paste in insert mode from clipboard
-inoremap <silent> <C-p> <C-r>+
-let g:WhichKeyDesc__c_p = "<C-p>       paste from clipboard (insert mode)"
-
-" Paste over selection without changing unnamed register
-xnoremap <silent> <leader>P "_dP
-vnoremap <silent> <leader>P "_dP
-let g:WhichKeyDesc__leader_P = "<leader>P  paste over (no yank)"
-
+" Delete without yanking
 nnoremap <leader>x "_d
 vnoremap <leader>x "_d
-let g:WhichKeyDesc__leader_x = "<leader>x  delete (no yank)"
 
-" Move lines -------------------------------------------------
-" nmap <S-j> :m .+1<CR>==
-" let g:WhichKeyDesc__shift_j = "<S-j>       move line down"
-
-" nmap <S-k> :m .-2<CR>==
-" let g:WhichKeyDesc__shift_k = "<S-k>       move line up"
-
-vmap <S-k> :m '<-2<CR>gv=gv
+" Move Lines Up and Down
+nmap <S-j> :m .+1<CR>==
+nmap <S-k> :m .-2<CR>==
 vmap <S-j> :m '>+1<CR>gv=gv
+vmap <S-k> :m '<-2<CR>gv=gv
 
-nmap <C-d> <C-d>zz
-nmap <C-u> <C-u>zz
-
-" Indent keep selection -------------------------------------
+" Maintain Selection After Indenting
 vmap < <gv^
 vmap > >gv^
 
-" misc -------------------------------------------------------
+" Save File Shortcut
 nmap <C-s> :w<CR>
-let g:WhichKeyDesc__c_s = "<C-s>       save file"
 
-nnoremap <esc> :noh<Return><esc>
-let g:WhichKeyDesc_escape = "<Esc>       clear search highlight"
+" Clear Search Highlight on ESC
+nnoremap <esc> :noh<return><esc>
 
-" mini-ai -------------------------------------------------------
-let g:WhichKeyDesc_aq = "aq           around any quotes"
-let g:WhichKeyDesc_iq = "iq           inside any quotes"
-let g:WhichKeyDesc_ab = "ab           around any (), {}, []"
-let g:WhichKeyDesc_ib = "ib           inside any (), {}, []"
-
-" mini-ai -------------------------------------------------------
-let g:WhichKeyDesc_ib = "ib           inside any (), {}, []"
+" Redefine Redo (map U to redo)
+nmap U <C-r>
 
 " ========================================
-" Multiple Cursors (vim-multiple-cursors)
+" GUI & Miscellaneous Tools
 " ========================================
 
-" Normal & Visual ─ add cursor and jump to next WHOLE word
-nmap <C-n> <Plug>NextWholeOccurrence
-xmap <C-n> <Plug>NextWholeOccurrence
+" GUI Controls & Layout
+map <Leader>tb <Action>(ViewStatusBar)
+map <Leader>td <Action>(ToggleDistractionFreeMode)
+map <Leader>tv <Action>(ToggleFullScreen)
+map <Leader>ti <Action>(EditorToggleShowIndentLines)
 
-" Normal & Visual ─ add cursor and jump to next match (substring)
-nmap g<C-n> <Plug>NextOccurrence
-xmap g<C-n> <Plug>NextOccurrence
-let g:WhichKeyDesc_g_c_n = "g<C-n>      add cursor (partial)"
-
-" Visual ─ skip this occurrence
-xmap <C-x> <Plug>SkipOccurrence
-
-" Visual ─ remove cursor here
-xmap <C-p> <Plug>RemoveOccurrence
-
-" -- Bulk selection variants (leader prefix) ----------------
-
-" Normal & Visual ─ select ALL whole-word occurrences
-nmap <leader><C-n> <Plug>AllWholeOccurrences
-xmap <leader><C-n> <Plug>AllWholeOccurrences
-let g:WhichKeyDesc__leader_c_n = "<leader><C-n> select all (whole)"
-
-" Declare <leader>g as a second-level prefix for multi-cursor
-let g:WhichKeyDesc__leader_g = "<leader>g   multiple cursors"   " prefix
-
-" Normal & Visual ─ select ALL occurrences (substring)
-nmap <leader>g<C-n> <Plug>AllOccurrences
-xmap <leader>g<C-n> <Plug>AllOccurrences
-let g:WhichKeyDesc__leader_g_c_n = "<leader>g<C-n> select all (partial)"
+" Tool Window Group & Popup Menu
+map <Leader>tt <Action>(ToolWindowsGroup)
+map <Leader>ge <Action>(EditorPopupMenu)
 
 " ========================================
-" EasyMotion – explicit maps & Which-Key labels
+" Continue Plugin Settings & Keybindings
 " ========================================
 
-nmap s <Plug>(easymotion-f)
-nmap S <Plug>(easymotion-F)
+" Focus Continue Input: Focus the input for continuing.
+map <Leader>cof <Action>(continue.focusContinueInput)
 
-" prefix folder
-let g:WhichKeyDesc__leader_leader = "<leader><leader> jump"
+" Focus Continue Input (Without Clear): Focus input without clearing.
+map <Leader>coF <Action>(continue.focusContinueInputWithoutClear)
 
-" ---------- 1-char / till-char -------------------------------------------
-nmap  <silent> <leader><leader>f <Plug>(easymotion-f)
-xmap  <silent> <leader><leader>f <Plug>(easymotion-f)
-let g:WhichKeyDesc__leader_leader_f = "<leader><leader>f  find char →"
+" Inline Edit: Edit inline within a continue session.
+map <Leader>coi <Action>(continue.inlineEdit)
 
-nmap  <silent> <leader><leader>F <Plug>(easymotion-F)
-xmap  <silent> <leader><leader>F <Plug>(easymotion-F)
-let g:WhichKeyDesc__leader_leader_F = "<leader><leader>F  find char ←"
+" New Continue Session: Start a new continue session.
+map <Leader>con <Action>(continue.newContinueSession)
 
-nmap  <silent> <leader><leader>t <Plug>(easymotion-t)
-xmap  <silent> <leader><leader>t <Plug>(easymotion-t)
-let g:WhichKeyDesc__leader_leader_t = "<leader><leader>t  till char →"
+" Open Account Dialog: Open the account dialog.
+map <Leader>cou <Action>(continue.openAccountDialog)
 
-nmap  <silent> <leader><leader>T <Plug>(easymotion-T)
-xmap  <silent> <leader><leader>T <Plug>(easymotion-T)
-let g:WhichKeyDesc__leader_leader_T = "<leader><leader>T  till char ←"
+" Open Config Page: Open the configuration page.
+map <Leader>coc <Action>(continue.openConfigPage)
 
-" ---------- word / WORD --------------------------------------------------
-nmap  <silent> <leader><leader>w <Plug>(easymotion-w)
-let g:WhichKeyDesc__leader_leader_w = "<leader><leader>w  next word →"
+" Open More Page: Open additional information or options.
+map <Leader>com <Action>(continue.openMorePage)
 
-nmap  <silent> <leader><leader>W <Plug>(easymotion-W)
-let g:WhichKeyDesc__leader_leader_W = "<leader><leader>W  next WORD →"
+" View History: Open the history view.
+map <Leader>coh <Action>(continue.viewHistory)
 
-nmap  <silent> <leader><leader>b <Plug>(easymotion-b)
-let g:WhichKeyDesc__leader_leader_b = "<leader><leader>b  prev word ←"
+" Sidebar Actions Group: Open the sidebar actions group.
+map <Leader>cos <Action>(ContinueSidebarActionsGroup)
 
-nmap  <silent> <leader><leader>B <Plug>(easymotion-B)
-let g:WhichKeyDesc__leader_leader_B = "<leader><leader>B  prev WORD ←"
+" Activate Continue Tool Window: Open the continue tool window.
+map <Leader>cot <Action>(ActivateContinueToolWindow)
 
-nmap  <silent> <leader><leader>e <Plug>(easymotion-e)
-let g:WhichKeyDesc__leader_leader_e = "<leader><leader>e  end word →"
+" ========================================
+" Split resize
+" ========================================
 
-nmap  <silent> <leader><leader>E <Plug>(easymotion-E)
-let g:WhichKeyDesc__leader_leader_E = "<leader><leader>E  END WORD →"
+nmap <C-w>\| <Action>(MaximizeEditorInSplit)
+; even though it's the same command map it for muscle memory
+nmap <C-w>= <Action>(MaximizeEditorInSplit)
 
-nmap  <silent> <leader><leader>ge <Plug>(easymotion-ge)
-let g:WhichKeyDesc__leader_leader_ge = "<leader><leader>ge end word ←"
-
-nmap  <silent> <leader><leader>gE <Plug>(easymotion-gE)
-let g:WhichKeyDesc__leader_leader_gE = "<leader><leader>gE END WORD ←"
-
-
-" sort of acts like vim's netrw mode to give me keyboard-driven filesystem
-" navigation relative to the file I had open.
-noremap - :action ShowNavBar<cr>
+nmap <C-w><Down> <Action>(StretchSplitToBottom)
+nmap <C-w><Left> <Action>(StretchSplitToLeft)
+nmap <C-w><Right> <Action>(StretchSplitToRight)
+nmap <C-w><Up> <Action>(StretchSplitToTop)
