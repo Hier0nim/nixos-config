@@ -37,10 +37,10 @@
     proton-pass
     remmina
     qbittorrent
-    # libreoffice
     # protonvpn-gui
     protonmail-desktop
     celluloid
     comma
+    libreoffice-fresh
   ];
 }
