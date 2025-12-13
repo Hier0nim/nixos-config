@@ -6,7 +6,6 @@
 {
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
-    inputs.chaotic.nixosModules.default
     inputs.disko.nixosModules.disko
 
     ./disko-config.nix
@@ -60,9 +59,6 @@
 
     tmp.cleanOnBoot = true;
   };
-
-  # ASUS G14 Patched Kernel based off of Arch Linux Kernel
-  boot.kernelPackages = pkgs.linuxPackages_cachyos-gcc;
 
   services = {
     # supergfxd controls GPU switching

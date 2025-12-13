@@ -128,9 +128,6 @@
       flake = false;
     };
 
-    # CachyOS kernel with asus patches
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-
     asus-px-keyboard-tool.url = "github:a-chaudhari/asus-px-keyboard-tool";
 
     nixCats = {
