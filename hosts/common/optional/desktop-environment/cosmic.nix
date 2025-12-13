@@ -22,9 +22,12 @@ with lib;
 
       systemPackages = with pkgs; [
         wl-clipboard
-        # cosmic-ext-applet-external-monitor-brightness
         cosmic-ext-tweaks
         gnome-keyring
+        cosmic-ext-applet-privacy-indicator
+        cosmic-ext-applet-external-monitor-brightness
+        cosmic-ext-applet-caffeine
+        cosmic-ext-applet-minimon
       ];
     };
 
