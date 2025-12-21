@@ -37,7 +37,7 @@
     proton-pass
     remmina
     qbittorrent
-    # protonvpn-gui
+    protonvpn-gui
     protonmail-desktop
     celluloid
     comma
