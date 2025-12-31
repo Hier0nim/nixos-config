@@ -1,7 +1,6 @@
 {
   inputs,
   pkgs,
-  lib,
   ...
 }:
 {
@@ -26,8 +25,4 @@
     brightnessctl
     wl-clipboard
   ];
-
-  home.activation.resetPanels = lib.hm.dag.entryAfter [ "configureCosmic" ] ''
-    exec ${pkgs.procps}/bin/pkill cosmic-panel
-  '';
 }
