@@ -29,6 +29,10 @@ in
           variant = "Path";
           value = [ "${config.home.homeDirectory}/Projects" ];
         })
+        (mkRON "enum" {
+          variant = "Path";
+          value = [ "/mnt/NAS" ];
+        })
       ];
 
       show_details = false;

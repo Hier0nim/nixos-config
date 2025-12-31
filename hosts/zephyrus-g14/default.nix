@@ -109,12 +109,30 @@
   powerManagement.powertop.enable = true;
   custom.programs.winboat.enable = false;
 
-  environment.systemPackages = [
-    pkgs.stress-ng
-    pkgs.mprime
-    pkgs.glmark2
-    pkgs.lm_sensors
+  environment.systemPackages = with pkgs; [
+    stress-ng
+    mprime
+    glmark2
+    lm_sensors
+    cifs-utils
   ];
+
+  fileSystems."/mnt/NAS" = {
+    device = "//192.168.8.1/nas";
+    fsType = "cifs";
+    options = [
+      "guest"
+      "iocharset=utf8"
+      "vers=3.1.1"
+      "uid=1000"
+      "gid=100"
+      "dir_mode=0755"
+      "file_mode=0644"
+      "nofail"
+      "x-systemd.automount"
+      "x-systemd.idle-timeout=60"
+    ];
+  };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";
