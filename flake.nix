@@ -132,7 +132,7 @@
 
     nixCats = {
       url = "github:Hier0nim/nvim";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
   };
 }
