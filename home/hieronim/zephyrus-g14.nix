@@ -39,7 +39,6 @@
     qbittorrent
     protonvpn-gui
     protonmail-desktop
-    celluloid
     comma
     libreoffice-fresh
   ];
