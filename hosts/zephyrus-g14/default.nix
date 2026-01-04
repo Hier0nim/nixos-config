@@ -26,6 +26,7 @@
     ../common/optional/services/howdy.nix
     ../common/optional/services/winboat.nix
     ../common/optional/services/openssh.nix
+    ../common/optional/services/wsdd.nix
     ../common/optional/boot/plymouth.nix
     ../common/optional/boot/usbcore.nix
     ../common/optional/desktop-environment/cosmic.nix
