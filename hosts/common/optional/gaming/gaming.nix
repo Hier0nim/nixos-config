@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   hardware.xone.enable = true; # xbox controller
 
@@ -13,5 +14,12 @@
       enable = true;
       capSysNice = true;
     };
+
+    gamemode.enable = true;
+
   };
+
+  environment.systemPackages = with pkgs; [
+    mangohud
+  ];
 }
