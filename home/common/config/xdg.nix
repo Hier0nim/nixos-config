@@ -24,7 +24,7 @@
         mediaPlayer = [ "com.system76.CosmicPlayer.desktop" ];
         fileBrowser = [ "com.system76.CosmicFiles.desktop" ];
         webBrowser = [ "firefox.desktop" ];
-        documentViewer = [ "org.gnome.Papers.desktop" ];
+        documentViewer = [ "com.system76.CosmicReader.desktop" ];
         editor = [ "nvim-ghostty.desktop" ];
 
         media = [
@@ -45,14 +45,19 @@
           "text/plain"
         ];
 
+        document = [
+          "application/pdf"
+          "application/acrobat"
+        ];
+
         associations =
           (lib.genAttrs code (_: editor))
           // (lib.genAttrs media (_: mediaPlayer))
           // (lib.genAttrs images (_: imageViewer))
           // (lib.genAttrs browser (_: webBrowser))
+          // (lib.genAttrs document (_: documentViewer))
           // {
             "inode/directory" = fileBrowser;
-            "application/pdf" = documentViewer;
 
             "x-scheme-handler/spotify" = [ "spotify.desktop" ];
             "x-scheme-handler/discord" = [ "vesktop.desktop" ];
