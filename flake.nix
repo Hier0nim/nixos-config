@@ -134,5 +134,7 @@
       url = "github:Hier0nim/nvim";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
   };
 }
