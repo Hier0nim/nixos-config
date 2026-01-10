@@ -42,7 +42,7 @@
     };
 
     overlays = [
-      inputs.nix-cachyos-kernel.overlays.default
+      inputs.nix-cachyos-kernel.overlays.pinned
       # (final: prev: {
       #   cosmic-comp = prev.cosmic-comp.overrideAttrs (old: {
       #     patches = [ ./../../../../patches/no_ssd.patch ];
