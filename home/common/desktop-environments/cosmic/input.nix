@@ -30,7 +30,7 @@ in
       };
 
       tap_config = mkRON "optional" {
-        button_map = mkRON "optional" (cosmicLib.cosmic.mkRON "enum" "LeftMiddleRight");
+        button_map = mkRON "optional" (cosmicLib.cosmic.mkRON "enum" "LeftRightMiddle");
         drag = true;
         drag_lock = true;
         enabled = true;
