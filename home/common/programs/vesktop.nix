@@ -1,20 +1,30 @@
 {
   programs.vesktop = {
     enable = true;
+
     settings = {
-      appBadge = false;
       arRPC = true;
-      checkUpdates = false;
-      customTitleBar = false;
-      disableMinSize = true;
-      minimizeToTray = true;
-      tray = true;
-      splashBackground = "#000000";
-      splashColor = "#ffffff";
-      splashTheming = true;
+      customTitleBar = true;
       staticTitle = true;
-      hardwareAcceleration = true;
       discordBranch = "stable";
+      enableSplashScreen = false;
+      hardwareAcceleration = true;
+      minimizeToTray = true;
+    };
+
+    vencord.settings = {
+      autoUpdate = false;
+      autoUpdateNotification = false;
+      notifyAboutUpdates = false;
+      useQuickCss = true;
+      themeLinks = [
+        "https://raw.githubusercontent.com/refact0r/midnight-discord/refs/heads/master/themes/flavors/midnight-vencord.theme.css"
+      ];
+
+      plugins = {
+        ClearURLs.enabled = true;
+        FixYoutubeEmbeds.enabled = true;
+      };
     };
   };
 }
