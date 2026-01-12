@@ -13,6 +13,7 @@
     ../common/shell
     ../common/desktop-environments/cosmic
     ../common/config/cursor.nix
+    ../common/config/xdg.nix
     ../common/services/suspend.nix
   ];
 
