@@ -23,7 +23,7 @@ in
 
       toolkit = {
         apply_theme_global = true;
-        icon_theme = "Papirus-Dark";
+        icon_theme = "Cosmic";
 
         interface_font = {
           family = "Inter";
