@@ -8,7 +8,7 @@
       staticTitle = true;
       discordBranch = "stable";
       enableSplashScreen = false;
-      hardwareAcceleration = true;
+      hardwareAcceleration = false;
       minimizeToTray = true;
     };
 

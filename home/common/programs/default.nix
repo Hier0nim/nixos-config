@@ -10,5 +10,6 @@
     ./vesktop.nix
     ./ghostty.nix
     ./nvim.nix
+    ./spicetify.nix
   ];
 }
