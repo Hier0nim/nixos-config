@@ -28,6 +28,9 @@ with lib;
         cosmic-ext-applet-external-monitor-brightness
         cosmic-ext-applet-caffeine
         cosmic-ext-applet-minimon
+        cosmic-ext-applet-weather
+        quick-webapps
+        examine
       ];
     };
 
