@@ -108,11 +108,6 @@ in
           # ── Extra completions from nu_scripts ──
           ${sources}
 
-          # ---- Windows explorer helper (WSL) ----
-          export def ii [ path ] {
-            let _ = /mnt/c/Windows/explorer.exe (wslpath -w $"($path | path expand)")
-          }
-
           # ---- yazi + cwd transfer ----
           def --env ff [...args] {
           	let tmp = (mktemp -t "yazi-cwd.XXXXX")
