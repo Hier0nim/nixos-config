@@ -12,6 +12,7 @@ in
     inter
     nerd-fonts.iosevka
     nerd-fonts.jetbrains-mono
+    papirus-icon-theme
   ];
 
   wayland.desktopManager.cosmic = {
@@ -23,7 +24,7 @@ in
 
       toolkit = {
         apply_theme_global = true;
-        icon_theme = "Cosmic";
+        icon_theme = "Papirus-Dark";
 
         interface_font = {
           family = "Inter";
