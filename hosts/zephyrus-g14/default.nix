@@ -24,7 +24,7 @@
     ../common/optional/services/gnome-keyring.nix
     ../common/optional/services/printing.nix
     ../common/optional/services/logind.nix
-    ../common/optional/services/howdy.nix
+    # ../common/optional/services/howdy.nix
     ../common/optional/services/winboat.nix
     ../common/optional/services/openssh.nix
     ../common/optional/services/wsdd.nix
@@ -60,13 +60,10 @@
     };
 
     tmp.cleanOnBoot = true;
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
+    kernelPackages = pkgs.linuxPackagesFor pkgs.cachyosKernels.linux-cachyos-latest-lto-x86_64-v3;
   };
 
   services = {
-    # supergfxd controls GPU switching
-    supergfxd.enable = true;
-
     # ASUS specific software. This also installs asusctl.
     asusd = {
       enable = true;
