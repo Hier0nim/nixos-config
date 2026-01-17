@@ -9,7 +9,7 @@
       discordBranch = "stable";
       enableSplashScreen = false;
       hardwareAcceleration = false;
-      minimizeToTray = false;
+      minimizeToTray = true;
     };
 
     vencord.settings = {
