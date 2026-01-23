@@ -22,7 +22,7 @@ in
     };
 
     workspaces = {
-      workspace_layout = mkRON "enum" "Horizontal";
+      workspace_layout = mkRON "enum" "Vertical";
       workspace_mode = mkRON "enum" "OutputBound";
     };
 
