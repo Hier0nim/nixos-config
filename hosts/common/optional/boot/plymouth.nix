@@ -1,10 +1,10 @@
 {
   boot = {
     kernelParams = [
-      # "quiet"
+      "quiet"
     ];
     plymouth = {
-      enable = false;
+      enable = true;
       # theme = lib.mkForce "hexagon_hud";
       # themePackages = [
       #   (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "hexagon_hud" ]; })
@@ -17,5 +17,5 @@
       # '';
     };
   };
-  # services.hardware.bolt.enable = true;
+  services.hardware.bolt.enable = true;
 }
