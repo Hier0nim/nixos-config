@@ -334,11 +334,17 @@ let
             chosen = choose_output(outputs)
 
             gs_args, env_add = build_gamescope_args(chosen)
-            inner = [GAMEMODERUN] + argv[1:]
-            full_cmd = [GAMESCOPE] + gs_args + ["--"] + inner
-
             env = os.environ.copy()
             env.update(env_add)
+
+            original_ld_preload = env.get("LD_PRELOAD", "")
+            env["LD_PRELOAD"] = ""
+
+            inner = [GAMEMODERUN] + argv[1:]
+            if original_ld_preload:
+                inner = ["env", f"LD_PRELOAD={original_ld_preload}", *inner]
+
+            full_cmd = [GAMESCOPE] + gs_args + ["--"] + inner
 
             log(f"Selected output: {chosen.name}")
             log(f"Selected mode: {chosen.current_mode.width}x{chosen.current_mode.height} @ {chosen.current_mode.hz} Hz")
