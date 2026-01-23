@@ -8,10 +8,12 @@
     enable = true;
     package = pkgs.gitFull;
 
-    userName = "Hier0nim";
-    userEmail = "hieronimdaniel@proton.me";
+    settings = {
+      user = {
+        name = "Hier0nim";
+        email = "hieronimdaniel@proton.me";
+      };
 
-    extraConfig = {
       core.editor = "${config.home.sessionVariables.EDITOR}";
       init.defaultBranch = "main";
       branch.autosetupmerge = "true";
@@ -38,17 +40,17 @@
         enabled = true;
         autoupdate = true;
       };
-    };
 
-    aliases = {
-      # Semantic commit message aliases
-      chore = "!f() { git commit -m \"chore($1): $2\"; }; f";
-      docs = "!f() { git commit -m \"docs($1): $2\"; }; f";
-      feat = "!f() { git commit -m \"feat($1): $2\"; }; f";
-      fix = "!f() { git commit -m \"fix($1): $2\"; }; f";
-      refactor = "!f() { git commit -m \"refactor($1): $2\"; }; f";
-      style = "!f() { git commit -m \"style($1): $2\"; }; f";
-      test = "!f() { git commit -m \"test($1): $2\"; }; f";
+      alias = {
+        # Semantic commit message aliases
+        chore = "!f() { git commit -m \"chore($1): $2\"; }; f";
+        docs = "!f() { git commit -m \"docs($1): $2\"; }; f";
+        feat = "!f() { git commit -m \"feat($1): $2\"; }; f";
+        fix = "!f() { git commit -m \"fix($1): $2\"; }; f";
+        refactor = "!f() { git commit -m \"refactor($1): $2\"; }; f";
+        style = "!f() { git commit -m \"style($1): $2\"; }; f";
+        test = "!f() { git commit -m \"test($1): $2\"; }; f";
+      };
     };
 
     ignores = [
