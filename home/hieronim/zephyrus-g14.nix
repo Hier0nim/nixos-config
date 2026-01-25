@@ -15,6 +15,7 @@
     ../common/config/cursor.nix
     ../common/config/xdg.nix
     ../common/services/suspend.nix
+    ../common/services/copyq.nix
   ];
 
   home = {
