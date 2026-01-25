@@ -26,4 +26,8 @@
     wl-clipboard
     valent
   ];
+
+  services.copyq = {
+    enable = true;
+  };
 }

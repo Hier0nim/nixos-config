@@ -29,7 +29,7 @@ with lib;
         cosmic-ext-applet-caffeine
         cosmic-ext-applet-minimon
         cosmic-ext-applet-weather
-        cosmic-ext-applet-clipboard-manager
+        # cosmic-ext-applet-clipboard-manager
         quick-webapps
         examine
       ];

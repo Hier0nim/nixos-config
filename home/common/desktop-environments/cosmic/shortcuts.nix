@@ -1,4 +1,8 @@
-{ config, cosmicLib, ... }:
+{
+  config,
+  cosmicLib,
+  ...
+}:
 let
   inherit (cosmicLib) getExe optionals;
   inherit (cosmicLib.cosmic) mkRON;
@@ -22,6 +26,22 @@ in
         variant = "System";
       };
       key = "Super+Shift+S";
+    }
+
+    {
+      action = mkRON "enum" "SwapWindow";
+      key = "Super+E";
+    }
+
+  ]
+  ++ optionals config.services.copyq.enable [
+    # CopyQ toggle
+    {
+      action = mkRON "enum" {
+        variant = "Spawn";
+        value = [ "copyq toggle" ];
+      };
+      key = "Super+V";
     }
   ];
 }

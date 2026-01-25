@@ -36,4 +36,16 @@ in
       variant = mkDefault "";
     };
   };
+
+  # Tiling exceptions
+  xdg.configFile."cosmic/com.system76.CosmicSettings.WindowRules/v1/tiling_exception_custom" = {
+    force = true;
+    text =
+      # ron
+      ''
+        [
+            (appid: "copyq", title: ".*", enabled: true)
+        ]
+      '';
+  };
 }
