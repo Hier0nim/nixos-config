@@ -1,10 +1,10 @@
 {
   inputs,
+  system,
   ...
 }:
 {
-
-  pre-commit-check = inputs.pre-commit-hooks.lib.run {
+  pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
     src = ./.;
     default_stages = [ "pre-commit" ];
     hooks = {
