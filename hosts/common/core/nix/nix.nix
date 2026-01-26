@@ -43,6 +43,19 @@
 
     overlays = [
       inputs.nix-cachyos-kernel.overlays.pinned
+      (final: prev: {
+        asusctl = prev.asusctl.overrideAttrs (old: rec {
+          version = "6.3.1";
+
+          src = prev.fetchFromGitLab {
+            owner = "asus-linux";
+            repo = "asusctl";
+            tag = version;
+
+            hash = "sha256-x3WKxjYrWYaLWDi52b3uQSYnr/Qunf6JYu4ikt4ajls=";
+          };
+        });
+      })
       # (final: prev: {
       #   cosmic-comp = prev.cosmic-comp.overrideAttrs (old: {
       #     patches = [ ./../../../../patches/no_ssd.patch ];

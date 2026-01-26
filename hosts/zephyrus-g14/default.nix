@@ -1,4 +1,5 @@
 {
+  lib,
   inputs,
   pkgs,
   ...
@@ -70,6 +71,7 @@
       enableUserService = true;
       asusdConfig.source = ./asusd.ron;
     };
+    supergfxd.enable = lib.mkForce false;
 
     lact = {
       enable = true;
