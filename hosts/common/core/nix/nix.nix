@@ -45,7 +45,7 @@
       inputs.nix-cachyos-kernel.overlays.pinned
       (final: prev: {
         asusctl = prev.asusctl.overrideAttrs (old: rec {
-          version = "6.3.1";
+          version = "6.3.2";
 
           src = prev.fetchFromGitLab {
             owner = "asus-linux";
