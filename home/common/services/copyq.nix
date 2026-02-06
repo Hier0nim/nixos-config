@@ -1,7 +1,7 @@
 {
   services.copyq = {
     enable = true;
-    forceXWayland = true;
+    forceXWayland = false;
   };
 
   xdg.configFile."copyq/themes/kanagawa.ini" = {
