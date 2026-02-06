@@ -52,7 +52,7 @@
             repo = "asusctl";
             tag = version;
 
-            hash = "sha256-x3WKxjYrWYaLWDi52b3uQSYnr/Qunf6JYu4ikt4ajls=";
+            hash = "sha256-6dZkQ8cPL8dbtvfuc/a5G1BxEaZyNbvy3eRBctFFwVU=";
           };
         });
       })
