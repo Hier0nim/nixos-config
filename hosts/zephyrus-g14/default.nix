@@ -80,7 +80,29 @@
 
   programs.rog-control-center = {
     enable = true;
-    autoStart = true;
+    autoStart = false;
+  };
+
+  systemd.user.services.rog-control-center = {
+    description = "rog-control-center";
+
+    after = [ "cosmic-session.target" ];
+    partOf = [ "cosmic-session.target" ];
+    wantedBy = [ "cosmic-session.target" ];
+
+    startLimitBurst = 5;
+    startLimitIntervalSec = 120;
+
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = lib.getExe' pkgs.asusctl "rog-control-center";
+      Restart = "always";
+      RestartSec = 1;
+      TimeoutStopSec = 10;
+
+      # Optional: keep your delay
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
+    };
   };
 
   # services.auto-cpufreq = {
