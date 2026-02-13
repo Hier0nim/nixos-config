@@ -22,6 +22,7 @@ in
         mkRON "tuple" [
           [
             "com.system76.CosmicAppletTime"
+            "io.github.cosmic_utils.weather-applet"
             "dev.DBrox.CosmicPrivacyIndicator"
           ]
           [
