@@ -30,7 +30,7 @@
               inherit inputs outputs lib;
             };
             modules = [
-              inputs.cosmic-unstable.nixosModules.default
+              # inputs.cosmic-unstable.nixosModules.default
               inputs.determinate.nixosModules.default
               inputs.disko.nixosModules.default
               inputs.home-manager.nixosModules.default
@@ -85,7 +85,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
+    # cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
 
     # ========= Utilities =========
     # Declarative partitioning and formatting
