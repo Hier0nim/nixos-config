@@ -4,6 +4,7 @@
     enable = true;
     package = pkgs.yazi;
     enableNushellIntegration = true;
+    shellWrapperName = "y";
     settings = {
       mgr = {
         show_hidden = false;
