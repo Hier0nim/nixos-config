@@ -6,7 +6,7 @@
 }:
 with lib;
 let
-  firefox-addons = inputs.firefox-addons.packages.${pkgs.system};
+  firefox-addons = inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
   arkenfoxConfig = builtins.readFile "${inputs.arkenfox-userjs}/user.js";
 
   # Relax some arkenfox settings, to get a less strict
