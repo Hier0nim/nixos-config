@@ -135,8 +135,6 @@
       url = "github:Hier0nim/nvim";
     };
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
   };
 }

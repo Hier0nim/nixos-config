@@ -61,8 +61,9 @@
     };
 
     tmp.cleanOnBoot = true;
-    kernelPackages = pkgs.linuxPackagesFor pkgs.cachyosKernels.linux-cachyos-latest-lto-x86_64-v3;
+    kernelPackages = pkgs.linuxPackages_latest;
   };
+  hardware.nvidia.open = false;
 
   services = {
     # ASUS specific software. This also installs asusctl.
