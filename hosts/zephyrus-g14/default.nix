@@ -69,7 +69,6 @@
     # ASUS specific software. This also installs asusctl.
     asusd = {
       enable = true;
-      enableUserService = true;
       asusdConfig.source = ./asusd.ron;
     };
     supergfxd.enable = lib.mkForce false;
