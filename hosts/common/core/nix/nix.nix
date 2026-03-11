@@ -42,20 +42,19 @@
     };
 
     overlays = [
-      inputs.nix-cachyos-kernel.overlays.pinned
-      (final: prev: {
-        asusctl = prev.asusctl.overrideAttrs (old: rec {
-          version = "6.3.2";
-
-          src = prev.fetchFromGitLab {
-            owner = "asus-linux";
-            repo = "asusctl";
-            tag = version;
-
-            hash = "sha256-6dZkQ8cPL8dbtvfuc/a5G1BxEaZyNbvy3eRBctFFwVU=";
-          };
-        });
-      })
+      # (final: prev: {
+      #   asusctl = prev.asusctl.overrideAttrs (old: rec {
+      #     version = "6.3.4";
+      #
+      #     src = prev.fetchFromGitLab {
+      #       owner = "asus-linux";
+      #       repo = "asusctl";
+      #       tag = version;
+      #
+      #       hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      #     };
+      #   });
+      # })
       # (final: prev: {
       #   cosmic-comp = prev.cosmic-comp.overrideAttrs (old: {
       #     patches = [ ./../../../../patches/no_ssd.patch ];
