@@ -9,35 +9,28 @@
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.disko.nixosModules.disko
 
-    ./disko-config.nix
+    ./disko.nix
     ./hardware-configuration.nix
 
-    ../common/core
-    ../users/hieronim
+    ../../users/hieronim
 
-    ../common/optional/hardware/bluetooth.nix
-    ../common/optional/hardware/suspend-and-hibernate.nix
-    ../common/optional/hardware/i2c.nix
-    ../common/optional/input-devices/default.nix
-    ../common/optional/programs/neovim.nix
-    ../common/optional/services/openssh.nix
-    ../common/optional/services/openvpn3.nix
-    ../common/optional/services/gnome-keyring.nix
-    ../common/optional/services/printing.nix
-    ../common/optional/services/logind.nix
-    # ../common/optional/services/howdy.nix
-    ../common/optional/services/winboat.nix
-    ../common/optional/services/openssh.nix
-    ../common/optional/services/wsdd.nix
-    ../common/optional/boot/plymouth.nix
-    ../common/optional/boot/usbcore.nix
-    ../common/optional/desktop-environment/cosmic.nix
-    ../common/optional/gaming
-    ../common/optional/fonts
+    ../../modules/nixos/core
+    ../../modules/nixos/profiles/laptop.nix
+    ../../modules/nixos/profiles/workstation.nix
+    ../../modules/nixos/profiles/gaming.nix
+    ../../modules/nixos/profiles/cosmic.nix
+
+    ../../modules/nixos/boot/plymouth.nix
+    ../../modules/nixos/boot/usbcore.nix
+    ../../modules/nixos/input-devices
+    ../../modules/nixos/programs/neovim.nix
+    ../../modules/nixos/services/openvpn3.nix
+    ../../modules/nixos/services/winboat.nix
+
+    # ../../modules/nixos/services/howdy.nix
   ];
 
   networking.hostName = "zephyrus-g14";
-  desktopManager.cosmicCustom.enable = true;
 
   boot = {
     initrd = {
@@ -145,22 +138,22 @@
     cifs-utils
   ];
 
-  fileSystems."/mnt/NAS" = {
-    device = "//192.168.8.1/nas";
-    fsType = "cifs";
-    options = [
-      "guest"
-      "iocharset=utf8"
-      "vers=3.1.1"
-      "uid=1000"
-      "gid=100"
-      "dir_mode=0755"
-      "file_mode=0644"
-      "nofail"
-      "x-systemd.automount"
-      "x-systemd.idle-timeout=60"
-    ];
-  };
+  # fileSystems."/mnt/NAS" = {
+  #   device = "//192.168.8.1/nas";
+  #   fsType = "cifs";
+  #   options = [
+  #     "guest"
+  #     "iocharset=utf8"
+  #     "vers=3.1.1"
+  #     "uid=1000"
+  #     "gid=100"
+  #     "dir_mode=0755"
+  #     "file_mode=0644"
+  #     "nofail"
+  #     "x-systemd.automount"
+  #     "x-systemd.idle-timeout=60"
+  #   ];
+  # };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";

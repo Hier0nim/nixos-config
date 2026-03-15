@@ -17,30 +17,27 @@
       # ========== Extend lib with lib.custom ==========
       # NOTE: This approach allows lib.custom to propagate into hm
       # see: https://github.com/nix-community/home-manager/pull/3454
-      lib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
+      baseLib = nixpkgs.lib;
+      lib = baseLib.extend (self: super: { custom = import ./lib { lib = self; }; });
 
     in
     {
       # ========= Host Configurations =========
-      nixosConfigurations = builtins.listToAttrs (
-        map (host: {
-          name = host;
-          value = nixpkgs.lib.nixosSystem {
-            specialArgs = {
-              inherit inputs outputs lib;
-            };
-            modules = [
-              # inputs.cosmic-unstable.nixosModules.default
-              inputs.determinate.nixosModules.default
-              inputs.disko.nixosModules.default
-              inputs.home-manager.nixosModules.default
-              inputs.asus-px-keyboard-tool.nixosModules.default
+      nixosConfigurations = {
+        zephyrus-g14 = lib.custom.mkHost {
+          inherit inputs outputs nixpkgs;
+          system = "x86_64-linux";
+          modules = [
+            # inputs.cosmic-unstable.nixosModules.default
+            inputs.determinate.nixosModules.default
+            inputs.disko.nixosModules.default
+            inputs.home-manager.nixosModules.default
+            inputs.asus-px-keyboard-tool.nixosModules.default
 
-              ./hosts/${host}
-            ];
-          };
-        }) (builtins.attrNames (builtins.readDir ./hosts))
-      );
+            ./hosts/zephyrus-g14
+          ];
+        };
+      };
 
       # ========= Formatting =========
       # Nix formatter available through 'nix fmt' https://github.com/NixOS/nixfmt
@@ -70,6 +67,7 @@
           checks = self.checks.${system};
         }
       );
+
     };
 
   inputs = {
