@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 let
   sharedModules = [
     (lib.custom.relativeToRoot "modules/home")
@@ -25,5 +25,8 @@ in
       }
     ]
     ++ sharedModules;
+
+    # Provide flake inputs to Home Manager modules.
+    extraSpecialArgs = { inherit inputs; };
   };
 }
