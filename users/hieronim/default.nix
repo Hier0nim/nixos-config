@@ -8,10 +8,20 @@
 }:
 let
   inherit (config.custom) username;
+  inherit (config.networking) hostName;
   ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in
 {
   custom.username = lib.mkDefault "hieronim";
+
+  sops.secrets = {
+    user_password_hash = {
+      sopsFile = config.custom.repoPath + "/secrets/${hostName}/users.yaml";
+    };
+    root_password_hash = {
+      sopsFile = config.custom.repoPath + "/secrets/${hostName}/users.yaml";
+    };
+  };
 
   users = {
     mutableUsers = false;
@@ -34,15 +44,13 @@ in
             "i2c"
           ])
         ];
-        # TODO(sops-nix): store hashed password in an encrypted secret.
-        hashedPassword = "$y$j9T$A393jWCF3yvUwEwDdalP9/$9JAJVGgOujBcX/SMg8zRuuagNfWH9y6aochFeAsEOC1";
+        hashedPasswordFile = config.sops.secrets.user_password_hash.path;
         shell = pkgs.nushell;
       };
 
       root = {
         shell = pkgs.nushell;
-        # TODO(sops-nix): store hashed password in an encrypted secret.
-        hashedPassword = "$y$j9T$Vh7yCdbgKEzY59Z2cI3Vr/$JspXXRYmAAhD8NCxx4cdm0o2VQETx8aXxTlG/8dz/W9";
+        hashedPasswordFile = config.sops.secrets.root_password_hash.path;
       };
     };
   };

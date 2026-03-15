@@ -21,6 +21,7 @@
               content = {
                 type = "luks";
                 name = "crypted";
+                askPassword = true;
                 settings = {
                   allowDiscards = true;
                 };

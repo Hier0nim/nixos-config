@@ -16,6 +16,7 @@
 {
   default = pkgs.mkShell {
     NIX_CONFIG = "extra-experimental-features = nix-command flakes";
+    SOPS_CONFIG = "./secrets/.sops.yaml";
 
     inherit (checks.pre-commit-check) shellHook;
     buildInputs = checks.pre-commit-check.enabledPackages;
