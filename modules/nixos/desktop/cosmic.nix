@@ -34,9 +34,11 @@ with lib;
       ];
     };
 
-    services.desktopManager.cosmic.enable = true;
+    services.desktopManager.cosmic = {
+      enable = true;
+      showExcludedPkgsWarning = false;
+    };
     services.displayManager.cosmic-greeter.enable = true;
-
     security.pam.services.cosmic-greeter.enableGnomeKeyring = true;
 
     systemd.tmpfiles.rules = [
