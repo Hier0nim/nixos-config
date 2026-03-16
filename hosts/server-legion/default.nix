@@ -1,0 +1,74 @@
+{
+  inputs,
+  pkgs,
+  ...
+}:
+{
+  imports = [
+    inputs.nixos-hardware.nixosModules.lenovo-legion-y530-15ich
+
+    ./disko.nix
+    ./hardware-configuration.nix
+
+    ../../users/hieronim
+
+    ../../modules/nixos/core
+    ../../modules/nixos/profiles/server.nix
+    ../../modules/nixos/programs/neovim.nix
+    ../../modules/nixos/homelab
+  ];
+
+  networking.hostName = "server-legion";
+
+  nixpkgs.overlays = [
+    inputs.copyparty.overlays.default
+  ];
+
+  boot = {
+    initrd = {
+      systemd.enable = true;
+    };
+
+    loader = {
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+
+      systemd-boot = {
+        enable = true;
+        editor = false;
+        configurationLimit = 5;
+      };
+
+      timeout = 3;
+    };
+
+    tmp.cleanOnBoot = true;
+    kernelPackages = pkgs.linuxPackages;
+  };
+
+  environment.systemPackages = with pkgs; [
+    btrfs-progs
+    cifs-utils
+    hdparm
+    lm_sensors
+    smartmontools
+    nvme-cli
+    usbutils
+    pciutils
+  ];
+
+  homelab = {
+    enable = true;
+    domain = "pieczarkowo.me";
+
+    proxy.enable = true;
+    media.enable = true;
+    photos.enable = true;
+    files.enable = true;
+  };
+
+  # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
+  system.stateVersion = "25.05";
+}

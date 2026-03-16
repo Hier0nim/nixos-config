@@ -17,6 +17,12 @@
       path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_pieczarkownia";
       mode = "0600";
     };
+    ssh_server_legion = {
+      sopsFile = config.custom.repoPath + "/secrets/common/ssh/server-legion.yaml";
+      key = "key";
+      path = "${config.home.homeDirectory}/.ssh/id_ed25519_server_legion";
+      mode = "0600";
+    };
   };
 
   programs.ssh = {
@@ -48,6 +54,11 @@
           HostName <your-server-ip>
           User root
           IdentityFile ~/.ssh/id_ed25519_hetzner_pieczarkownia
+
+        Host homelab
+          HostName 192.168.8.2
+          User hieronim
+          IdentityFile ~/.ssh/id_ed25519_server_legion
 
         Host router
           HostName 192.168.8.1

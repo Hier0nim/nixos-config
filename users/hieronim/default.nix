@@ -17,9 +17,11 @@ in
   sops.secrets = {
     user_password_hash = {
       sopsFile = config.custom.repoPath + "/secrets/${hostName}/users.yaml";
+      neededForUsers = true;
     };
     root_password_hash = {
       sopsFile = config.custom.repoPath + "/secrets/${hostName}/users.yaml";
+      neededForUsers = true;
     };
   };
 

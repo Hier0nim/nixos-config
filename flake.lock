@@ -34,6 +34,27 @@
         "type": "github"
       }
     },
+    "copyparty": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773272006,
+        "narHash": "sha256-YGuXb5p9RCWJ7NrqDh1AUTy2NNfLYn38t6trGMpSkJc=",
+        "owner": "9001",
+        "repo": "copyparty",
+        "rev": "6eb4f0ad9cc266abd5007509a15be93daa887ccf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "9001",
+        "repo": "copyparty",
+        "type": "github"
+      }
+    },
     "cosmic-manager": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -231,6 +252,21 @@
         "url": "https://flakehub.com/f/hercules-ci/flake-parts/0.1"
       }
     },
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1678901627,
+        "narHash": "sha256-U02riOqrKKzwjsxc/400XnElV+UtPUQWpANPlyazjH0=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "93a2b84fc4b70d9e089d029deacc3583435c2ed6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -298,6 +334,27 @@
         "type": "github"
       }
     },
+    "home-manager-stable": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773607598,
+        "narHash": "sha256-nPV/IE0NwQjYcXkEGOmCIEsX9i8HFMeq2RupYzfVdiI=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "1f8f9e001235652cf54f9c1f7983f9c0e920944a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "nix": {
       "inputs": {
         "flake-parts": "flake-parts_2",
@@ -339,6 +396,28 @@
       "original": {
         "owner": "Hier0nim",
         "repo": "nvim",
+        "type": "github"
+      }
+    },
+    "nixarr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ],
+        "vpnconfinement": "vpnconfinement",
+        "website-builder": "website-builder"
+      },
+      "locked": {
+        "lastModified": 1770542066,
+        "narHash": "sha256-RTyyeuvK84WqFah0qUoyq28o2oM7yBfkFIHjFu5h0hc=",
+        "owner": "nix-media-server",
+        "repo": "nixarr",
+        "rev": "7cc521933dc6800ae81ecfc91fe36237476e4ffb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-media-server",
+        "repo": "nixarr",
         "type": "github"
       }
     },
@@ -603,12 +682,15 @@
       "inputs": {
         "arkenfox-userjs": "arkenfox-userjs",
         "asus-px-keyboard-tool": "asus-px-keyboard-tool",
+        "copyparty": "copyparty",
         "cosmic-manager": "cosmic-manager",
         "determinate": "determinate",
         "disko": "disko",
         "firefox-addons": "firefox-addons",
         "home-manager": "home-manager",
+        "home-manager-stable": "home-manager-stable",
         "nixCats": "nixCats",
+        "nixarr": "nixarr",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_5",
         "nixpkgs-stable": "nixpkgs-stable",
@@ -669,6 +751,42 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "vpnconfinement": {
+      "locked": {
+        "lastModified": 1765634578,
+        "narHash": "sha256-Fujb9sn1cj+u/bzfo2RbQkcAvJ7Ch1pimJzFie4ptb4=",
+        "owner": "Maroka-chan",
+        "repo": "VPN-Confinement",
+        "rev": "f2989e1e3cb06c7185939e9ddc368f88b998616a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Maroka-chan",
+        "repo": "VPN-Confinement",
+        "type": "github"
+      }
+    },
+    "website-builder": {
+      "inputs": {
+        "nixpkgs": [
+          "nixarr",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1753958235,
+        "narHash": "sha256-Rd27XQJKv8Z4BCr3gdbaHFd0TmumiGxdjGRzsEf/mOg=",
+        "owner": "rasmus-kirk",
+        "repo": "website-builder",
+        "rev": "00a14b7ae7baef2197978ba7c3fe72dfca7bc475",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rasmus-kirk",
+        "repo": "website-builder",
         "type": "github"
       }
     },

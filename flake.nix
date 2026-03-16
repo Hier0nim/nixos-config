@@ -37,6 +37,27 @@
             ./hosts/zephyrus-g14
           ];
         };
+        # server-legion intentionally uses nixpkgs-stable + home-manager-stable.
+        server-legion = lib.custom.mkHost {
+          inherit inputs outputs;
+          nixpkgs = inputs.nixpkgs-stable;
+          specialArgs = {
+            inputs = inputs // {
+              nixpkgs = inputs.nixpkgs-stable;
+              home-manager = inputs.home-manager-stable;
+            };
+          };
+          system = "x86_64-linux";
+          modules = [
+            inputs.determinate.nixosModules.default
+            inputs.disko.nixosModules.default
+            inputs.home-manager-stable.nixosModules.default
+            inputs.nixarr.nixosModules.default
+            inputs.copyparty.nixosModules.default
+
+            ./hosts/server-legion
+          ];
+        };
       };
 
       # ========= Formatting =========
@@ -81,6 +102,18 @@
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+    nixarr = {
+      url = "github:nix-media-server/nixarr";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+    copyparty = {
+      url = "github:9001/copyparty";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
     # cosmic-unstable.url = "github:ninelore/nixpkgs-cosmic-unstable";
