@@ -32,6 +32,7 @@ in
         uid = 1000;
         extraGroups = lib.flatten [
           "wheel"
+          "sops"
           (ifTheyExist [
             "audio"
             "video"

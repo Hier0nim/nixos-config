@@ -13,6 +13,7 @@
   # SOPS config is stored at `secrets/.sops.yaml`.
   # Encrypt files with: sops -e -i secrets/common/<name>.yaml
   sops = {
+    # Use one dedicated AGE identity shared by NixOS and Home Manager.
     age.keyFile = "/var/lib/sops-nix/key.txt";
 
     # Default location for shared secrets (create the encrypted file when ready).
@@ -29,9 +30,12 @@
     # };
   };
 
-  # Host key setup (run once per host):
-  #   sudo mkdir -p /var/lib/sops-nix
-  #   sudo age-keygen -o /var/lib/sops-nix/key.txt
-  #   age-keygen -y /var/lib/sops-nix/key.txt
-  # Add the public key output to `secrets/.sops.yaml` for this host.
+  # Allow group-based access so Home Manager can read the shared key.
+  users.groups.sops = { };
+
+  systemd.tmpfiles.rules = [
+    # Maintain permissions for the shared key and its directory.
+    "d /var/lib/sops-nix 0750 root sops -"
+    "z /var/lib/sops-nix/key.txt 0640 root sops -"
+  ];
 }
