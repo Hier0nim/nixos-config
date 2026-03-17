@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -19,6 +20,7 @@
   ];
 
   networking.hostName = "server-legion";
+  networking.networkmanager.wifi.powersave = lib.mkForce false;
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
@@ -67,6 +69,13 @@
     media.enable = true;
     photos.enable = true;
     files.enable = true;
+  };
+
+  custom.wifi.networks = {
+    pieczarkowo = {
+      enable = true;
+      autoconnect = true;
+    };
   };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion

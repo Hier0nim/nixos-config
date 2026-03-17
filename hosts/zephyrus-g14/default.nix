@@ -32,6 +32,13 @@
 
   networking.hostName = "zephyrus-g14";
 
+  custom.wifi.networks = {
+    pieczarkowo = {
+      enable = true;
+      autoconnect = true;
+    };
+  };
+
   boot = {
     initrd = {
       verbose = false;
