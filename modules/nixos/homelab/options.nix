@@ -80,5 +80,11 @@ in
     photos.enable = mkEnableOption "photos stack";
     files.enable = mkEnableOption "file stack";
     proxy.enable = mkEnableOption "reverse proxy stack";
+
+    ssh.authorizedKeys = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = "Public SSH keys allowed to log in to the homelab admin user.";
+    };
   };
 }
