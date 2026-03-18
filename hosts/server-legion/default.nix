@@ -22,6 +22,12 @@
   networking.hostName = "server-legion";
   networking.networkmanager.wifi.powersave = lib.mkForce false;
 
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchDocked = "ignore";
+  };
+
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
   ];
