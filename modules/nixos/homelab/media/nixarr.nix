@@ -14,6 +14,10 @@ in
       sopsFile = config.custom.repoPath + "/secrets/${hostName}/vpn/transmission-wireguard.conf";
       format = "binary";
     };
+    sops.secrets.transmission_credentials = {
+      sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
+      format = "yaml";
+    };
 
     nixarr = {
       enable = true;
@@ -48,6 +52,8 @@ in
         openFirewall = false;
         vpn.enable = true;
         messageLevel = "info";
+        credentialsFile = config.sops.secrets.transmission_credentials.path;
+
         extraSettings = {
           "download-dir" = cfg.downloadsDir;
           "trash-original-torrent-files" = true;

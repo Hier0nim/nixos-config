@@ -43,30 +43,56 @@ in
     };
 
     services = {
-      jellyfin.subdomain = mkOption {
-        type = types.str;
-        default = "grzybflix";
-        description = "Subdomain for Jellyfin.";
+      jellyfin = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "grzybflix";
+          description = "Subdomain for Jellyfin.";
+        };
       };
-      immich.subdomain = mkOption {
-        type = types.str;
-        default = "fotki";
-        description = "Subdomain for Immich.";
+      immich = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "fotki";
+          description = "Subdomain for Immich.";
+        };
       };
-      copyparty.subdomain = mkOption {
-        type = types.str;
-        default = "pliki";
-        description = "Subdomain for Copyparty.";
+      copyparty = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "pliki";
+          description = "Subdomain for Copyparty.";
+        };
       };
-      jellyseerr.subdomain = mkOption {
-        type = types.str;
-        default = "chciejnik";
-        description = "Subdomain for Jellyseerr.";
+      jellyseerr = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "chciejnik";
+          description = "Subdomain for Jellyseerr.";
+        };
+        protect = mkEnableOption "HTTP Basic Auth via Caddy" // {
+          default = true;
+        };
       };
-      audiobookshelf.subdomain = mkOption {
-        type = types.str;
-        default = "czytelnia";
-        description = "Subdomain for Audiobookshelf.";
+      audiobookshelf = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "czytelnia";
+          description = "Subdomain for Audiobookshelf.";
+        };
+        protect = mkEnableOption "HTTP Basic Auth via Caddy" // {
+          default = true;
+        };
+      };
+      transmission = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "pobieralnia";
+          description = "Subdomain for Transmission.";
+        };
+        protect = mkEnableOption "HTTP Basic Auth via Caddy" // {
+          default = true;
+        };
       };
     };
 

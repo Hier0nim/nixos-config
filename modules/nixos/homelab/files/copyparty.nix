@@ -6,61 +6,99 @@
 let
   cfg = config.homelab;
   inherit (config.networking) hostName;
+
   copypartyUser = config.services.copyparty.user;
   copypartyGroup = config.services.copyparty.group;
+
+  copypartySecretsFile = config.custom.repoPath + "/secrets/${hostName}/copyparty.yaml";
+
+  mkCopypartyPasswordSecret = key: {
+    sopsFile = copypartySecretsFile;
+    inherit key;
+    owner = copypartyUser;
+    group = copypartyGroup;
+    mode = "0400";
+  };
+
+  commonVolumeFlags = {
+    e2d = true;
+    d2t = true;
+    scan = 60;
+    fk = 4;
+  };
 in
 {
   config = lib.mkIf (cfg.enable && cfg.files.enable) {
-    sops.secrets.copyparty_hieronim_password = {
-      sopsFile = config.custom.repoPath + "/secrets/${hostName}/copyparty.yaml";
-      key = "hieronim_password";
-      # statix:ignore
-      owner = copypartyUser;
-      # statix:ignore
-      group = copypartyGroup;
-      mode = "0400";
+    users.groups.media = { };
+
+    users.users.${copypartyUser}.extraGroups = [
+      "media"
+    ];
+
+    sops = {
+      secrets = {
+        copyparty_admin_password = mkCopypartyPasswordSecret "admin_password";
+        copyparty_hieronim_password = mkCopypartyPasswordSecret "hieronim_password";
+        copyparty_sarka_password = mkCopypartyPasswordSecret "sarka_password";
+      };
     };
 
-    sops.secrets.copyparty_sarka_password = {
-      sopsFile = config.custom.repoPath + "/secrets/${hostName}/copyparty.yaml";
-      key = "sarka_password";
-      # statix:ignore
-      owner = copypartyUser;
-      # statix:ignore
-      group = copypartyGroup;
-      mode = "0400";
-    };
+    systemd.tmpfiles.rules = [
+      # NAS is writable by Copyparty.
+      "d ${cfg.nasDir} 0770 root ${copypartyGroup} - -"
+      "Z ${cfg.nasDir} 0770 root ${copypartyGroup} - -"
+
+      # Photos are only read by Copyparty; ownership is handled by Immich.
+      "d ${cfg.photosDir} 0750 root media - -"
+    ];
 
     services.copyparty = {
       enable = true;
+
       settings = {
         i = "127.0.0.1";
         p = 3923;
       };
+
       accounts = {
+        admin.passwordFile = config.sops.secrets.copyparty_admin_password.path;
         hieronim.passwordFile = config.sops.secrets.copyparty_hieronim_password.path;
         sarka.passwordFile = config.sops.secrets.copyparty_sarka_password.path;
       };
+
       groups = {
-        family = [
+        admin = [ "admin" ];
+        shared = [
           "hieronim"
           "sarka"
         ];
       };
+
       volumes = {
-        "/" = {
+        "/nas" = {
           path = cfg.nasDir;
           access = {
-            rw = [ "family" ];
+            rw = [
+              "admin"
+              "shared"
+            ];
           };
-          flags = {
-            e2d = true;
-            d2t = true;
-            scan = 60;
-            fk = 4;
+          flags = commonVolumeFlags;
+        };
+      }
+      // lib.optionalAttrs cfg.photos.enable {
+        "/photos" = {
+          path = cfg.photosDir;
+          access = {
+            r = [
+              "admin"
+              "shared"
+            ];
           };
+          flags = commonVolumeFlags;
         };
       };
+
       openFilesLimit = 8192;
     };
   };

@@ -9,6 +9,8 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.photos.enable) {
+    users.groups.media = { };
+
     services.immich = {
       enable = true;
       host = "127.0.0.1";
@@ -22,7 +24,10 @@ in
     };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.photosDir} 0750 immich immich - -"
+      # Immich owns the photo library and can write to it.
+      # Group 'media' gets read/traverse access so Copyparty can expose it read-only.
+      "d ${cfg.photosDir} 0750 immich media - -"
+      "Z ${cfg.photosDir} 0750 immich media - -"
     ];
   };
 }
