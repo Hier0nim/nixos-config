@@ -94,19 +94,19 @@ in
 
       prowlarr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       radarr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       sonarr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       bazarr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       transmission = {
         enable = true;
@@ -122,23 +122,23 @@ in
       };
       jellyfin = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       jellyseerr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       readarr = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       "readarr-audiobook" = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       audiobookshelf = {
         enable = true;
-        openFirewall = false;
+        openFirewall = true;
       };
       recyclarr = {
         enable = true;
