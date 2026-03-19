@@ -16,12 +16,18 @@ in
 
       # Base directories only.
       # Service-specific ownership/permissions are handled in the service modules.
-      "d ${cfg.mediaDir} 0755 root root - -"
-      "d ${cfg.mediaDir}/movies 0755 root root - -"
-      "d ${cfg.mediaDir}/shows 0755 root root - -"
-      "d ${cfg.mediaDir}/music 0755 root root - -"
-      "d ${cfg.mediaDir}/ebooks 0755 root root - -"
-      "d ${cfg.mediaDir}/audiobooks 0755 root root - -"
+      "d ${cfg.mediaDir} 2775 root media - -"
+      "Z ${cfg.mediaDir} 2775 root media - -"
+      "d ${cfg.mediaDir}/movies 2775 root media - -"
+      "Z ${cfg.mediaDir}/movies 2775 root media - -"
+      "d ${cfg.mediaDir}/shows 2775 root media - -"
+      "Z ${cfg.mediaDir}/shows 2775 root media - -"
+      "d ${cfg.mediaDir}/music 2775 root media - -"
+      "Z ${cfg.mediaDir}/music 2775 root media - -"
+      "d ${cfg.mediaDir}/ebooks 2775 root media - -"
+      "Z ${cfg.mediaDir}/ebooks 2775 root media - -"
+      "d ${cfg.mediaDir}/audiobooks 2775 root media - -"
+      "Z ${cfg.mediaDir}/audiobooks 2775 root media - -"
       "d ${cfg.downloadsDir} 0750 root root - -"
     ];
   };
