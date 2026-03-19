@@ -10,13 +10,41 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.media.enable) {
-    sops.secrets.${wgSecretName} = {
-      sopsFile = config.custom.repoPath + "/secrets/${hostName}/vpn/transmission-wireguard.conf";
-      format = "binary";
-    };
-    sops.secrets.transmission_credentials = {
-      sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
-      format = "yaml";
+    systemd.tmpfiles.rules = [
+      # Nixarr services keep their state under this shared directory.
+      # Group write allows the service users (in the media group) to create subdirs.
+      "d ${cfg.dataDir}/.state/nixarr 0770 root media - -"
+      "Z ${cfg.dataDir}/.state/nixarr 0770 root media - -"
+    ];
+
+    sops = {
+      secrets = {
+        ${wgSecretName} = {
+          sopsFile = config.custom.repoPath + "/secrets/${hostName}/vpn/transmission-wireguard.conf";
+          format = "binary";
+        };
+        transmission_rpc_username = {
+          sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
+          key = "rpc-username";
+        };
+        transmission_rpc_password = {
+          sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
+          key = "rpc-password";
+        };
+      };
+
+      templates.transmission_credentials_json = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+        content = ''
+          {
+            "rpc-authentication-required": true,
+            "rpc-username": "${config.sops.placeholder.transmission_rpc_username}",
+            "rpc-password": "${config.sops.placeholder.transmission_rpc_password}"
+          }
+        '';
+      };
     };
 
     nixarr = {
@@ -52,7 +80,7 @@ in
         openFirewall = false;
         vpn.enable = true;
         messageLevel = "info";
-        credentialsFile = config.sops.secrets.transmission_credentials.path;
+        credentialsFile = config.sops.templates.transmission_credentials_json.path;
 
         extraSettings = {
           "download-dir" = cfg.downloadsDir;

@@ -29,18 +29,14 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.files.enable) {
-    users.groups.media = { };
-
     users.users.${copypartyUser}.extraGroups = [
       "media"
     ];
 
-    sops = {
-      secrets = {
-        copyparty_admin_password = mkCopypartyPasswordSecret "admin_password";
-        copyparty_hieronim_password = mkCopypartyPasswordSecret "hieronim_password";
-        copyparty_sarka_password = mkCopypartyPasswordSecret "sarka_password";
-      };
+    sops.secrets = {
+      copyparty_admin_password = mkCopypartyPasswordSecret "admin_password";
+      copyparty_hieronim_password = mkCopypartyPasswordSecret "hieronim_password";
+      copyparty_sarka_password = mkCopypartyPasswordSecret "sarka_password";
     };
 
     systemd.tmpfiles.rules = [
@@ -58,6 +54,7 @@ in
       settings = {
         i = "127.0.0.1";
         p = 3923;
+        rproxy = 1;
       };
 
       accounts = {
@@ -67,7 +64,6 @@ in
       };
 
       groups = {
-        admin = [ "admin" ];
         shared = [
           "hieronim"
           "sarka"
@@ -80,7 +76,8 @@ in
           access = {
             rw = [
               "admin"
-              "shared"
+              "hieronim"
+              "sarka"
             ];
           };
           flags = commonVolumeFlags;
@@ -92,7 +89,8 @@ in
           access = {
             r = [
               "admin"
-              "shared"
+              "hieronim"
+              "sarka"
             ];
           };
           flags = commonVolumeFlags;

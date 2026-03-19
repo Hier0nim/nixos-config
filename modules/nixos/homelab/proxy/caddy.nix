@@ -16,88 +16,52 @@ let
   jellyseerrFqdn = "${cfg.services.jellyseerr.subdomain}.${cfg.domain}";
   audiobookshelfFqdn = "${cfg.services.audiobookshelf.subdomain}.${cfg.domain}";
   transmissionFqdn = "${cfg.services.transmission.subdomain}.${cfg.domain}";
+
+  mkAuth = name: {
+    secrets = {
+      "${name}_user" = {
+        sopsFile = caddySecretsFile;
+        key = "${name}_user";
+        owner = "caddy";
+        group = "caddy";
+        mode = "0400";
+      };
+      "${name}_hash" = {
+        sopsFile = caddySecretsFile;
+        key = "${name}_hash";
+        owner = "caddy";
+        group = "caddy";
+        mode = "0400";
+      };
+    };
+    template = {
+      "caddy-basic-auth-${name}".content = ''
+        basic_auth {
+          ${config.sops.placeholder."${name}_user"} ${config.sops.placeholder."${name}_hash"}
+        }
+      '';
+    };
+  };
+
+  jellyseerrAuth = mkAuth "jellyseerr";
+  audiobookshelfAuth = mkAuth "audiobookshelf";
+  transmissionAuth = mkAuth "transmission";
 in
 {
   config = mkIf (cfg.enable && cfg.proxy.enable) {
     sops.secrets =
-      (optionalAttrs cfg.services.jellyseerr.protect {
-        jellyseerr_user = {
-          sopsFile = caddySecretsFile;
-          key = "jellyseerr_user";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-        jellyseerr_hash = {
-          sopsFile = caddySecretsFile;
-          key = "jellyseerr_hash";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-      })
-      // (optionalAttrs cfg.services.audiobookshelf.protect {
-        audiobookshelf_user = {
-          sopsFile = caddySecretsFile;
-          key = "audiobookshelf_user";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-        audiobookshelf_hash = {
-          sopsFile = caddySecretsFile;
-          key = "audiobookshelf_hash";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-      })
-      // (optionalAttrs cfg.services.transmission.protect {
-        transmission_user = {
-          sopsFile = caddySecretsFile;
-          key = "transmission_user";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-        transmission_hash = {
-          sopsFile = caddySecretsFile;
-          key = "transmission_hash";
-          owner = "caddy";
-          group = "caddy";
-          mode = "0400";
-        };
-      });
+      (optionalAttrs cfg.services.jellyseerr.protect jellyseerrAuth.secrets)
+      // (optionalAttrs cfg.services.audiobookshelf.protect audiobookshelfAuth.secrets)
+      // (optionalAttrs cfg.services.transmission.protect transmissionAuth.secrets);
 
     sops.templates =
-      (optionalAttrs cfg.services.jellyseerr.protect {
-        "caddy-basic-auth-jellyseerr".content = ''
-          basic_auth {
-            ${config.sops.placeholder.jellyseerr_user} ${config.sops.placeholder.jellyseerr_hash}
-          }
-        '';
-      })
-      // (optionalAttrs cfg.services.audiobookshelf.protect {
-        "caddy-basic-auth-audiobookshelf".content = ''
-          basic_auth {
-            ${config.sops.placeholder.audiobookshelf_user} ${config.sops.placeholder.audiobookshelf_hash}
-          }
-        '';
-      })
-      // (optionalAttrs cfg.services.transmission.protect {
-        "caddy-basic-auth-transmission".content = ''
-          basic_auth {
-            ${config.sops.placeholder.transmission_user} ${config.sops.placeholder.transmission_hash}
-          }
-        '';
-      });
+      (optionalAttrs cfg.services.jellyseerr.protect jellyseerrAuth.template)
+      // (optionalAttrs cfg.services.audiobookshelf.protect audiobookshelfAuth.template)
+      // (optionalAttrs cfg.services.transmission.protect transmissionAuth.template);
 
-    services.caddy.enable = true;
-
-    networking.firewall.allowedTCPPorts = [
-      80
-      443
-    ];
+    services.caddy = {
+      enable = true;
+    };
 
     services.caddy.virtualHosts = {
       "${jellyfinFqdn}".extraConfig = ''
@@ -109,7 +73,13 @@ in
       '';
 
       "${copypartyFqdn}".extraConfig = ''
-        reverse_proxy http://127.0.0.1:3923
+        reverse_proxy http://127.0.0.1:3923 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Real-IP {remote_host}
+        }
       '';
 
       "${jellyseerrFqdn}".extraConfig = ''
@@ -130,7 +100,10 @@ in
         ${optionalString cfg.services.transmission.protect ''
           import ${config.sops.templates.caddy-basic-auth-transmission.path}
         ''}
-        reverse_proxy http://127.0.0.1:9091 {
+
+        redir / /transmission/
+
+        reverse_proxy /transmission/* http://127.0.0.1:9091 {
           header_up X-Forwarded-Proto {scheme}
           header_up X-Forwarded-Host {host}
           header_up X-Real-IP {remote_host}

@@ -8,10 +8,12 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    users.groups.media = { };
+
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0755 root root - -"
-      "d ${cfg.dataDir}/.state 0750 root root - -"
-      "d ${cfg.dataDir}/.state/nixarr 0750 root root - -"
+      "d ${cfg.dataDir}/.state 0755 root root - -"
+      "d ${cfg.dataDir}/.state/nixarr 0755 root root - -"
 
       # Base directories only.
       # Service-specific ownership/permissions are handled in the service modules.

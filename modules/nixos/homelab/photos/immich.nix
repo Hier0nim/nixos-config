@@ -9,8 +9,6 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.photos.enable) {
-    users.groups.media = { };
-
     services.immich = {
       enable = true;
       host = "127.0.0.1";
