@@ -10,25 +10,58 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.media.enable) {
+    users = {
+      users = {
+        bazarr.extraGroups = [ "media" ];
+        jellyseerr.extraGroups = [ "media" ];
+        prowlarr.extraGroups = [ "media" ];
+        radarr.extraGroups = [ "media" ];
+        readarr.extraGroups = [ "media" ];
+        "readarr-audiobook".extraGroups = [ "media" ];
+        sonarr.extraGroups = [ "media" ];
+      };
+    };
+
     systemd.tmpfiles.rules = [
       # Nixarr services keep their state under this shared directory.
       # Group write allows the service users (in the media group) to create subdirs.
       "d ${cfg.dataDir}/.state/nixarr 0770 root media - -"
       "Z ${cfg.dataDir}/.state/nixarr 0770 root media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/prowlarr 0750 prowlarr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/prowlarr 0750 prowlarr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/radarr 0750 radarr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/radarr 0750 radarr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/sonarr 0750 sonarr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/sonarr 0750 sonarr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/bazarr 0750 bazarr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/bazarr 0750 bazarr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/jellyseerr 0750 jellyseerr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/jellyseerr 0750 jellyseerr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/readarr 0750 readarr media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/readarr 0750 readarr media - -"
+
+      "d ${cfg.dataDir}/.state/nixarr/readarr-audiobook 0750 readarr-audiobook media - -"
+      "Z ${cfg.dataDir}/.state/nixarr/readarr-audiobook 0750 readarr-audiobook media - -"
     ];
 
     sops = {
       secrets = {
         ${wgSecretName} = {
-          sopsFile = config.custom.repoPath + "/secrets/${hostName}/vpn/transmission-wireguard.conf";
+          sopsFile = "${config.custom.repoPath}/secrets/${hostName}/vpn/transmission-wireguard.conf";
           format = "binary";
         };
         transmission_rpc_username = {
-          sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
+          sopsFile = "${config.custom.repoPath}/secrets/${hostName}/transmission/credentials.yaml";
           key = "rpc-username";
         };
         transmission_rpc_password = {
-          sopsFile = config.custom.repoPath + "/secrets/${hostName}/transmission/credentials.yaml";
+          sopsFile = "${config.custom.repoPath}/secrets/${hostName}/transmission/credentials.yaml";
           key = "rpc-password";
         };
       };

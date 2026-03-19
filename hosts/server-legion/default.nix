@@ -68,6 +68,10 @@
   ];
 
   homelab = {
+    ssh.authorizedKeys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINpMtn/1wYa2EhgfnGjU0ZHk4mBKz1Mr0SjioMu2h4Ya server-legion"
+    ];
+
     enable = true;
     domain = "pieczarkowo.me";
 
@@ -75,9 +79,13 @@
     media.enable = true;
     photos.enable = true;
     files.enable = true;
-    ssh.authorizedKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINpMtn/1wYa2EhgfnGjU0ZHk4mBKz1Mr0SjioMu2h4Ya server-legion"
-    ];
+    monitoring = {
+      enable = true;
+      metrics.enable = true;
+      logs.enable = true;
+      grafana.enable = true;
+      cockpit.enable = true;
+    };
   };
 
   custom.wifi.networks = {

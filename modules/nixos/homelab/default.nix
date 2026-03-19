@@ -9,5 +9,6 @@
     ./media
     ./photos
     ./files
+    ./monitoring
   ];
 }

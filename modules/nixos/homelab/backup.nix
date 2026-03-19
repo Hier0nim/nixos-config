@@ -11,6 +11,7 @@ in
     # Backup policy (skeleton):
     # - Back up: /data/photos, /data/nas
     # - Maybe later: /data/media/ebooks, /data/media/audiobooks
+    # - Optional: /data/.state/monitoring (metrics/logs are ephemeral)
     # - Do not back up: /data/downloads, recreatable media libraries
   };
 }

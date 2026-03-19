@@ -10,7 +10,7 @@ let
   copypartyUser = config.services.copyparty.user;
   copypartyGroup = config.services.copyparty.group;
 
-  copypartySecretsFile = config.custom.repoPath + "/secrets/${hostName}/copyparty.yaml";
+  copypartySecretsFile = "${config.custom.repoPath}/secrets/${hostName}/copyparty.yaml";
 
   mkCopypartyPasswordSecret = key: {
     sopsFile = copypartySecretsFile;

@@ -13,12 +13,9 @@ in
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0755 root root - -"
       "d ${cfg.dataDir}/.state 0755 root root - -"
-      "d ${cfg.dataDir}/.state/nixarr 0755 root root - -"
 
       # Base directories only.
       # Service-specific ownership/permissions are handled in the service modules.
-      "d ${cfg.nasDir} 0750 root root - -"
-      "d ${cfg.photosDir} 0750 root root - -"
       "d ${cfg.mediaDir} 0755 root root - -"
       "d ${cfg.mediaDir}/movies 0755 root root - -"
       "d ${cfg.mediaDir}/shows 0755 root root - -"

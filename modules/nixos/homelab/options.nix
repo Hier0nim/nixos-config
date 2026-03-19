@@ -94,6 +94,26 @@ in
           default = true;
         };
       };
+      grafana = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "monitoring";
+          description = "Subdomain for Grafana.";
+        };
+        protect = mkEnableOption "HTTP Basic Auth via Caddy" // {
+          default = true;
+        };
+      };
+      cockpit = {
+        subdomain = mkOption {
+          type = types.str;
+          default = "server";
+          description = "Subdomain for Cockpit.";
+        };
+        protect = mkEnableOption "HTTP Basic Auth via Caddy" // {
+          default = true;
+        };
+      };
     };
 
     media.vpn.wgConfSecretName = mkOption {
@@ -106,6 +126,13 @@ in
     photos.enable = mkEnableOption "photos stack";
     files.enable = mkEnableOption "file stack";
     proxy.enable = mkEnableOption "reverse proxy stack";
+    monitoring = {
+      enable = mkEnableOption "monitoring stack";
+      metrics.enable = mkEnableOption "Prometheus and node exporter";
+      logs.enable = mkEnableOption "Loki and Promtail";
+      grafana.enable = mkEnableOption "Grafana UI";
+      cockpit.enable = mkEnableOption "Cockpit UI";
+    };
 
     ssh.authorizedKeys = mkOption {
       type = types.listOf types.str;
