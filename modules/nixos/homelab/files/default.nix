@@ -1,5 +1,0 @@
-{
-  imports = [
-    ./copyparty.nix
-  ];
-}

@@ -1,9 +1,9 @@
 { lib, ... }:
 {
   imports = lib.flatten [
-    ./metrics.nix
-    ./logs.nix
-    ./grafana.nix
+    ./nixarr.nix
+    ./immich.nix
+    ./copyparty.nix
     ./cockpit.nix
   ];
 }

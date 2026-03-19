@@ -7,9 +7,8 @@ let
   cfg = config.homelab;
   inherit (config.networking) hostName;
 
-  copypartyUser = config.services.copyparty.user;
-  copypartyGroup = config.services.copyparty.group;
-
+  copypartyUser = cfg.services.copyparty.user;
+  copypartyGroup = cfg.services.copyparty.group;
   copypartySecretsFile = "${config.custom.repoPath}/secrets/${hostName}/copyparty.yaml";
 
   mkCopypartyPasswordSecret = key: {
@@ -28,10 +27,10 @@ let
   };
 in
 {
-  config = lib.mkIf (cfg.enable && cfg.files.enable) {
-    users.users.${copypartyUser}.extraGroups = [
-      "media"
-    ];
+  config = lib.mkIf (cfg.enable && cfg.profiles.files.enable && cfg.services.copyparty.enable) {
+    homelab.services.copyparty.expose.reverseProxyExtraConfig = lib.mkDefault ''
+      header_up X-Real-IP {remote_host}
+    '';
 
     sops.secrets = {
       copyparty_admin_password = mkCopypartyPasswordSecret "admin_password";
@@ -39,21 +38,14 @@ in
       copyparty_sarka_password = mkCopypartyPasswordSecret "sarka_password";
     };
 
-    systemd.tmpfiles.rules = [
-      # NAS is writable by Copyparty.
-      "d ${cfg.nasDir} 0770 root ${copypartyGroup} - -"
-      "Z ${cfg.nasDir} 0770 root ${copypartyGroup} - -"
-
-      # Photos are only read by Copyparty; ownership is handled by Immich.
-      "d ${cfg.photosDir} 0750 root media - -"
-    ];
-
     services.copyparty = {
       enable = true;
+      user = copypartyUser;
+      group = copypartyGroup;
 
       settings = {
         i = "127.0.0.1";
-        p = 3923;
+        p = cfg.services.copyparty.upstream.port;
         rproxy = 1;
       };
 
@@ -72,22 +64,9 @@ in
 
       volumes = {
         "/nas" = {
-          path = cfg.nasDir;
+          path = cfg.data.nas;
           access = {
             rw = [
-              "admin"
-              "hieronim"
-              "sarka"
-            ];
-          };
-          flags = commonVolumeFlags;
-        };
-      }
-      // lib.optionalAttrs cfg.photos.enable {
-        "/photos" = {
-          path = cfg.photosDir;
-          access = {
-            r = [
               "admin"
               "hieronim"
               "sarka"

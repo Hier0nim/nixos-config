@@ -76,15 +76,12 @@
     domain = "pieczarkowo.me";
 
     proxy.enable = true;
-    media.enable = true;
-    photos.enable = true;
-    files.enable = true;
-    monitoring = {
-      enable = true;
-      metrics.enable = true;
-      logs.enable = true;
-      grafana.enable = true;
-      cockpit.enable = true;
+
+    profiles = {
+      media.enable = true;
+      photos.enable = true;
+      files.enable = true;
+      admin.enable = true;
     };
   };
 
