@@ -89,12 +89,16 @@ let
           mkReverseProxy upstream svc.expose.reverseProxyExtraConfig
         else
           mkPrefixedProxy svc.expose.pathPrefix upstream svc.expose.reverseProxyExtraConfig;
-      apiBypassConfig = optionalString svc.auth.bypassForApi ''
-        @api path ${optionalString (svc.expose.pathPrefix != null) "${svc.expose.pathPrefix}/"}api/*
-        handle @api {
-          ${mkReverseProxy upstream svc.expose.reverseProxyExtraConfig}
-        }
-      '';
+      apiBypassConfig =
+        let
+          apiPrefix = if svc.expose.pathPrefix != null then "${svc.expose.pathPrefix}/" else "/";
+        in
+        optionalString svc.auth.bypassForApi ''
+          @api path ${apiPrefix}api/*
+          handle @api {
+            ${mkReverseProxy upstream svc.expose.reverseProxyExtraConfig}
+          }
+        '';
       baseHandle =
         if svc.auth.bypassForApi then
           ''

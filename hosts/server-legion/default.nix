@@ -83,6 +83,11 @@
       files.enable = true;
       admin.enable = true;
     };
+
+    services = {
+      sonarr.auth.bypassForApi = true;
+      radarr.auth.bypassForApi = true;
+    };
   };
 
   custom.wifi.networks = {
