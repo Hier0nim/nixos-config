@@ -12,8 +12,6 @@ let
 
   resticSecretsFile = "${repoPath}/secrets/${hostName}/backup.yaml";
   rcloneSecretsFile = "${repoPath}/secrets/${hostName}/rclone/proton.conf";
-  resticEnvTemplateName = "restic-homelab-proton.env";
-  resticEnvPath = "/run/restic/homelab-proton.env";
   resticCacheDir = "/var/cache/restic-backups-homelab-proton";
 in
 {
@@ -42,19 +40,6 @@ in
         group = "root";
         mode = "0400";
       };
-
-      templates.${resticEnvTemplateName} = {
-        content = ''
-          RCLONE_CONFIG=${config.sops.secrets.${backupCfg.rcloneConfigSecretName}.path}
-          RESTIC_PASSWORD_FILE=${config.sops.secrets.${backupCfg.passwordSecretName}.path}
-          RESTIC_REPOSITORY=rclone:${backupCfg.repositoryRemoteName}:${backupCfg.repositoryPath}
-          RESTIC_CACHE_DIR=${resticCacheDir}
-        '';
-        path = resticEnvPath;
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      };
     };
 
     services.restic.backups.homelab-proton = {
@@ -62,7 +47,21 @@ in
       inherit (backupCfg) paths timerConfig;
       user = "root";
       passwordFile = config.sops.secrets.${backupCfg.passwordSecretName}.path;
-      environmentFile = config.sops.templates.${resticEnvTemplateName}.path;
+      repository = "rclone:${backupCfg.repositoryRemoteName}:${backupCfg.repositoryPath}";
+      rcloneConfigFile = config.sops.secrets.${backupCfg.rcloneConfigSecretName}.path;
+      rcloneOptions = {
+        retries = "10";
+        low-level-retries = "20";
+        retries-sleep = "10s";
+      };
+      rcloneConfig = {
+        replace_existing_draft = true;
+      };
+      extraBackupArgs = [
+        "--compression"
+        "max"
+        "--one-file-system"
+      ];
       backupPrepareCommand =
         #bash
         ''
@@ -80,18 +79,9 @@ in
         "--keep-weekly ${toString backupCfg.retention.weekly}"
         "--keep-monthly ${toString backupCfg.retention.monthly}"
       ];
-      extraBackupArgs = [
-        "--compression"
-        "max"
-        "--one-file-system"
-      ];
     };
 
     systemd = {
-      tmpfiles.rules = [
-        "d /run/restic 0700 root root - -"
-      ];
-
       services.restic-backups-homelab-proton.path = lib.mkAfter [
         pkgs.rclone
         pkgs.restic
@@ -108,7 +98,12 @@ in
         serviceConfig = {
           Type = "oneshot";
           User = "root";
-          EnvironmentFile = config.sops.templates.${resticEnvTemplateName}.path;
+          Environment = [
+            "RCLONE_CONFIG=${config.sops.secrets.${backupCfg.rcloneConfigSecretName}.path}"
+            "RESTIC_PASSWORD_FILE=${config.sops.secrets.${backupCfg.passwordSecretName}.path}"
+            "RESTIC_REPOSITORY=rclone:${backupCfg.repositoryRemoteName}:${backupCfg.repositoryPath}"
+            "RESTIC_CACHE_DIR=${resticCacheDir}"
+          ];
           CacheDirectory = "restic-backups-homelab-proton";
           CacheDirectoryMode = "0700";
           PrivateTmp = true;
