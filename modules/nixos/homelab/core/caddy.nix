@@ -80,7 +80,7 @@ let
     name: svc:
     let
       fqdn = "${svc.expose.subdomain}.${cfg.domain}";
-      upstream = "http://${svc.upstream.host}:${toString svc.upstream.port}";
+      upstream = "${svc.upstream.scheme}://${svc.upstream.host}:${toString svc.upstream.port}";
       authImport =
         optionalString (svc.auth.group != null)
           "import ${config.sops.templates."caddy-basic-auth-${svc.auth.group}".path}";
