@@ -84,6 +84,18 @@
       admin.enable = true;
     };
 
+    backups = {
+      enable = true;
+      paths = [
+        "/data/photos/library"
+        "/data/photos/backups"
+        "/data/photos/upload"
+        "/data/photos/profile"
+        "/data/nas"
+        "/data/appdata"
+      ];
+    };
+
     services = {
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;

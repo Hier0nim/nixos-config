@@ -151,6 +151,92 @@ in
       };
     };
 
+    backups = {
+      enable = mkEnableOption "homelab restic backups";
+
+      paths = mkOption {
+        type = types.listOf types.str;
+        default = [
+          "/data/photos/library"
+          "/data/photos/backups"
+          "/data/photos/upload"
+          "/data/nas"
+          "/data/appdata"
+        ];
+        description = "Paths to back up with restic.";
+      };
+
+      repositoryRemoteName = mkOption {
+        type = types.str;
+        default = "proton";
+        description = "Rclone remote name for the restic repository.";
+      };
+
+      repositoryPath = mkOption {
+        type = types.str;
+        default = "homelab-backups/server-legion/restic";
+        description = "Path inside the rclone remote used for the restic repository.";
+      };
+
+      passwordSecretName = mkOption {
+        type = types.str;
+        default = "restic_password";
+        description = "SOPS key name for the restic repository password.";
+      };
+
+      rcloneConfigSecretName = mkOption {
+        type = types.str;
+        default = "rclone_proton_config";
+        description = "SOPS secret name for the Proton rclone config file.";
+      };
+
+      retention = {
+        daily = mkOption {
+          type = types.int;
+          default = 7;
+          description = "Number of daily snapshots to keep.";
+        };
+
+        weekly = mkOption {
+          type = types.int;
+          default = 4;
+          description = "Number of weekly snapshots to keep.";
+        };
+
+        monthly = mkOption {
+          type = types.int;
+          default = 6;
+          description = "Number of monthly snapshots to keep.";
+        };
+      };
+
+      timerConfig = mkOption {
+        type = types.attrsOf types.anything;
+        default = {
+          OnCalendar = "02:00";
+          Persistent = true;
+        };
+        description = "Systemd timer config for the restic backup job.";
+      };
+
+      check = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Enable periodic restic integrity checks.";
+        };
+
+        timerConfig = mkOption {
+          type = types.attrsOf types.anything;
+          default = {
+            OnCalendar = "Sun 03:00";
+            Persistent = true;
+          };
+          description = "Systemd timer config for the restic check job.";
+        };
+      };
+    };
+
     profiles = {
       media.enable = mkEnableOption "media stack profile";
       photos.enable = mkEnableOption "photos stack profile";
