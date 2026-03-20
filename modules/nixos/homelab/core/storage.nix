@@ -61,10 +61,10 @@ in
       "Z ${data.nas} 2770 root nas - -"
       "d ${data.nas}/shared 2770 root nas - -"
       "Z ${data.nas}/shared 2770 root nas - -"
-      "d ${data.nas}/documents 2770 root nas - -"
-      "Z ${data.nas}/documents 2770 root nas - -"
-      "d ${data.nas}/backups 2770 root nas - -"
-      "Z ${data.nas}/backups 2770 root nas - -"
+      "d ${data.nas}/hieronim 2770 root nas - -"
+      "Z ${data.nas}/hieronim 2770 root nas - -"
+      "d ${data.nas}/sarka 2770 root nas - -"
+      "Z ${data.nas}/sarka 2770 root nas - -"
     ];
   };
 }

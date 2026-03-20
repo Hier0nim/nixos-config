@@ -63,12 +63,32 @@ in
       };
 
       volumes = {
-        "/nas" = {
-          path = cfg.data.nas;
+        "/nas/shared" = {
+          path = "${cfg.data.nas}/shared";
           access = {
             rw = [
               "admin"
               "hieronim"
+              "sarka"
+            ];
+          };
+          flags = commonVolumeFlags;
+        };
+        "/nas/hieronim" = {
+          path = "${cfg.data.nas}/hieronim";
+          access = {
+            rw = [
+              "admin"
+              "hieronim"
+            ];
+          };
+          flags = commonVolumeFlags;
+        };
+        "/nas/sarka" = {
+          path = "${cfg.data.nas}/sarka";
+          access = {
+            rw = [
+              "admin"
               "sarka"
             ];
           };
