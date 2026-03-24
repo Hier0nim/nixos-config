@@ -5,35 +5,12 @@
 }:
 let
   cfg = config.homelab;
-  inherit (cfg) data;
+  inherit (cfg) data state;
   inherit (config.networking) hostName;
   inherit (cfg.media.vpn) wgConfSecretName;
-
-  mkAppdataRules =
-    name:
-    let
-      svc = cfg.services.${name};
-    in
-    lib.optionals svc.enable [
-      "d ${data.appdata}/${name} 0750 ${svc.user} ${svc.group} - -"
-      "Z ${data.appdata}/${name} 0750 ${svc.user} ${svc.group} - -"
-    ];
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable) {
-    systemd.tmpfiles.rules = lib.concatLists [
-      (mkAppdataRules "sonarr")
-      (mkAppdataRules "radarr")
-      (mkAppdataRules "prowlarr")
-      (mkAppdataRules "bazarr")
-      (mkAppdataRules "transmission")
-      (mkAppdataRules "jellyfin")
-      (mkAppdataRules "jellyseerr")
-      (mkAppdataRules "audiobookshelf")
-      (mkAppdataRules "readarr")
-      (mkAppdataRules "readarr-audiobook")
-    ];
-
     sops.secrets.${wgConfSecretName} = {
       sopsFile = "${config.custom.repoPath}/secrets/${hostName}/vpn/transmission-wireguard.conf";
       format = "binary";
@@ -48,7 +25,7 @@ in
     nixarr = {
       enable = true;
       mediaDir = data.media;
-      stateDir = data.appdata;
+      stateDir = state.nixarr;
       mediaUsers = [ config.custom.username ];
 
       vpn = {
@@ -117,6 +94,13 @@ in
         enable = true;
         configFile = ./recyclarr.yaml;
       };
+    };
+
+    services.jellyfin = lib.mkIf cfg.services.jellyfin.enable {
+      configDir = lib.mkForce "${state.jellyfin}/config";
+      dataDir = lib.mkForce "${state.jellyfin}/data";
+      cacheDir = lib.mkForce "${state.jellyfin}/cache";
+      logDir = lib.mkForce "${state.jellyfin}/log";
     };
   };
 }

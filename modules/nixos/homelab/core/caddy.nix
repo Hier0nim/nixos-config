@@ -1,5 +1,6 @@
 {
   config,
+  homelabMeta,
   lib,
   ...
 }:
@@ -53,6 +54,8 @@ let
   authAttrs = builtins.map (name: mkAuth name groups.${name}) authNames;
   authSecrets = lib.foldl' (acc: item: acc // item.secrets) { } authAttrs;
   authTemplates = lib.foldl' (acc: item: acc // item.template) { } authAttrs;
+
+  inherit (homelabMeta) proxiedServices;
 
   mkReverseProxy =
     upstream: extraConfig:
@@ -138,19 +141,8 @@ in
       443
     ];
 
-    services.caddy.virtualHosts =
-      mkServiceVhost "sonarr" cfg.services.sonarr
-      // mkServiceVhost "radarr" cfg.services.radarr
-      // mkServiceVhost "prowlarr" cfg.services.prowlarr
-      // mkServiceVhost "bazarr" cfg.services.bazarr
-      // mkServiceVhost "transmission" cfg.services.transmission
-      // mkServiceVhost "jellyfin" cfg.services.jellyfin
-      // mkServiceVhost "jellyseerr" cfg.services.jellyseerr
-      // mkServiceVhost "audiobookshelf" cfg.services.audiobookshelf
-      // mkServiceVhost "readarr" cfg.services.readarr
-      // mkServiceVhost "readarr-audiobook" cfg.services."readarr-audiobook"
-      // mkServiceVhost "immich" cfg.services.immich
-      // mkServiceVhost "copyparty" cfg.services.copyparty
-      // mkServiceVhost "cockpit" cfg.services.cockpit;
+    services.caddy.virtualHosts = lib.foldl' (
+      acc: name: acc // mkServiceVhost name cfg.services.${name}
+    ) { } proxiedServices;
   };
 }

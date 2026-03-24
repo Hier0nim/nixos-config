@@ -122,6 +122,32 @@ in
       description = "Public SSH keys allowed to log in to the homelab admin user.";
     };
 
+    state = {
+      root = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab";
+        description = "Root directory for homelab service state.";
+      };
+
+      nixarr = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/nixarr";
+        description = "State directory for nixarr-managed services.";
+      };
+
+      jellyfin = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/jellyfin";
+        description = "State directory for Jellyfin.";
+      };
+
+      immichHot = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/immich-hot";
+        description = "SSD-backed hot data directory for Immich.";
+      };
+    };
+
     data = {
       root = mkOption {
         type = types.path;
@@ -139,12 +165,6 @@ in
         type = types.path;
         default = "/data/downloads";
         description = "Downloads/import directory.";
-      };
-
-      appdata = mkOption {
-        type = types.path;
-        default = "/data/appdata";
-        description = "Per-service app data directory.";
       };
 
       photos = mkOption {
@@ -203,10 +223,7 @@ in
         subdomain = "sonarr";
         port = 8989;
         authGroup = "media-admin";
-        dataGroups = [
-          "media"
-          "downloads"
-        ];
+        dataGroups = [ "media" ];
       };
 
       radarr = mkServiceOptions {
@@ -214,10 +231,7 @@ in
         subdomain = "radarr";
         port = 7878;
         authGroup = "media-admin";
-        dataGroups = [
-          "media"
-          "downloads"
-        ];
+        dataGroups = [ "media" ];
       };
 
       prowlarr = mkServiceOptions {
@@ -243,7 +257,7 @@ in
         authGroup = "media-admin";
         pathPrefix = "/transmission";
         redirectToPrefix = true;
-        dataGroups = [ "downloads" ];
+        dataGroups = [ "media" ];
       };
 
       jellyfin = mkServiceOptions {
@@ -273,10 +287,7 @@ in
         subdomain = "readarr";
         port = 8787;
         authGroup = "media-admin";
-        dataGroups = [
-          "media"
-          "downloads"
-        ];
+        dataGroups = [ "media" ];
         exposeEnable = false;
       };
 
@@ -285,10 +296,7 @@ in
         subdomain = "readarr-audiobook";
         port = 8788;
         authGroup = "media-admin";
-        dataGroups = [
-          "media"
-          "downloads"
-        ];
+        dataGroups = [ "media" ];
         exposeEnable = false;
       };
 
