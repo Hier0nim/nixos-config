@@ -1,11 +1,11 @@
 {
   config,
-  homelabMeta,
   lib,
   ...
 }:
 let
   cfg = config.homelab;
+  homelabMeta = import ../meta-data.nix;
 
   mediaEnabled = cfg.profiles.media.enable;
   photosEnabled = cfg.profiles.photos.enable;

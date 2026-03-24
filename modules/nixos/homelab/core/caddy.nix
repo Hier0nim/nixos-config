@@ -1,11 +1,11 @@
 {
   config,
-  homelabMeta,
   lib,
   ...
 }:
 let
   cfg = config.homelab;
+  homelabMeta = import ../meta-data.nix;
   inherit (config.networking) hostName;
   inherit (lib) mkIf optionalAttrs optionalString;
   inherit (config.custom) repoPath;

@@ -1,11 +1,11 @@
 {
   config,
-  homelabMeta,
   lib,
   ...
 }:
 let
   cfg = config.homelab;
+  homelabMeta = import ../meta-data.nix;
   immichService = cfg.services.immich;
   inherit (immichService.upstream) port;
   inherit (cfg.data) photos;

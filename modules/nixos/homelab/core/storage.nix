@@ -1,11 +1,11 @@
 {
   config,
-  homelabMeta,
   lib,
   ...
 }:
 let
   cfg = config.homelab;
+  homelabMeta = import ../meta-data.nix;
   inherit (cfg) data;
 
   mediaEnabled = cfg.profiles.media.enable;
