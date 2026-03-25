@@ -2,16 +2,53 @@ radarr:
   movies:
     base_url: http://localhost:7878
     api_key: !env_var RADARR_API_KEY
+
     quality_definition:
       type: movie
+
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
+
+    custom_formats:
+      - trash_ids:
+          - 4b900e171accbfb172729b63323ea8ca # MULTi
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 100
+
+      - trash_ids:
+          - 0dc8aec3bd1c47cd6c40c46ecd27e846 # Language: Not English
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -100
+
+      - trash_ids:
+          - 2051402ee9ca81162017d98cbe1dff2c # Wrong Language
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -10000
+
 
 sonarr:
   series:
     base_url: http://localhost:8989
     api_key: !env_var SONARR_API_KEY
+
     quality_definition:
       type: series
+
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
+
+    custom_formats:
+      - trash_ids:
+          - 7ba05c6e0e14e793538174c679126996 # MULTi
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 100
+
+      - trash_ids:
+          - 69aa1e159f97d860440b04cd6d590c4f # Language: Not English
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -100
