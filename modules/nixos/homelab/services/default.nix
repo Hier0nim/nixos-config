@@ -5,5 +5,6 @@
     ./immich.nix
     ./copyparty.nix
     ./cockpit.nix
+    ./actual.nix
   ];
 }

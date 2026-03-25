@@ -13,6 +13,7 @@
     "immich"
     "copyparty"
     "cockpit"
+    "actual"
   ];
 
   nixarrStateServices = [

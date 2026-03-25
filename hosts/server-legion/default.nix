@@ -85,6 +85,7 @@
     };
 
     services = {
+      actual.enable = true;
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
     };

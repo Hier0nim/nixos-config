@@ -146,6 +146,12 @@ in
         default = "/var/lib/homelab/immich-hot";
         description = "SSD-backed hot data directory for Immich.";
       };
+
+      actual = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/actual";
+        description = "State directory for Actual Budget.";
+      };
     };
 
     data = {
@@ -320,6 +326,12 @@ in
         port = 9090;
         authGroup = "infra-admin";
         exposeEnable = false;
+      };
+
+      actual = mkServiceOptions {
+        name = "actual";
+        subdomain = "kasa";
+        port = 3100;
       };
     };
 
