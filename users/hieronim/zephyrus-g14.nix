@@ -14,7 +14,7 @@
     proton-pass
     remmina
     qbittorrent
-    protonvpn-gui
+    proton-vpn
     protonmail-desktop
     comma
     libreoffice-fresh

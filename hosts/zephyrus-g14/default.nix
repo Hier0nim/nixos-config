@@ -24,7 +24,6 @@
     ../../modules/nixos/boot/usbcore.nix
     ../../modules/nixos/input-devices
     ../../modules/nixos/programs/neovim.nix
-    ../../modules/nixos/services/openvpn3.nix
     ../../modules/nixos/services/winboat.nix
 
     # ../../modules/nixos/services/howdy.nix
@@ -145,22 +144,22 @@
     cifs-utils
   ];
 
-  # fileSystems."/mnt/NAS" = {
-  #   device = "//192.168.8.1/nas";
-  #   fsType = "cifs";
-  #   options = [
-  #     "guest"
-  #     "iocharset=utf8"
-  #     "vers=3.1.1"
-  #     "uid=1000"
-  #     "gid=100"
-  #     "dir_mode=0755"
-  #     "file_mode=0644"
-  #     "nofail"
-  #     "x-systemd.automount"
-  #     "x-systemd.idle-timeout=60"
-  #   ];
-  # };
+  fileSystems."/mnt/NAS" = {
+    device = "//192.168.8.1/nas";
+    fsType = "cifs";
+    options = [
+      "guest"
+      "iocharset=utf8"
+      "vers=3.1.1"
+      "uid=1000"
+      "gid=100"
+      "dir_mode=0755"
+      "file_mode=0644"
+      "nofail"
+      "x-systemd.automount"
+      "x-systemd.idle-timeout=60"
+    ];
+  };
 
   # https://wiki.nixos.org/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";
