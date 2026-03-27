@@ -169,7 +169,7 @@ in
 
       actual = mkOption {
         type = types.path;
-        default = "/var/lib/homelab/actual";
+        default = "/var/lib/actual";
         description = "State directory for Actual Budget.";
       };
     };
