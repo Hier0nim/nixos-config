@@ -102,6 +102,26 @@ let
           description = "Upstream port for ${name}.";
         };
       };
+
+      backup = {
+        enable = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Include ${name} data in homelab backups.";
+        };
+
+        paths = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Service-specific backup paths registered by ${name}.";
+        };
+
+        exclude = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Service-specific exclude patterns for ${name} backups.";
+        };
+      };
     };
 in
 {
@@ -183,6 +203,34 @@ in
         type = types.path;
         default = "/data/nas";
         description = "NAS/shared data directory.";
+      };
+    };
+
+    backup = {
+      enable = mkEnableOption "restic backups for homelab data";
+
+      mountPoint = mkOption {
+        type = types.str;
+        default = "/mnt/backup-router";
+        description = "Mountpoint for the router SMB backup share.";
+      };
+
+      repositoryPath = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Absolute path to the restic repository (defaults to mountPoint/restic/<host>).";
+      };
+
+      schedule = mkOption {
+        type = types.str;
+        default = "03:30";
+        description = "Systemd OnCalendar value for nightly backups.";
+      };
+
+      checkSchedule = mkOption {
+        type = types.str;
+        default = "Sun 04:30";
+        description = "Systemd OnCalendar value for restic repository checks.";
       };
     };
 

@@ -6,5 +6,6 @@
     ./copyparty.nix
     ./cockpit.nix
     ./actual.nix
+    ./backup.nix
   ];
 }

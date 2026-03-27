@@ -8,6 +8,11 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.services.actual.enable) {
+    homelab.services.actual.backup = {
+      enable = lib.mkDefault true;
+      paths = lib.mkDefault [ cfg.state.actual ];
+    };
+
     services.actual = {
       enable = true;
       openFirewall = false;

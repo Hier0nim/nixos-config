@@ -89,6 +89,8 @@
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
     };
+
+    backup.enable = true;
   };
 
   custom.wifi.networks = {

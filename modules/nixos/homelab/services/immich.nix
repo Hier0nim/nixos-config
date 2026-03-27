@@ -15,6 +15,20 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.photos.enable && immichService.enable) {
+    homelab.services.immich.backup = {
+      enable = lib.mkDefault true;
+      paths = lib.mkDefault [
+        "${cfg.data.photos}/library"
+        "${cfg.data.photos}/backups"
+        "${cfg.data.photos}/profile"
+      ];
+      exclude = lib.mkDefault [
+        "${cfg.data.photos}/upload"
+        "${cfg.data.photos}/thumbs"
+        "${cfg.data.photos}/encoded-video"
+      ];
+    };
+
     services.immich = {
       enable = true;
       host = "127.0.0.1";

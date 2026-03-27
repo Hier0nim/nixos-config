@@ -28,6 +28,11 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.files.enable && cfg.services.copyparty.enable) {
+    homelab.services.copyparty.backup = {
+      enable = lib.mkDefault true;
+      paths = lib.mkDefault [ cfg.data.nas ];
+    };
+
     homelab.services.copyparty.expose.reverseProxyExtraConfig = lib.mkDefault ''
       header_up X-Real-IP {remote_host}
     '';
