@@ -301,7 +301,7 @@ in
         port = 6767;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
-        exposeEnable = false;
+        exposeEnable = true;
       };
 
       transmission = mkServiceOptions {
