@@ -342,16 +342,16 @@ in
         port = 8787;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
-        exposeEnable = false;
+        exposeEnable = true;
       };
 
       "readarr-audiobook" = mkServiceOptions {
         name = "readarr-audiobook";
         subdomain = "readarr-audiobook";
-        port = 8788;
+        port = 9494;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
-        exposeEnable = false;
+        exposeEnable = true;
       };
 
       immich = mkServiceOptions {
