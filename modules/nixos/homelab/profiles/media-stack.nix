@@ -19,6 +19,7 @@ in
       audiobookshelf.enable = true;
       readarr.enable = true;
       "readarr-audiobook".enable = true;
+      recyclarr.enable = true;
     };
   };
 }

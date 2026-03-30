@@ -354,6 +354,15 @@ in
         exposeEnable = true;
       };
 
+      # Internal nixarr-managed helper with private state, not a proxied web app.
+      recyclarr = mkServiceOptions {
+        name = "recyclarr";
+        subdomain = "recyclarr";
+        port = 1;
+        exposeEnable = false;
+        dataGroups = [ ];
+      };
+
       immich = mkServiceOptions {
         name = "immich";
         subdomain = "fotki";

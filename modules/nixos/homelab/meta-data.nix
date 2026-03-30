@@ -26,6 +26,7 @@
     "audiobookshelf"
     "readarr"
     "readarr-audiobook"
+    "recyclarr"
   ];
 
   sharedRoles = {

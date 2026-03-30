@@ -91,7 +91,7 @@ in
         openFirewall = false;
       };
       recyclarr = {
-        enable = true;
+        inherit (cfg.services.recyclarr) enable;
         configFile = ./recyclarr.yaml;
       };
     };
