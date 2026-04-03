@@ -28,6 +28,36 @@ radarr:
           - name: HD - 720p/1080p
             score: -10000
 
+      - trash_ids:
+          - 240770601cc226190c367ef59aba7463 # AAC
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 300
+
+      - trash_ids:
+          - c2998bd0d90ed5621d8df281e839436e # DD
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 150
+
+      - trash_ids:
+          - 185f1dd7264c4562b9022d963ac37424 # DD+
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -50
+
+      - trash_ids:
+          - 1c1a4c5e823891c75bc50380a6866f73 # DTS
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -300
+
+      - trash_ids:
+          - 3cafb66171b47f226146a0770576870f # TrueHD
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -500
+
 
 sonarr:
   series:
@@ -52,3 +82,33 @@ sonarr:
         assign_scores_to:
           - name: HD - 720p/1080p
             score: -100
+
+      - trash_ids:
+          - a50b8a0c62274a7c38b09a9619ba9d86 # AAC
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 300
+
+      - trash_ids:
+          - dbe00161b08a25ac6154c55f95e6318d # DD
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: 150
+
+      - trash_ids:
+          - 63487786a8b01b7f20dd2bc90dd4a477 # DD+
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -50
+
+      - trash_ids:
+          - 5964f2a8b3be407d083498e4459d05d0 # DTS
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -300
+
+      - trash_ids:
+          - 1808e4b9cee74e064dfae3f1db99dbfe # TrueHD
+        assign_scores_to:
+          - name: HD - 720p/1080p
+            score: -500
