@@ -38,8 +38,25 @@ in
       # Canonical Immich media root
       mediaLocation = photos;
 
+      accelerationDevices = lib.mkIf immichService.hardwareAcceleration.enable (
+        [
+          (toString immichService.hardwareAcceleration.device)
+        ]
+        ++ lib.optionals (immichService.hardwareAcceleration.type == "nvenc") [
+          "/dev/nvidiactl"
+          "/dev/nvidia-modeset"
+          "/dev/nvidia-uvm"
+          "/dev/nvidia-uvm-tools"
+        ]
+      );
+
       settings = {
         newVersionCheck.enabled = false;
+
+        ffmpeg = lib.mkIf immichService.hardwareAcceleration.enable {
+          accel = immichService.hardwareAcceleration.type;
+          accelDecode = true;
+        };
 
         server = {
           externalDomain = "https://${immichFqdn}";
@@ -52,6 +69,11 @@ in
         };
       };
     };
+
+    users.users.${immichService.user}.extraGroups = lib.mkIf immichService.hardwareAcceleration.enable [
+      "render"
+      "video"
+    ];
 
     fileSystems = lib.listToAttrs (
       map (name: {

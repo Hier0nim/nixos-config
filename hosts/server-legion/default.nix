@@ -93,6 +93,11 @@
         type = "nvenc";
         device = "/dev/nvidia0";
       };
+      immich.hardwareAcceleration = {
+        enable = true;
+        type = "nvenc";
+        device = "/dev/nvidia0";
+      };
     };
 
     backup.enable = true;

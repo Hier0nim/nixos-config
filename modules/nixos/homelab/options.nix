@@ -389,12 +389,33 @@ in
         dataGroups = [ ];
       };
 
-      immich = mkServiceOptions {
-        name = "immich";
-        subdomain = "fotki";
-        port = 2283;
-        dataGroups = [ "photos" ];
-      };
+      immich =
+        (mkServiceOptions {
+          name = "immich";
+          subdomain = "fotki";
+          port = 2283;
+          dataGroups = [ "photos" ];
+        })
+        // {
+          hardwareAcceleration = {
+            enable = mkEnableOption "Immich hardware-accelerated transcoding";
+
+            type = mkOption {
+              type = types.enum [
+                "nvenc"
+                "vaapi"
+              ];
+              default = "nvenc";
+              description = "Hardware acceleration backend used by Immich transcoding.";
+            };
+
+            device = mkOption {
+              type = types.path;
+              default = "/dev/nvidia0";
+              description = "Primary device node exposed to Immich for hardware acceleration.";
+            };
+          };
+        };
 
       copyparty = mkServiceOptions {
         name = "copyparty";
