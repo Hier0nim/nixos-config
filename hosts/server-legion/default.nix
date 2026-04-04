@@ -88,6 +88,11 @@
       actual.enable = true;
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
+      jellyfin.hardwareAcceleration = {
+        enable = true;
+        type = "nvenc";
+        device = "/dev/nvidia0";
+      };
     };
 
     backup.enable = true;

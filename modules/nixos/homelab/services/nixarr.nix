@@ -8,6 +8,7 @@ let
   inherit (cfg) data state;
   inherit (config.networking) hostName;
   inherit (cfg.media.vpn) wgConfSecretName;
+  jellyfinHwAccel = cfg.services.jellyfin.hardwareAcceleration;
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable) {
@@ -102,5 +103,28 @@ in
       cacheDir = lib.mkForce "${state.jellyfin}/cache";
       logDir = lib.mkForce "${state.jellyfin}/log";
     };
+
+    users.users.${cfg.services.jellyfin.user}.extraGroups =
+      lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
+        [
+          "render"
+          "video"
+        ];
+
+    systemd.services.jellyfin.serviceConfig =
+      lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable)
+        {
+          DeviceAllow = lib.mkAfter (
+            [
+              "${toString jellyfinHwAccel.device} rw"
+            ]
+            ++ lib.optionals (jellyfinHwAccel.type == "nvenc") [
+              "/dev/nvidiactl rw"
+              "/dev/nvidia-modeset rw"
+              "/dev/nvidia-uvm rw"
+              "/dev/nvidia-uvm-tools rw"
+            ]
+          );
+        };
   };
 }

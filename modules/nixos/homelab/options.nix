@@ -314,12 +314,38 @@ in
         dataGroups = [ "media" ];
       };
 
-      jellyfin = mkServiceOptions {
-        name = "jellyfin";
-        subdomain = "grzybflix";
-        port = 8096;
-        dataGroups = [ "media" ];
-      };
+      jellyfin =
+        (mkServiceOptions {
+          name = "jellyfin";
+          subdomain = "grzybflix";
+          port = 8096;
+          dataGroups = [ "media" ];
+        })
+        // {
+          hardwareAcceleration = {
+            enable = mkEnableOption "Jellyfin hardware-accelerated transcoding";
+
+            type = mkOption {
+              type = types.enum [
+                "amf"
+                "nvenc"
+                "qsv"
+                "rkmpp"
+                "v4l2m2m"
+                "vaapi"
+              ];
+              default = "nvenc";
+              description = "Hardware acceleration backend for Jellyfin transcoding.";
+            };
+
+            device = mkOption {
+              type = types.path;
+              default = "/dev/nvidia0";
+              description = "Device node used by Jellyfin for hardware acceleration.";
+            };
+
+          };
+        };
 
       jellyseerr = mkServiceOptions {
         name = "jellyseerr";
