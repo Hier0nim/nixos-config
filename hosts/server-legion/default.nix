@@ -88,7 +88,13 @@
       actual.enable = true;
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
+      tdarr.enable = true;
       jellyfin.hardwareAcceleration = {
+        enable = true;
+        type = "nvenc";
+        device = "/dev/nvidia0";
+      };
+      tdarr.hardwareAcceleration = {
         enable = true;
         type = "nvenc";
         device = "/dev/nvidia0";

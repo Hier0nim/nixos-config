@@ -161,6 +161,12 @@ in
         description = "State directory for Jellyfin.";
       };
 
+      tdarr = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/tdarr";
+        description = "State directory for Tdarr.";
+      };
+
       immichHot = mkOption {
         type = types.path;
         default = "/var/lib/homelab/immich-hot";
@@ -352,6 +358,47 @@ in
         subdomain = "chciejnik";
         port = 5055;
       };
+
+      tdarr =
+        (mkServiceOptions {
+          name = "tdarr";
+          subdomain = "tdarr";
+          port = 8265;
+          authGroup = "media-admin";
+          dataGroups = [ "media" ];
+        })
+        // {
+          image = mkOption {
+            type = types.str;
+            default = "ghcr.io/haveagitgat/tdarr:2.58.02";
+            description = "OCI image used for the Tdarr server container.";
+          };
+
+          cacheDir = mkOption {
+            type = types.path;
+            default = "/var/lib/homelab/tdarr/cache";
+            description = "Temporary working directory used by Tdarr while transcoding.";
+          };
+
+          hardwareAcceleration = {
+            enable = mkEnableOption "Tdarr hardware-accelerated transcoding";
+
+            type = mkOption {
+              type = types.enum [
+                "nvenc"
+                "vaapi"
+              ];
+              default = "nvenc";
+              description = "Hardware acceleration backend exposed to Tdarr.";
+            };
+
+            device = mkOption {
+              type = types.path;
+              default = "/dev/nvidia0";
+              description = "Primary hardware acceleration device path exposed to Tdarr.";
+            };
+          };
+        };
 
       audiobookshelf = mkServiceOptions {
         name = "audiobookshelf";

@@ -99,6 +99,16 @@ in
             ++ mkStateDir "${state.jellyfin}/cache" cfg.services.jellyfin.user cfg.services.jellyfin.group
             ++ mkStateDir "${state.jellyfin}/log" cfg.services.jellyfin.user cfg.services.jellyfin.group
           ))
+          (lib.optionals cfg.services.tdarr.enable (
+            [
+              "d ${state.tdarr} 0750 ${cfg.services.tdarr.user} ${cfg.services.tdarr.group} - -"
+              "Z ${state.tdarr} 0750 ${cfg.services.tdarr.user} ${cfg.services.tdarr.group} - -"
+            ]
+            ++ mkStateDir "${state.tdarr}/server" cfg.services.tdarr.user cfg.services.tdarr.group
+            ++ mkStateDir "${state.tdarr}/configs" cfg.services.tdarr.user cfg.services.tdarr.group
+            ++ mkStateDir "${state.tdarr}/logs" cfg.services.tdarr.user cfg.services.tdarr.group
+            ++ mkStateDir cfg.services.tdarr.cacheDir cfg.services.tdarr.user cfg.services.tdarr.group
+          ))
           (lib.optionals (cfg.profiles.photos.enable && cfg.services.immich.enable) (
             [
               "d ${state.immichHot} 0750 ${cfg.services.immich.user} ${cfg.services.immich.group} - -"
