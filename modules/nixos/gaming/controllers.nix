@@ -6,6 +6,9 @@
 
     # Logitech Driving Force GT Racing Wheel
     ATTRS{idProduct}=="c29a", RUN+="/bin/sh -c 'cd %S%p; chmod 666 alternate_modes combine_pedals range gain autocenter spring_level damper_level friction_level ffb_leds peak_ffb_level'"
+
+    # VIA
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="19f5", ATTRS{idProduct}=="3255", TAG+="uaccess", MODE="0660"
   '';
 
   environment.systemPackages = [ pkgs.oversteer ];
