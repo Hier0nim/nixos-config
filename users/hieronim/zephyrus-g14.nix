@@ -18,5 +18,7 @@
     protonmail-desktop
     comma
     libreoffice-fresh
+    jellyfin-desktop
+    via
   ];
 }
