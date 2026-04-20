@@ -8,6 +8,7 @@
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.disko.nixosModules.disko
+    inputs.monique.nixosModules.default
 
     ./disko.nix
     ./hardware-configuration.nix
@@ -18,7 +19,7 @@
     ../../modules/nixos/profiles/laptop.nix
     ../../modules/nixos/profiles/workstation.nix
     ../../modules/nixos/profiles/gaming.nix
-    ../../modules/nixos/profiles/cosmic.nix
+    ../../modules/nixos/profiles/niri.nix
 
     ../../modules/nixos/boot/plymouth.nix
     ../../modules/nixos/boot/usbcore.nix
@@ -82,12 +83,14 @@
     autoStart = false;
   };
 
+  programs.monique.enable = true;
+
   systemd.user.services.rog-control-center = {
     description = "rog-control-center";
 
-    after = [ "cosmic-session.target" ];
-    partOf = [ "cosmic-session.target" ];
-    wantedBy = [ "cosmic-session.target" ];
+    after = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    wantedBy = [ "graphical-session.target" ];
 
     startLimitBurst = 5;
     startLimitIntervalSec = 120;

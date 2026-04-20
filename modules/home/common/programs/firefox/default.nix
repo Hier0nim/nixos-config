@@ -119,8 +119,8 @@ in
       # "force_installed" and "normal_installed".
       ExtensionSettings = {
         # Kanagawa
-        "{26690e10-862d-456f-8bf2-50117a3cb206}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/4453995/kanagawa_theme-latest.xpi";
+        "pywalfox@frewacom.org" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4651382/pywalfox-latest.xpi";
           installation_mode = "force_installed";
         };
       };
@@ -137,6 +137,10 @@ in
       };
     };
   };
+
+  home.packages = with pkgs; [
+    pywalfox-native
+  ];
 
   xdg.configFile."tridactyl/tridactylrc".source = ./tridactylrc;
 }

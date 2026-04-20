@@ -21,10 +21,10 @@
     mimeApps =
       let
         imageViewer = [ "org.gnome.Loupe.desktop" ];
-        mediaPlayer = [ "com.system76.CosmicPlayer.desktop" ];
-        fileBrowser = [ "com.system76.CosmicFiles.desktop" ];
+        mediaPlayer = [ "io.github.celluloid_player.Celluloid.desktop" ];
+        fileBrowser = [ "org.gnome.Nautilus.desktop" ];
         webBrowser = [ "firefox.desktop" ];
-        documentViewer = [ "com.system76.CosmicReader.desktop" ];
+        documentViewer = [ "org.gnome.Papers.desktop" ];
         editor = [ "nvim-ghostty.desktop" ];
 
         media = [
