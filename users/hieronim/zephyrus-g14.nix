@@ -7,6 +7,7 @@
     (lib.custom.relativeToRoot "modules/home/profiles/dev.nix")
     (lib.custom.relativeToRoot "modules/home/profiles/gaming.nix")
     (lib.custom.relativeToRoot "modules/home/profiles/remote-admin.nix")
+    (lib.custom.relativeToRoot "modules/home/common/services/copyparty-drive.nix")
   ];
 
   home.packages = with pkgs; [
