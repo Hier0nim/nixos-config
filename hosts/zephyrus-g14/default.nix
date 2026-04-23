@@ -19,7 +19,7 @@
     ../../modules/nixos/profiles/laptop.nix
     ../../modules/nixos/profiles/workstation.nix
     ../../modules/nixos/profiles/gaming.nix
-    ../../modules/nixos/profiles/niri.nix
+    ../../modules/nixos/profiles/dms.nix
 
     ../../modules/nixos/boot/plymouth.nix
     ../../modules/nixos/boot/usbcore.nix

@@ -7,6 +7,6 @@
     # ../common/services/suspend.nix
     ../common/config/cursor.nix
     ../common/config/xdg.nix
-    ../desktop/noctalia
+    ../desktop/dms
   ];
 }

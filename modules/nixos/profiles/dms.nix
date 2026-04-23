@@ -1,6 +1,6 @@
 { ... }:
 {
   imports = [
-    ../desktop/niri.nix
+    ../desktop/dms.nix
   ];
 }

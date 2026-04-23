@@ -1,0 +1,42 @@
+{
+  "id": "kanagawa-paper",
+  "name": "Kanagawa Paper",
+  "dark": {
+    "primary": "#c4b28a",
+    "primaryText": "#1F1F28",
+    "primaryContainer": "#363646",
+    "secondary": "#8ea49e",
+    "surface": "#1F1F28",
+    "surfaceText": "#DCD7BA",
+    "surfaceVariant": "#2A2A37",
+    "surfaceVariantText": "#C8C093",
+    "surfaceTint": "#c4b28a",
+    "background": "#1F1F28",
+    "backgroundText": "#DCD7BA",
+    "outline": "#435965",
+    "surfaceContainer": "#2A2A37",
+    "surfaceContainerHigh": "#363646",
+    "error": "#c4746e",
+    "warning": "#d4c196",
+    "info": "#8ea49e"
+  },
+  "light": {
+    "primary": "#6b7f9f",
+    "primaryText": "#ffffff",
+    "primaryContainer": "#c9cdd7",
+    "secondary": "#6f8795",
+    "surface": "#f2f1ec",
+    "surfaceText": "#4f5357",
+    "surfaceVariant": "#e4e1d8",
+    "surfaceVariantText": "#666b70",
+    "surfaceTint": "#6b7f9f",
+    "background": "#f2f1ec",
+    "backgroundText": "#4f5357",
+    "outline": "#8e8a80",
+    "surfaceContainer": "#e4e1d8",
+    "surfaceContainerHigh": "#c8c5bd",
+    "error": "#c27672",
+    "warning": "#a7956a",
+    "info": "#809ba7"
+  }
+}
