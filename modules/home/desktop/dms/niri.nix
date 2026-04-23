@@ -31,6 +31,8 @@ let
       action.spawn = dmsIpc target function args;
     };
   niriFloatSticky = inputs.niri-float-sticky.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  dmsTheme = builtins.fromJSON (builtins.readFile ./themes/kanagawa-paper/theme.json);
+  dmsColors = dmsTheme.dark;
   hidden = {
     hotkey-overlay.hidden = true;
   };
@@ -51,7 +53,11 @@ in
 
       spawn-at-startup = [
         {
-          command = [ (lib.getExe niriFloatSticky) ];
+          command = [
+            (lib.getExe niriFloatSticky)
+            "-title"
+            "(?i)(picture[- ]in[- ]picture|\\bpip\\b)"
+          ];
         }
       ];
 
@@ -74,6 +80,12 @@ in
       layout = {
         gaps = 5;
         background-color = "transparent";
+        border = {
+          enable = true;
+          active.color = dmsColors.primary;
+          inactive.color = dmsColors.outline;
+          urgent.color = dmsColors.error;
+        };
       };
 
       workspaces = {
@@ -102,6 +114,19 @@ in
       };
 
       window-rules = [
+        {
+          matches = [
+            { title = "(?i)(picture[- ]in[- ]picture|\\bpip\\b)"; }
+          ];
+          default-column-width.proportion = 0.25;
+          default-floating-position = {
+            relative-to = "bottom-right";
+            x = 24;
+            y = 24;
+          };
+          default-window-height.proportion = 0.25;
+          open-floating = true;
+        }
         {
           geometry-corner-radius = {
             top-left = 10.0;
@@ -316,14 +341,6 @@ in
         };
         "Mod+G" = hidden // {
           action.toggle-window-floating = { };
-        };
-        "Mod+Shift+G" = {
-          hotkey-overlay.title = "Toggle sticky floating window";
-          action.spawn = [
-            (lib.getExe niriFloatSticky)
-            "-ipc"
-            "toggle_sticky"
-          ];
         };
         "Mod+W" = hidden // {
           action.toggle-column-tabbed-display = { };
