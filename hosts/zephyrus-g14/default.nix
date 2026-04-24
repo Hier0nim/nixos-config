@@ -76,6 +76,9 @@
     lact = {
       enable = true;
     };
+
+    openssh.enable = lib.mkForce false;
+    fail2ban.enable = lib.mkForce false;
   };
 
   programs.rog-control-center = {
