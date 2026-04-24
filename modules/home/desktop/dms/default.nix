@@ -43,6 +43,7 @@
   programs.dsearch.enable = true;
 
   dconf.enable = true;
+  services.kdeconnect.enable = true;
 
   home = {
     activation.seedDankMaterialShellConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -66,8 +67,9 @@
       adw-gtk3
       bibata-cursors
       inputs.niri-float-sticky.packages.${pkgs.stdenv.hostPlatform.system}.default
+      kdePackages.qt6ct
+      libsForQt5.qt5ct
       papirus-icon-theme
-      qt6Packages.qt6ct
       wl-clipboard
     ];
   };

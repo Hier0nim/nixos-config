@@ -49,6 +49,7 @@ in
     settings = {
       environment = {
         QT_QPA_PLATFORMTHEME = "qt6ct";
+        QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
       };
 
       spawn-at-startup = [
