@@ -12,7 +12,7 @@
   "widgetColorMode": "default",
   "controlCenterTileColorMode": "primary",
   "buttonColorMode": "primary",
-  "cornerRadius": 12,
+  "cornerRadius": 5,
   "niriLayoutGapsOverride": -1,
   "niriLayoutRadiusOverride": -1,
   "niriLayoutBorderSize": -1,
@@ -110,7 +110,7 @@
       "width": 50
     },
     {
-      "id": "darkMode",
+      "id": "idleInhibitor",
       "enabled": true,
       "width": 50
     }
@@ -219,7 +219,7 @@
   "dankLauncherV2UnloadOnClose": false,
   "useAutoLocation": false,
   "weatherEnabled": false,
-  "networkPreference": "auto",
+  "networkPreference": "wifi",
   "iconTheme": "Bibata-Modern-Classic",
   "cursorSettings": {
     "theme": "Bibata-Modern-Classic",
@@ -237,7 +237,7 @@
       "cursorHideTimeout": 0
     }
   },
-  "launcherLogoMode": "apps",
+  "launcherLogoMode": "os",
   "launcherLogoCustomPath": "",
   "launcherLogoColorOverride": "",
   "launcherLogoColorInvertOnMode": false,
@@ -259,18 +259,18 @@
   "soundNewNotification": true,
   "soundVolumeChanged": true,
   "soundPluggedIn": true,
-  "acMonitorTimeout": 0,
-  "acLockTimeout": 0,
-  "acSuspendTimeout": 0,
-  "acSuspendBehavior": 0,
+  "acMonitorTimeout": 300,
+  "acLockTimeout": 180,
+  "acSuspendTimeout": 600,
+  "acSuspendBehavior": 2,
   "acProfileName": "",
-  "batteryMonitorTimeout": 0,
-  "batteryLockTimeout": 0,
-  "batterySuspendTimeout": 0,
-  "batterySuspendBehavior": 0,
+  "batteryMonitorTimeout": 180,
+  "batteryLockTimeout": 120,
+  "batterySuspendTimeout": 600,
+  "batterySuspendBehavior": 2,
   "batteryProfileName": "",
-  "batteryChargeLimit": 100,
-  "lockBeforeSuspend": false,
+  "batteryChargeLimit": 80,
+  "lockBeforeSuspend": true,
   "loginctlLockIntegration": true,
   "fadeToLockEnabled": true,
   "fadeToLockGracePeriod": 5,
@@ -282,8 +282,8 @@
   "bluetoothDevicePins": {},
   "audioInputDevicePins": {},
   "audioOutputDevicePins": {},
-  "gtkThemingEnabled": false,
-  "qtThemingEnabled": false,
+  "gtkThemingEnabled": true,
+  "qtThemingEnabled": true,
   "syncModeWithPortal": true,
   "terminalsAlwaysDark": false,
   "runDmsMatugenTemplates": true,
@@ -335,7 +335,7 @@
   "dockMaxVisibleApps": 0,
   "dockMaxVisibleRunningApps": 0,
   "dockShowOverflowBadge": true,
-  "notificationOverlayEnabled": false,
+  "notificationOverlayEnabled": true,
   "notificationPopupShadowEnabled": true,
   "notificationPopupPrivacyMode": false,
   "modalDarkenBackground": true,
@@ -369,7 +369,16 @@
   "notificationHistorySaveLow": true,
   "notificationHistorySaveNormal": true,
   "notificationHistorySaveCritical": true,
-  "notificationRules": [],
+  "notificationRules": [
+    {
+      "enabled": true,
+      "field": "summary",
+      "pattern": "dGPU status changed",
+      "matchType": "contains",
+      "action": "no_history",
+      "urgency": "default"
+    }
+  ],
   "osdAlwaysShowValue": false,
   "osdPosition": 3,
   "osdVolumeEnabled": true,
@@ -381,7 +390,7 @@
   "osdCapsLockEnabled": true,
   "osdPowerProfileEnabled": true,
   "osdAudioOutputEnabled": true,
-  "powerActionConfirm": true,
+  "powerActionConfirm": false,
   "powerActionHoldDuration": 0.5,
   "powerMenuActions": [
     "reboot",
@@ -389,7 +398,8 @@
     "poweroff",
     "lock",
     "suspend",
-    "restart"
+    "restart",
+    "hibernate"
   ],
   "powerMenuDefaultAction": "logout",
   "powerMenuGridLayout": false,
@@ -427,8 +437,13 @@
       "showOnLastDisplay": true,
       "leftWidgets": [
         {
-          "id": "clock",
+          "id": "launcherButton",
           "enabled": true
+        },
+        {
+          "id": "clock",
+          "enabled": true,
+          "clockCompactMode": false
         },
         {
           "id": "privacyIndicator",
@@ -451,7 +466,7 @@
           "enabled": true
         },
         {
-          "id": "idleInhibitor",
+          "id": "dankKDEConnect",
           "enabled": true
         },
         {
@@ -476,8 +491,8 @@
       "squareCorners": true,
       "noBackground": false,
       "maximizeWidgetIcons": true,
-      "maximizeWidgetText": true,
-      "removeWidgetPadding": true,
+      "maximizeWidgetText": false,
+      "removeWidgetPadding": false,
       "widgetPadding": 8,
       "gothCornersEnabled": true,
       "gothCornerRadiusOverride": false,
