@@ -66,6 +66,7 @@ in
       screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
 
       input = {
+        focus-follows-mouse.enable = true;
         keyboard = {
           xkb.layout = "pl";
           repeat-delay = 600;

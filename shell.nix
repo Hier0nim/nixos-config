@@ -67,6 +67,7 @@ in
           ssh-to-age
           files-to-prompt
           nixfmt-tree
+          codex
           ;
       }
       ++ [

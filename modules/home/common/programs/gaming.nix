@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ stablePkgs, pkgs, ... }:
 let
   gamewrapAuto = pkgs.writeTextFile {
     name = "gamewrap-auto";
@@ -385,7 +385,7 @@ in
       ];
     })
     prismlauncher
-    lutris
+    stablePkgs.lutris
   ];
 
   xdg.configFile."gamescope/scripts/gamescope-explicit-sync-off.lua" = {
