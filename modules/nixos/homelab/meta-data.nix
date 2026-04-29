@@ -15,6 +15,7 @@
     "copyparty"
     "cockpit"
     "actual"
+    "enable-actual"
   ];
 
   nixarrStateServices = [

@@ -178,6 +178,12 @@ in
         default = "/var/lib/actual";
         description = "State directory for Actual Budget.";
       };
+
+      enableActual = mkOption {
+        type = types.path;
+        default = "/var/lib/homelab/enable-actual";
+        description = "State directory for Enable Actual.";
+      };
     };
 
     data = {
@@ -484,6 +490,21 @@ in
         subdomain = "kasa";
         port = 3100;
       };
+
+      "enable-actual" =
+        (mkServiceOptions {
+          name = "enable-actual";
+          subdomain = "actual-sync";
+          port = 3000;
+          authGroup = "infra-admin";
+        })
+        // {
+          image = mkOption {
+            type = types.str;
+            default = "2manyvcos/enable-actual";
+            description = "OCI image used for the Enable Actual container.";
+          };
+        };
     };
 
     media.vpn.wgConfSecretName = mkOption {

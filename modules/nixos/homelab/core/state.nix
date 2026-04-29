@@ -109,6 +109,10 @@ in
             ++ mkStateDir "${state.tdarr}/logs" cfg.services.tdarr.user cfg.services.tdarr.group
             ++ mkStateDir cfg.services.tdarr.cacheDir cfg.services.tdarr.user cfg.services.tdarr.group
           ))
+          (lib.optionals cfg.services."enable-actual".enable [
+            "d ${state.enableActual} 0750 root root - -"
+            "Z ${state.enableActual} 0750 root root - -"
+          ])
           (lib.optionals (cfg.profiles.photos.enable && cfg.services.immich.enable) (
             [
               "d ${state.immichHot} 0750 ${cfg.services.immich.user} ${cfg.services.immich.group} - -"

@@ -7,6 +7,7 @@
     ./copyparty.nix
     ./cockpit.nix
     ./actual.nix
+    ./enable-actual.nix
     ./backup.nix
   ];
 }
