@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   lib,
+  config,
   ...
 }:
 with lib;
@@ -112,6 +113,7 @@ in
 {
   programs.firefox = {
     enable = true;
+    configPath = "${config.xdg.configHome}/mozilla/firefox";
     policies = {
       # ---- EXTENSIONS ----
       # Check about:support for extension/add-on ID strings.
