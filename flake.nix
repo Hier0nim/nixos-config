@@ -189,5 +189,10 @@
     };
 
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+
+    serena = {
+      url = "github:oraios/serena";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }
