@@ -14,14 +14,13 @@
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gnome
       xdg-desktop-portal-gtk
     ];
     config.niri = {
       default = lib.mkForce [
         "gtk"
-        "gnome"
       ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
       "org.freedesktop.impl.portal.Access" = [ "gtk" ];
       "org.freedesktop.impl.portal.Notification" = [ "gtk" ];
       "org.freedesktop.impl.portal.Settings" = [ "gtk" ];
@@ -31,13 +30,10 @@
 
   systemd.user.services = {
     xdg-desktop-portal.serviceConfig.Environment = [
-      "XDG_CURRENT_DESKTOP=niri:GNOME"
+      "XDG_CURRENT_DESKTOP=niri"
     ];
     xdg-desktop-portal-gtk.serviceConfig.Environment = [
-      "XDG_CURRENT_DESKTOP=niri:GNOME"
-    ];
-    xdg-desktop-portal-gnome.serviceConfig.Environment = [
-      "XDG_CURRENT_DESKTOP=niri:GNOME"
+      "XDG_CURRENT_DESKTOP=niri"
     ];
   };
 
