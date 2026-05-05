@@ -107,7 +107,7 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     nixarr = {
-      url = "github:nix-media-server/nixarr";
+      url = "github:nix-media-server/nixarr/077bb8a83d6d07b25e098638db50d0ac80456174";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     copyparty = {
