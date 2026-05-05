@@ -1,11 +1,19 @@
-{ pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  ...
+}:
 {
   home.packages = with pkgs; [
     gcc
     gnumake
     jq
+    nixd
     ripgrep
     wget
     devenv
+    codex
+    claude-code
+    inputs.serena.packages.${pkgs.stdenv.hostPlatform.system}.serena
   ];
 }
