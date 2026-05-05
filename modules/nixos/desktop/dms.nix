@@ -50,7 +50,13 @@
 
     upower.enable = true;
     power-profiles-daemon.enable = true;
+    ddccontrol.enable = true;
   };
 
   programs.dconf.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    ddcutil
+    ddcui
+  ];
 }
