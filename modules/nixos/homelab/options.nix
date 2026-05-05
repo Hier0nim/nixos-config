@@ -11,6 +11,7 @@ let
       authGroup ? null,
       pathPrefix ? null,
       redirectToPrefix ? false,
+      openFirewall ? false,
       dataGroups ? [ ],
     }:
     {
@@ -101,6 +102,12 @@ let
           default = port;
           description = "Upstream port for ${name}.";
         };
+      };
+
+      openFirewall = mkOption {
+        type = types.bool;
+        default = openFirewall;
+        description = "Open firewall port for ${name}.";
       };
 
       backup = {
@@ -216,6 +223,12 @@ in
         default = "/data/nas";
         description = "NAS/shared data directory.";
       };
+
+      models = mkOption {
+        type = types.path;
+        default = "/data/models";
+        description = "Root directory for local model files and other large AI artifacts.";
+      };
     };
 
     backup = {
@@ -251,6 +264,7 @@ in
       photos.enable = mkEnableOption "photos stack profile";
       files.enable = mkEnableOption "files stack profile";
       admin.enable = mkEnableOption "admin stack profile";
+      ai.enable = mkEnableOption "local AI stack profile";
     };
 
     auth.groups = mkOption {
@@ -503,6 +517,171 @@ in
             type = types.str;
             default = "2manyvcos/enable-actual";
             description = "OCI image used for the Enable Actual container.";
+          };
+        };
+
+      # Example host config:
+      #
+      # {
+      #   homelab.profiles.ai.enable = true;
+      #
+      #   homelab.services."llama-cpp-agent" = {
+      #     autoStart = true;
+      #     dynamicStart.enable = true;
+      #
+      #     modelDir = "/data/models/llm";
+      #     modelFile = "Qwen3.6-35B-A3B-Q4_K_M.gguf";
+      #
+      #     apiKeySecretName = "llama_cpp_agent_api_key";
+      #
+      #     expose = {
+      #       enable = true;
+      #       subdomain = "ai";
+      #       api = {
+      #         enable = true;
+      #         subdomain = "ai-api";
+      #       };
+      #     };
+      #   };
+      # }
+      "llama-cpp-agent" =
+        let
+          base = mkServiceOptions {
+            name = "llama-cpp-agent";
+            subdomain = "ai";
+            port = 8080;
+            authGroup = "infra-admin";
+            exposeEnable = false;
+          };
+        in
+        base
+        // {
+          expose = base.expose // {
+            api = {
+              enable = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Expose a separate API hostname for the llama.cpp server.";
+              };
+
+              subdomain = mkOption {
+                type = types.str;
+                default = "ai-api";
+                description = "Subdomain used for the llama.cpp API hostname.";
+              };
+            };
+          };
+
+          image = mkOption {
+            type = types.str;
+            default = "ghcr.io/ggerganov/llama.cpp:server-cuda";
+            description = "OCI image used for the llama.cpp CUDA server.";
+          };
+
+          autoStart = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Whether to start the llama.cpp stack automatically during boot.";
+          };
+
+          dynamicStart = {
+            enable = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether to route requests through llama-swap so the model loads on demand.";
+            };
+
+            idleStopMinutes = mkOption {
+              type = types.int;
+              default = 15;
+              description = "Minutes of inactivity before llama-swap unloads the model. Set to 0 to keep it loaded.";
+            };
+          };
+
+          apiKeySecretName = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Name of SOPS secret used for the llama.cpp API key.";
+          };
+
+          bindAddress = mkOption {
+            type = types.str;
+            default = "127.0.0.1";
+            description = "Host address used for publishing the llama.cpp server port.";
+          };
+
+          modelDir = mkOption {
+            type = types.path;
+            default = "/data/models/llm";
+            description = "Host directory containing GGUF model files.";
+          };
+
+          modelFile = mkOption {
+            type = types.str;
+            default = "Qwen3.6-35B-A3B-Q4_K_M.gguf";
+            description = "GGUF model filename inside modelDir.";
+          };
+
+          contextSize = mkOption {
+            type = types.int;
+            default = 8192;
+            description = "Maximum llama.cpp context size in tokens.";
+          };
+
+          gpuLayers = mkOption {
+            type = types.int;
+            default = 999;
+            description = "Number of model layers to offload to GPU. A high value means as many as possible.";
+          };
+
+          cpuMoeLayers = mkOption {
+            type = types.nullOr types.int;
+            default = 35;
+            description = "Number of MoE layers to keep on CPU. Set to null to omit --n-cpu-moe.";
+          };
+
+          cacheTypeK = mkOption {
+            type = types.str;
+            default = "q8_0";
+            description = "llama.cpp KV cache type for K cache.";
+          };
+
+          cacheTypeV = mkOption {
+            type = types.str;
+            default = "q8_0";
+            description = "llama.cpp KV cache type for V cache.";
+          };
+
+          noMmap = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Whether to pass --no-mmap to llama.cpp.";
+          };
+
+          mlock = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Whether to pass --mlock to llama.cpp and allow unlimited memlock in Docker.";
+          };
+
+          flashAttention = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Whether to pass --flash-attn to llama.cpp.";
+          };
+
+          gpu = {
+            enable = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether to expose NVIDIA GPU access to the llama.cpp container.";
+            };
+
+            useCdi = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether to expose the NVIDIA GPU using the container toolkit CDI device option.";
+            };
           };
         };
     };

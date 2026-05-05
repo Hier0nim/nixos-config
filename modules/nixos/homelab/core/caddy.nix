@@ -55,7 +55,19 @@ let
   authSecrets = lib.foldl' (acc: item: acc // item.secrets) { } authAttrs;
   authTemplates = lib.foldl' (acc: item: acc // item.template) { } authAttrs;
 
-  inherit (homelabMeta) proxiedServices;
+  proxiedServices =
+    homelabMeta.proxiedServices
+    ++
+      lib.optionals
+        (
+          cfg.services."llama-cpp-agent".enable
+          && (
+            cfg.services."llama-cpp-agent".expose.enable || cfg.services."llama-cpp-agent".expose.api.enable
+          )
+        )
+        [
+          "llama-cpp-agent"
+        ];
 
   mkReverseProxy =
     upstream: extraConfig:
@@ -79,31 +91,39 @@ let
         }
       '';
 
-  mkServiceVhost =
-    name: svc:
+  mkVhost =
+    {
+      svc,
+      subdomain,
+      authGroup ? svc.auth.group,
+      pathPrefix ? svc.expose.pathPrefix,
+      redirectToPrefix ? svc.expose.redirectToPrefix,
+      reverseProxyExtraConfig ? svc.expose.reverseProxyExtraConfig,
+      bypassForApi ? svc.auth.bypassForApi,
+    }:
     let
-      fqdn = "${svc.expose.subdomain}.${cfg.domain}";
+      fqdn = "${subdomain}.${cfg.domain}";
       upstream = "${svc.upstream.scheme}://${svc.upstream.host}:${toString svc.upstream.port}";
       authImport =
-        optionalString (svc.auth.group != null)
-          "import ${config.sops.templates."caddy-basic-auth-${svc.auth.group}".path}";
+        optionalString (authGroup != null)
+          "import ${config.sops.templates."caddy-basic-auth-${authGroup}".path}";
       reverseProxy =
-        if svc.expose.pathPrefix == null then
-          mkReverseProxy upstream svc.expose.reverseProxyExtraConfig
+        if pathPrefix == null then
+          mkReverseProxy upstream reverseProxyExtraConfig
         else
-          mkPrefixedProxy svc.expose.pathPrefix upstream svc.expose.reverseProxyExtraConfig;
+          mkPrefixedProxy pathPrefix upstream reverseProxyExtraConfig;
       apiBypassConfig =
         let
-          apiPrefix = if svc.expose.pathPrefix != null then "${svc.expose.pathPrefix}/" else "/";
+          apiPrefix = if pathPrefix != null then "${pathPrefix}/" else "/";
         in
-        optionalString svc.auth.bypassForApi ''
+        optionalString bypassForApi ''
           @api path ${apiPrefix}api/*
           handle @api {
-            ${mkReverseProxy upstream svc.expose.reverseProxyExtraConfig}
+            ${mkReverseProxy upstream reverseProxyExtraConfig}
           }
         '';
       baseHandle =
-        if svc.auth.bypassForApi then
+        if bypassForApi then
           ''
             handle {
               ${authImport}
@@ -115,11 +135,11 @@ let
             ${authImport}
             ${reverseProxy}
           '';
-      redirectConfig = optionalString (svc.expose.pathPrefix != null && svc.expose.redirectToPrefix) ''
-        redir / ${svc.expose.pathPrefix}/
+      redirectConfig = optionalString (pathPrefix != null && redirectToPrefix) ''
+        redir / ${pathPrefix}/
       '';
     in
-    optionalAttrs (svc.enable && svc.expose.enable) {
+    {
       "${fqdn}".extraConfig = ''
         ${redirectConfig}
         ${apiBypassConfig}
@@ -142,7 +162,26 @@ in
     ];
 
     services.caddy.virtualHosts = lib.foldl' (
-      acc: name: acc // mkServiceVhost name cfg.services.${name}
+      acc: name:
+      let
+        svc = cfg.services.${name};
+        baseVhost = optionalAttrs (svc.enable && svc.expose.enable) (mkVhost {
+          inherit svc;
+          inherit (svc.expose) subdomain;
+        });
+        apiVhost =
+          optionalAttrs (name == "llama-cpp-agent" && svc.enable && svc.expose.api.enable)
+            (mkVhost {
+              inherit svc;
+              inherit (svc.expose.api) subdomain;
+              authGroup = null;
+              pathPrefix = null;
+              redirectToPrefix = false;
+              reverseProxyExtraConfig = "";
+              bypassForApi = false;
+            });
+      in
+      acc // baseVhost // apiVhost
     ) { } proxiedServices;
   };
 }

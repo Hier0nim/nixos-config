@@ -82,6 +82,7 @@
       photos.enable = true;
       files.enable = true;
       admin.enable = true;
+      ai.enable = true;
     };
 
     services = {
@@ -90,6 +91,20 @@
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
       tdarr.enable = true;
+      "llama-cpp-agent" = {
+        autoStart = true;
+        dynamicStart.enable = true;
+        apiKeySecretName = "llama_cpp_agent_api_key";
+
+        expose = {
+          enable = true;
+          subdomain = "ai";
+          api = {
+            enable = true;
+            subdomain = "ai-api";
+          };
+        };
+      };
       jellyfin.hardwareAcceleration = {
         enable = true;
         type = "nvenc";
@@ -108,6 +123,14 @@
     };
 
     backup.enable = true;
+  };
+
+  sops.secrets.llama_cpp_agent_api_key = {
+    sopsFile = ../../secrets/server-legion/llama-cpp-agent.yaml;
+    key = "llama_cpp_agent_api_key";
+    owner = "root";
+    group = "keys";
+    mode = "0440";
   };
 
   custom.wifi.networks = {
