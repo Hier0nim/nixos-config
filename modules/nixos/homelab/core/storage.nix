@@ -12,6 +12,7 @@ let
   photosEnabled = cfg.profiles.photos.enable;
   filesEnabled = cfg.profiles.files.enable;
   aiEnabled = cfg.profiles.ai.enable;
+  llamaSvc = cfg.services."llama-cpp-agent";
 
   inherit (homelabMeta) immichBindTargets;
 in
@@ -71,6 +72,8 @@ in
       "Z ${data.models} 0755 root root - -"
       "d ${data.models}/llm 0755 root root - -"
       "Z ${data.models}/llm 0755 root root - -"
+      "d ${llamaSvc.modelDir} 0755 root root - -"
+      "Z ${llamaSvc.modelDir} 0755 root root - -"
     ];
   };
 }

@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   pkgs,
   lib,
   ...
@@ -30,6 +31,7 @@
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
+    (import ../../overlays/llama-cpp-turboquant.nix)
   ];
 
   boot = {
@@ -92,9 +94,24 @@
       radarr.auth.bypassForApi = true;
       tdarr.enable = true;
       "llama-cpp-agent" = {
-        autoStart = true;
-        dynamicStart.enable = true;
         apiKeySecretName = "llama_cpp_agent_api_key";
+        runtime = "native";
+        defaultModel = "qwen";
+        modelDir = "/var/lib/homelab/models/llm";
+
+        models.qwen = {
+          name = "Qwen 3.6 35B A3B";
+          file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
+          url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
+          sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
+
+          contextSize = 256000;
+          gpuLayers = 99;
+          cpuMoeLayers = 36;
+          cacheTypeK = "turbo4";
+          cacheTypeV = "turbo3";
+          jinja = true;
+        };
 
         expose = {
           enable = true;
@@ -125,12 +142,50 @@
     backup.enable = true;
   };
 
-  sops.secrets.llama_cpp_agent_api_key = {
-    sopsFile = ../../secrets/server-legion/llama-cpp-agent.yaml;
-    key = "llama_cpp_agent_api_key";
-    owner = "root";
-    group = "keys";
-    mode = "0440";
+  sops = {
+    secrets = {
+      llama_cpp_agent_api_key = {
+        sopsFile = ../../secrets/server-legion/llama-cpp-agent.yaml;
+        key = "llama_cpp_agent_api_key";
+        owner = "root";
+        group = "keys";
+        mode = "0440";
+      };
+
+      cloudflare_dns_api_token = {
+        sopsFile = ../../secrets/server-legion/cloudflare.yaml;
+        key = "cloudflare_dns_api_token";
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+    };
+
+    templates."acme-cloudflare.env" = {
+      owner = "root";
+      group = "root";
+      mode = "0400";
+      content = ''
+        CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder.cloudflare_dns_api_token}
+      '';
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = lib.mkDefault "hieronimdaniel@proton.me";
+
+    certs."ai.pieczarkowo.me" = {
+      extraDomainNames = [ "ai-api.pieczarkowo.me" ];
+      dnsProvider = "cloudflare";
+      environmentFile = config.sops.templates."acme-cloudflare.env".path;
+      group = "caddy";
+    };
+  };
+
+  homelab.services."llama-cpp-agent".expose.tls = {
+    certFile = "/var/lib/acme/ai.pieczarkowo.me/fullchain.pem";
+    keyFile = "/var/lib/acme/ai.pieczarkowo.me/key.pem";
   };
 
   custom.wifi.networks = {

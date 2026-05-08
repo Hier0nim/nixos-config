@@ -12,115 +12,212 @@ let
   apiKeyPath =
     if svc.apiKeySecretName != null then config.sops.secrets.${svc.apiKeySecretName}.path else null;
 
-  modelPathInContainer = "/models/${svc.modelFile}";
+  serverHost = if svc.runtime == "docker" then "0.0.0.0" else "127.0.0.1";
+  serverPort = if svc.runtime == "docker" then "8080" else portMacro;
 
-  serverArgs = [
-    "-m"
-    modelPathInContainer
+  enabledModels = lib.filterAttrs (_: model: model.enable) svc.models;
+  downloadableModels = lib.filterAttrs (
+    _: model: model.download.enable && model.url != null
+  ) enabledModels;
+  modelDownloadUnits = map (name: "llama-cpp-agent-model-${name}.service") (
+    builtins.attrNames downloadableModels
+  );
+  downloadServices = lib.mapAttrs' (
+    name: model: lib.nameValuePair "llama-cpp-agent-model-${name}" (mkDownloadUnit name model)
+  ) downloadableModels;
 
-    "-ngl"
-    (toString svc.gpuLayers)
+  mkModelPath =
+    model:
+    if svc.runtime == "docker" then
+      "/models/${model.file}"
+    else
+      "${toString svc.modelDir}/${model.file}";
 
-    "-c"
-    (toString svc.contextSize)
+  mkVerifyModelFunction =
+    model:
+    if model.sha256 == null then
+      ''
+        verify_model() {
+          return 0
+        }
+      ''
+    else
+      ''
+        verify_model() {
+          ${pkgs.coreutils}/bin/printf '%s  %s\n' ${lib.escapeShellArg model.sha256} "$1" | ${pkgs.coreutils}/bin/sha256sum -c -
+        }
+      '';
 
-    "--host"
-    "0.0.0.0"
+  mkServerArgs =
+    model:
+    [
+      "-m"
+      (mkModelPath model)
 
-    "--port"
-    (toString svc.upstream.port)
+      "-ngl"
+      (toString model.gpuLayers)
 
-    "--cache-type-k"
-    svc.cacheTypeK
+      "-c"
+      (toString model.contextSize)
 
-    "--cache-type-v"
-    svc.cacheTypeV
-  ]
-  ++ lib.optionals (svc.cpuMoeLayers != null) [
-    "--n-cpu-moe"
-    (toString svc.cpuMoeLayers)
-  ]
-  ++ lib.optionals svc.noMmap [
-    "--no-mmap"
-  ]
-  ++ lib.optionals svc.mlock [
-    "--mlock"
-  ]
-  ++ lib.optionals svc.flashAttention [
-    "--flash-attn"
-  ]
-  ++ lib.optionals (apiKeyPath != null) [
-    "--api-key-file"
-    "/run/secrets/llama-cpp-agent-api-key"
-  ];
+      "--host"
+      serverHost
+
+      "--port"
+      serverPort
+
+      "--cache-type-k"
+      model.cacheTypeK
+
+      "--cache-type-v"
+      model.cacheTypeV
+    ]
+    ++ lib.optionals (model.cpuMoeLayers != null) [
+      "--n-cpu-moe"
+      (toString model.cpuMoeLayers)
+    ]
+    ++ lib.optionals model.noMmap [
+      "--no-mmap"
+    ]
+    ++ lib.optionals model.mlock [
+      "--mlock"
+    ]
+    ++ lib.optionals (model.flashAttention != null) [
+      "--flash-attn"
+      model.flashAttention
+    ]
+    ++ lib.optionals model.jinja [
+      "--jinja"
+    ]
+    ++ model.extraArgs;
 
   gpuRunOptions = if svc.gpu.useCdi then [ "--device=nvidia.com/gpu=all" ] else [ "--gpus=all" ];
 
-  dockerRunCommand = lib.concatStringsSep " " (
-    [
-      "docker"
-      "run"
-      "--init"
-      "--rm"
-      "--name"
-      modelIdMacro
-      "--ipc=host"
-      "--publish"
-      "${portMacro}:8080"
-      "--volume"
-      "${toString svc.modelDir}:/models:ro"
-    ]
-    ++ lib.optionals (apiKeyPath != null) [
-      "--volume"
-      "${toString apiKeyPath}:/run/secrets/llama-cpp-agent-api-key:ro"
-    ]
-    ++ lib.optionals svc.gpu.enable (
+  mkDockerRunCommand =
+    model:
+    lib.concatStringsSep " " (
       [
-        "--env"
-        "NVIDIA_VISIBLE_DEVICES=all"
-        "--env"
-        "NVIDIA_DRIVER_CAPABILITIES=compute,utility"
+        "docker"
+        "run"
+        "--init"
+        "--rm"
+        "--name"
+        modelIdMacro
+        "--ipc=host"
+        "--publish"
+        "127.0.0.1:${portMacro}:8080"
+        "--volume"
+        "${toString svc.modelDir}:/models:ro"
       ]
-      ++ gpuRunOptions
-    )
-    ++ lib.optionals svc.mlock [
-      "--ulimit"
-      "memlock=-1:-1"
-    ]
-    ++ [
-      svc.image
-    ]
-    ++ serverArgs
-  );
+      ++ lib.optionals (svc.workDir != null) [
+        "--workdir"
+        svc.workDir
+      ]
+      ++ lib.concatMap (volume: [
+        "--volume"
+        volume
+      ]) svc.extraVolumes
+      ++ lib.optionals svc.gpu.enable (
+        [
+          "--env"
+          "NVIDIA_VISIBLE_DEVICES=all"
+          "--env"
+          "NVIDIA_DRIVER_CAPABILITIES=compute,utility"
+        ]
+        ++ gpuRunOptions
+      )
+      ++ lib.optionals model.mlock [
+        "--ulimit"
+        "memlock=-1:-1"
+      ]
+      ++ svc.extraRunOptions
+      ++ [
+        svc.image
+      ]
+      ++ svc.command
+      ++ mkServerArgs model
+    );
+
+  mkNativeRunCommand =
+    model:
+    lib.concatStringsSep " " (
+      [
+        "${svc.package}/bin/llama-server"
+      ]
+      ++ mkServerArgs model
+    );
+
+  mkRunCommand =
+    model: if svc.runtime == "docker" then mkDockerRunCommand model else mkNativeRunCommand model;
+  mkDownloadUnit =
+    name: model:
+    let
+      modelTarget = "${toString svc.modelDir}/${model.file}";
+    in
+    {
+      description = "Download llama.cpp model ${name} for llama-cpp-agent";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        set -euo pipefail
+
+        target=${lib.escapeShellArg modelTarget}
+        url=${lib.escapeShellArg model.url}
+        tmp="$target.part"
+
+        ${mkVerifyModelFunction model}
+
+        ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$target")"
+
+        if [ -s "$target" ]; then
+          verify_model "$target"
+          exit 0
+        fi
+
+        ${pkgs.curl}/bin/curl \
+          --location \
+          --fail \
+          --retry 5 \
+          --retry-delay 10 \
+          --continue-at - \
+          --output "$tmp" \
+          "$url"
+
+        verify_model "$tmp"
+        ${pkgs.coreutils}/bin/mv "$tmp" "$target"
+        ${pkgs.coreutils}/bin/chmod 0444 "$target"
+      '';
+    };
 
   llamaSwapConfig = {
     healthCheckTimeout = 600;
-    models.qwen = {
-      name = "Qwen 3.6 35B A3B";
-      ttl = svc.dynamicStart.idleStopMinutes * 60;
-      cmd = dockerRunCommand;
-      cmdStop = "docker stop ${modelIdMacro}";
-    };
+    models = lib.mapAttrs (
+      _: model:
+      {
+        inherit (model) name;
+        ttl = if model.ttl != null then model.ttl else svc.dynamicStart.idleStopMinutes * 60;
+        cmd = mkRunCommand model;
+      }
+      // lib.optionalAttrs (svc.runtime == "docker") {
+        cmdStop = "docker stop ${modelIdMacro}";
+      }
+    ) enabledModels;
   };
 in
 {
   config = lib.mkIf (cfg.enable && svc.enable) {
     assertions = [
       {
-        assertion = svc.modelFile != "";
-        message = "homelab.services.llama-cpp-agent.modelFile must not be empty.";
+        assertion = enabledModels != { };
+        message = "homelab.services.llama-cpp-agent.models must contain at least one enabled model.";
       }
       {
-        assertion = svc.contextSize > 0;
-        message = "homelab.services.llama-cpp-agent.contextSize must be greater than 0.";
-      }
-      {
-        assertion = svc.gpuLayers >= 0;
-        message = "homelab.services.llama-cpp-agent.gpuLayers must be greater than or equal to 0.";
-      }
-      {
-        assertion = svc.dynamicStart.idleStopMinutes >= 0;
-        message = "homelab.services.llama-cpp-agent.dynamicStart.idleStopMinutes must be greater than or equal to 0.";
+        assertion = svc.defaultModel == null || builtins.hasAttr svc.defaultModel enabledModels;
+        message = "homelab.services.llama-cpp-agent.defaultModel must reference an enabled model.";
       }
       {
         assertion =
@@ -128,70 +225,97 @@ in
           || (!svc.openFirewall && svc.bindAddress == "127.0.0.1" && !svc.expose.api.enable);
         message = "homelab.services.llama-cpp-agent.apiKeySecretName is required before exposing the API outside localhost.";
       }
+      {
+        assertion = !svc.expose.enable || svc.defaultModel != null;
+        message = "homelab.services.llama-cpp-agent.defaultModel is required when browser chat exposure is enabled.";
+      }
+      {
+        assertion =
+          !svc.expose.enable || (svc.defaultModel != null && builtins.hasAttr svc.defaultModel enabledModels);
+        message = "homelab.services.llama-cpp-agent.defaultModel must reference an enabled model when browser chat exposure is enabled.";
+      }
+      {
+        assertion =
+          svc.runtime != "docker"
+          ||
+            builtins.match ".*(^|[[:space:]])--publish[=[:space:]]0\\.0\\.0\\.0:.*" (
+              lib.concatStringsSep " " svc.extraRunOptions
+            ) == null;
+        message = "homelab.services.llama-cpp-agent.extraRunOptions must not publish Docker model ports on 0.0.0.0.";
+      }
+    ]
+    ++ lib.concatLists (
+      lib.mapAttrsToList (name: model: [
+        {
+          assertion = builtins.match "[A-Za-z0-9._-]+" name != null;
+          message = "homelab.services.llama-cpp-agent model id '${name}' may only contain letters, numbers, dots, underscores, and hyphens.";
+        }
+        {
+          assertion = model.file != "";
+          message = "homelab.services.llama-cpp-agent.models.${name}.file must not be empty.";
+        }
+        {
+          assertion = !model.download.enable || model.url != null;
+          message = "homelab.services.llama-cpp-agent.models.${name}.url must be set when download.enable is true.";
+        }
+        {
+          assertion = model.contextSize > 0;
+          message = "homelab.services.llama-cpp-agent.models.${name}.contextSize must be greater than 0.";
+        }
+        {
+          assertion = model.gpuLayers >= 0;
+          message = "homelab.services.llama-cpp-agent.models.${name}.gpuLayers must be greater than or equal to 0.";
+        }
+        {
+          assertion = model.ttl == null || model.ttl >= 0;
+          message = "homelab.services.llama-cpp-agent.models.${name}.ttl must be greater than or equal to 0.";
+        }
+      ]) enabledModels
+    )
+    ++ [
+      {
+        assertion = svc.dynamicStart.idleStopMinutes >= 0;
+        message = "homelab.services.llama-cpp-agent.dynamicStart.idleStopMinutes must be greater than or equal to 0.";
+      }
     ];
 
     virtualisation = {
-      docker.enable = true;
+      docker.enable = lib.mkIf (svc.runtime == "docker") true;
+    };
 
-      oci-containers = lib.mkIf (!svc.dynamicStart.enable) {
-        backend = lib.mkDefault "docker";
-
-        containers."llama-cpp-agent" = {
-          inherit (svc) autoStart image;
-
-          ports = [
-            "${svc.bindAddress}:${toString svc.upstream.port}:${toString svc.upstream.port}"
-          ];
-
-          volumes = [
-            "${toString svc.modelDir}:/models:ro"
-          ]
-          ++ lib.optionals (apiKeyPath != null) [
-            "${toString apiKeyPath}:/run/secrets/llama-cpp-agent-api-key:ro"
-          ];
-
-          cmd = serverArgs;
-
-          environment = lib.optionalAttrs svc.gpu.enable {
-            NVIDIA_VISIBLE_DEVICES = "all";
-            NVIDIA_DRIVER_CAPABILITIES = "compute,utility";
-          };
-
-          extraOptions = [
-            "--ipc=host"
-          ]
-          ++ lib.optionals svc.mlock [
-            "--ulimit=memlock=-1:-1"
-          ]
-          ++ lib.optionals svc.gpu.enable gpuRunOptions;
+    systemd.services = downloadServices // {
+      llama-cpp-agent = {
+        description = "llama.cpp on-demand proxy";
+        after = [
+          "network-online.target"
+        ]
+        ++ lib.optionals (svc.runtime == "docker") [ "docker.service" ]
+        ++ modelDownloadUnits;
+        wants = [
+          "network-online.target"
+        ]
+        ++ lib.optionals (svc.runtime == "docker") [ "docker.service" ]
+        ++ modelDownloadUnits;
+        requires = modelDownloadUnits;
+        wantedBy = lib.optionals (svc.autoStart || svc.expose.enable || svc.expose.api.enable) [
+          "multi-user.target"
+        ];
+        path = lib.optionals (svc.runtime == "docker") [ pkgs.docker ];
+        serviceConfig = {
+          ExecStart = "${pkgs.llama-swap}/bin/llama-swap --config /etc/llama-cpp-agent/config.json --listen ${svc.bindAddress}:${toString svc.upstream.port}";
+          Restart = "always";
+          RestartSec = 5;
         };
       };
     };
 
-    systemd.services.llama-cpp-agent = lib.mkIf svc.dynamicStart.enable {
-      description = "llama.cpp on-demand proxy for Qwen 3.6";
-      after = [
-        "docker.service"
-        "network-online.target"
-      ];
-      wants = [
-        "docker.service"
-        "network-online.target"
-      ];
-      wantedBy = lib.optionals svc.autoStart [ "multi-user.target" ];
-      path = [ pkgs.docker ];
-      serviceConfig = {
-        ExecStart = "${pkgs.llama-swap}/bin/llama-swap --config /etc/llama-cpp-agent/config.json --listen ${svc.bindAddress}:${toString svc.upstream.port}";
-        Restart = "always";
-        RestartSec = 5;
-      };
-    };
-
-    environment.etc = lib.mkIf svc.dynamicStart.enable {
+    environment.etc = {
       "llama-cpp-agent/config.json".text = builtins.toJSON llamaSwapConfig;
     };
 
-    hardware.nvidia-container-toolkit.enable = svc.gpu.enable;
+    hardware.nvidia-container-toolkit.enable = lib.mkIf (
+      svc.gpu.enable && svc.runtime == "docker"
+    ) true;
 
     networking.firewall.allowedTCPPorts = lib.optionals svc.openFirewall [
       svc.upstream.port

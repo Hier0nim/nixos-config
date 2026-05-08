@@ -50,10 +50,34 @@ let
     };
 
   inherit (cfg.auth) groups;
+  llamaSvc = cfg.services."llama-cpp-agent";
   authNames = builtins.attrNames groups;
   authAttrs = builtins.map (name: mkAuth name groups.${name}) authNames;
   authSecrets = lib.foldl' (acc: item: acc // item.secrets) { } authAttrs;
   authTemplates = lib.foldl' (acc: item: acc // item.template) { } authAttrs;
+  caddyQuote = value: "\"${lib.escape [ "\\" "\"" ] value}\"";
+  appendCaddyConfig =
+    first: second:
+    lib.concatStringsSep "\n" (
+      lib.filter (value: value != "") [
+        first
+        second
+      ]
+    );
+  llamaApiAuthTemplates =
+    optionalAttrs (llamaSvc.enable && llamaSvc.expose.api.enable && llamaSvc.apiKeySecretName != null)
+      {
+        caddy-bearer-auth-llama-cpp-agent = {
+          owner = "root";
+          group = "keys";
+          mode = "0440";
+          content = ''
+            @llamaCppAgentBearerAuth {
+              header Authorization "Bearer ${config.sops.placeholder.${llamaSvc.apiKeySecretName}}"
+            }
+          '';
+        };
+      };
 
   proxiedServices =
     homelabMeta.proxiedServices
@@ -98,12 +122,16 @@ let
       authGroup ? svc.auth.group,
       pathPrefix ? svc.expose.pathPrefix,
       redirectToPrefix ? svc.expose.redirectToPrefix,
+      rootRedirect ? null,
       reverseProxyExtraConfig ? svc.expose.reverseProxyExtraConfig,
       bypassForApi ? svc.auth.bypassForApi,
     }:
     let
       fqdn = "${subdomain}.${cfg.domain}";
       upstream = "${svc.upstream.scheme}://${svc.upstream.host}:${toString svc.upstream.port}";
+      tlsConfig = optionalString (svc.expose.tls != null) ''
+        tls ${svc.expose.tls.certFile} ${svc.expose.tls.keyFile}
+      '';
       authImport =
         optionalString (authGroup != null)
           "import ${config.sops.templates."caddy-basic-auth-${authGroup}".path}";
@@ -123,7 +151,19 @@ let
           }
         '';
       baseHandle =
-        if bypassForApi then
+        if rootRedirect != null then
+          ''
+            handle / {
+              ${authImport}
+              redir * ${caddyQuote rootRedirect}
+            }
+
+            handle {
+              ${authImport}
+              ${reverseProxy}
+            }
+          ''
+        else if bypassForApi then
           ''
             handle {
               ${authImport}
@@ -141,9 +181,43 @@ let
     in
     {
       "${fqdn}".extraConfig = ''
+        ${tlsConfig}
         ${redirectConfig}
         ${apiBypassConfig}
         ${baseHandle}
+      '';
+    };
+
+  mkLlamaApiVhost =
+    svc:
+    let
+      fqdn = "${svc.expose.api.subdomain}.${cfg.domain}";
+      upstream = "${svc.upstream.scheme}://${svc.upstream.host}:${toString svc.upstream.port}";
+      tlsConfig = optionalString (svc.expose.tls != null) ''
+        tls ${svc.expose.tls.certFile} ${svc.expose.tls.keyFile}
+      '';
+      authImport = optionalString (
+        svc.apiKeySecretName != null
+      ) "import ${config.sops.templates.caddy-bearer-auth-llama-cpp-agent.path}";
+      authHandle = optionalString (svc.apiKeySecretName != null) ''
+        handle @llamaCppAgentBearerAuth {
+          reverse_proxy ${upstream} {
+            header_up -Authorization
+          }
+        }
+      '';
+    in
+    {
+      "${fqdn}".extraConfig = ''
+        ${tlsConfig}
+        ${authImport}
+
+        ${authHandle}
+
+        handle {
+          header WWW-Authenticate "Bearer"
+          respond 401
+        }
       '';
     };
 in
@@ -152,7 +226,7 @@ in
     users.users.caddy.extraGroups = [ "keys" ];
 
     sops.secrets = authSecrets;
-    sops.templates = authTemplates;
+    sops.templates = authTemplates // llamaApiAuthTemplates;
 
     services.caddy.enable = true;
 
@@ -165,21 +239,23 @@ in
       acc: name:
       let
         svc = cfg.services.${name};
-        baseVhost = optionalAttrs (svc.enable && svc.expose.enable) (mkVhost {
-          inherit svc;
-          inherit (svc.expose) subdomain;
-        });
-        apiVhost =
-          optionalAttrs (name == "llama-cpp-agent" && svc.enable && svc.expose.api.enable)
-            (mkVhost {
+        baseVhost = optionalAttrs (svc.enable && svc.expose.enable) (
+          mkVhost (
+            {
               inherit svc;
-              inherit (svc.expose.api) subdomain;
-              authGroup = null;
-              pathPrefix = null;
-              redirectToPrefix = false;
-              reverseProxyExtraConfig = "";
-              bypassForApi = false;
-            });
+              inherit (svc.expose) subdomain;
+            }
+            // optionalAttrs (name == "llama-cpp-agent" && svc.defaultModel != null) {
+              rootRedirect = "/upstream/${svc.defaultModel}/?new_chat=true#/";
+              reverseProxyExtraConfig = appendCaddyConfig svc.expose.reverseProxyExtraConfig ''
+                header_up -Authorization
+              '';
+            }
+          )
+        );
+        apiVhost = optionalAttrs (name == "llama-cpp-agent" && svc.enable && svc.expose.api.enable) (
+          mkLlamaApiVhost svc
+        );
       in
       acc // baseVhost // apiVhost
     ) { } proxiedServices;

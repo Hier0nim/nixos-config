@@ -1,5 +1,6 @@
 # Shell for bootstrapping flake-enabled nix and other tooling
 {
+  system ? pkgs.stdenv.hostPlatform.system or builtins.currentSystem,
   pkgs ?
     # If pkgs is not defined, instantiate nixpkgs from locked commit
     let
@@ -10,10 +11,27 @@
       };
     in
     import nixpkgs { overlays = [ ]; },
+  pkgsUnstable ?
+    # Optional package set for pulling selected tools from unstable when pkgs is stable.
+    let
+      lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
+      nixpkgs = fetchTarball {
+        url = "https://github.com/nixos/nixpkgs/archive/${lock.rev}.tar.gz";
+        sha256 = lock.narHash;
+      };
+    in
+    import nixpkgs {
+      inherit system;
+      overlays = [ ];
+    },
+  unstablePackages ? [ ],
   checks,
   ...
 }:
 let
+  selectedUnstablePackages =
+    if builtins.isFunction unstablePackages then unstablePackages pkgsUnstable else unstablePackages;
+
   sopsBootstrap = pkgs.writeShellScriptBin "sops-bootstrap-key" ''
     set -euo pipefail
 
@@ -67,11 +85,12 @@ in
           ssh-to-age
           files-to-prompt
           nixfmt-tree
-          codex
           ;
       }
       ++ [
+        pkgsUnstable.codex
         sopsBootstrap
-      ];
+      ]
+      ++ selectedUnstablePackages;
   };
 }

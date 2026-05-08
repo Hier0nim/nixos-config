@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 
@@ -40,6 +40,26 @@ let
           type = types.bool;
           default = exposeEnable;
           description = "Expose ${name} via Caddy.";
+        };
+
+        tls = mkOption {
+          type = types.nullOr (
+            types.submodule {
+              options = {
+                certFile = mkOption {
+                  type = types.str;
+                  description = "Path to a PEM fullchain certificate file for ${name}.";
+                };
+
+                keyFile = mkOption {
+                  type = types.str;
+                  description = "Path to a PEM private key file for ${name}.";
+                };
+              };
+            }
+          );
+          default = null;
+          description = "Optional manual TLS configuration for ${name} (disables Caddy's ACME for this host).";
         };
 
         subdomain = mkOption {
@@ -526,13 +546,22 @@ in
       #   homelab.profiles.ai.enable = true;
       #
       #   homelab.services."llama-cpp-agent" = {
-      #     autoStart = true;
-      #     dynamicStart.enable = true;
-      #
-      #     modelDir = "/data/models/llm";
-      #     modelFile = "Qwen3.6-35B-A3B-Q4_K_M.gguf";
-      #
       #     apiKeySecretName = "llama_cpp_agent_api_key";
+      #     defaultModel = "qwen";
+      #
+      #     models.qwen = {
+      #       name = "Qwen 3.6 35B A3B";
+      #       file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
+      #       url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
+      #       sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
+      #
+      #       contextSize = 32768;
+      #       gpuLayers = 99;
+      #       cpuMoeLayers = 36;
+      #       cacheTypeK = "turbo4";
+      #       cacheTypeV = "turbo3";
+      #       jinja = true;
+      #     };
       #
       #     expose = {
       #       enable = true;
@@ -574,8 +603,47 @@ in
 
           image = mkOption {
             type = types.str;
-            default = "ghcr.io/ggerganov/llama.cpp:server-cuda";
+            default = "ghcr.io/ggml-org/llama.cpp:server-cuda-b6725";
             description = "OCI image used for the llama.cpp CUDA server.";
+          };
+
+          runtime = mkOption {
+            type = types.enum [
+              "docker"
+              "native"
+            ];
+            default = "docker";
+            description = "Runtime used for the llama.cpp server process.";
+          };
+
+          package = mkOption {
+            type = types.package;
+            default = pkgs.llama-cpp-turboquant;
+            description = "llama.cpp package used when runtime is native.";
+          };
+
+          command = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Optional command inserted after the OCI image and before llama.cpp server arguments.";
+          };
+
+          workDir = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Optional container working directory for the llama.cpp server command.";
+          };
+
+          extraVolumes = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Additional Docker volume mounts passed to the llama.cpp server container.";
+          };
+
+          extraRunOptions = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Additional Docker run options passed before the image name.";
           };
 
           autoStart = mkOption {
@@ -585,12 +653,6 @@ in
           };
 
           dynamicStart = {
-            enable = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Whether to route requests through llama-swap so the model loads on demand.";
-            };
-
             idleStopMinutes = mkOption {
               type = types.int;
               default = 15;
@@ -613,61 +675,137 @@ in
           modelDir = mkOption {
             type = types.path;
             default = "/data/models/llm";
-            description = "Host directory containing GGUF model files.";
+            description = ''
+              Host directory containing GGUF model files. Prefer an SSD/NVMe-backed path for
+              dynamic model loading because llama.cpp must read the GGUF during cold starts.
+            '';
           };
 
-          modelFile = mkOption {
-            type = types.str;
-            default = "Qwen3.6-35B-A3B-Q4_K_M.gguf";
-            description = "GGUF model filename inside modelDir.";
+          defaultModel = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Default model id used for browser chat root redirects and examples.";
           };
 
-          contextSize = mkOption {
-            type = types.int;
-            default = 8192;
-            description = "Maximum llama.cpp context size in tokens.";
-          };
+          models = mkOption {
+            type = types.attrsOf (
+              types.submodule (
+                { name, ... }:
+                {
+                  options = {
+                    enable = mkOption {
+                      type = types.bool;
+                      default = true;
+                      description = "Expose ${name} through llama-swap.";
+                    };
 
-          gpuLayers = mkOption {
-            type = types.int;
-            default = 999;
-            description = "Number of model layers to offload to GPU. A high value means as many as possible.";
-          };
+                    download.enable = mkOption {
+                      type = types.bool;
+                      default = true;
+                      description = "Download ${name} into modelDir before starting llama-swap.";
+                    };
 
-          cpuMoeLayers = mkOption {
-            type = types.nullOr types.int;
-            default = 35;
-            description = "Number of MoE layers to keep on CPU. Set to null to omit --n-cpu-moe.";
-          };
+                    name = mkOption {
+                      type = types.str;
+                      default = name;
+                      description = "Display name for ${name}.";
+                    };
 
-          cacheTypeK = mkOption {
-            type = types.str;
-            default = "q8_0";
-            description = "llama.cpp KV cache type for K cache.";
-          };
+                    file = mkOption {
+                      type = types.str;
+                      default = "";
+                      description = "GGUF model filename for ${name} inside modelDir.";
+                    };
 
-          cacheTypeV = mkOption {
-            type = types.str;
-            default = "q8_0";
-            description = "llama.cpp KV cache type for V cache.";
-          };
+                    url = mkOption {
+                      type = types.nullOr types.str;
+                      default = null;
+                      description = "Optional URL used by systemd to download ${name}.";
+                    };
 
-          noMmap = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Whether to pass --no-mmap to llama.cpp.";
-          };
+                    sha256 = mkOption {
+                      type = types.nullOr types.str;
+                      default = null;
+                      description = "Optional SHA256 checksum for the downloaded ${name} GGUF file.";
+                    };
 
-          mlock = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Whether to pass --mlock to llama.cpp and allow unlimited memlock in Docker.";
-          };
+                    ttl = mkOption {
+                      type = types.nullOr types.int;
+                      default = null;
+                      description = "Seconds before llama-swap unloads ${name}. Defaults to dynamicStart.idleStopMinutes.";
+                    };
 
-          flashAttention = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Whether to pass --flash-attn to llama.cpp.";
+                    contextSize = mkOption {
+                      type = types.int;
+                      default = 8192;
+                      description = "Maximum llama.cpp context size in tokens for ${name}.";
+                    };
+
+                    gpuLayers = mkOption {
+                      type = types.int;
+                      default = 999;
+                      description = "Number of ${name} model layers to offload to GPU.";
+                    };
+
+                    cpuMoeLayers = mkOption {
+                      type = types.nullOr types.int;
+                      default = 35;
+                      description = "Number of ${name} MoE layers to keep on CPU. Set to null to omit --n-cpu-moe.";
+                    };
+
+                    cacheTypeK = mkOption {
+                      type = types.str;
+                      default = "q8_0";
+                      description = "llama.cpp KV cache type for ${name} K cache.";
+                    };
+
+                    cacheTypeV = mkOption {
+                      type = types.str;
+                      default = "q8_0";
+                      description = "llama.cpp KV cache type for ${name} V cache.";
+                    };
+
+                    noMmap = mkOption {
+                      type = types.bool;
+                      default = true;
+                      description = "Whether to pass --no-mmap for ${name}.";
+                    };
+
+                    mlock = mkOption {
+                      type = types.bool;
+                      default = true;
+                      description = "Whether to pass --mlock for ${name}.";
+                    };
+
+                    flashAttention = mkOption {
+                      type = types.nullOr (
+                        types.enum [
+                          "on"
+                          "off"
+                          "auto"
+                        ]
+                      );
+                      default = "auto";
+                      description = "Flash Attention mode for ${name}; null omits --flash-attn.";
+                    };
+
+                    jinja = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = "Whether to pass --jinja for ${name}.";
+                    };
+
+                    extraArgs = mkOption {
+                      type = types.listOf types.str;
+                      default = [ ];
+                      description = "Additional llama-server arguments appended for ${name}.";
+                    };
+                  };
+                }
+              )
+            );
+            default = { };
+            description = "llama-swap models keyed by API model id.";
           };
 
           gpu = {
