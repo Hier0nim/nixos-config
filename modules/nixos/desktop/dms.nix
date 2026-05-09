@@ -22,6 +22,8 @@
         "gtk"
       ];
       "org.freedesktop.impl.portal.Settings" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
       "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
       "org.freedesktop.impl.portal.Access" = [ "gtk" ];
       "org.freedesktop.impl.portal.Notification" = [ "gtk" ];
@@ -34,6 +36,9 @@
       "XDG_CURRENT_DESKTOP=niri"
     ];
     xdg-desktop-portal-gtk.serviceConfig.Environment = [
+      "XDG_CURRENT_DESKTOP=niri"
+    ];
+    xdg-desktop-portal-gnome.serviceConfig.Environment = [
       "XDG_CURRENT_DESKTOP=niri"
     ];
   };
