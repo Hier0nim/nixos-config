@@ -93,6 +93,10 @@
       sonarr.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
       tdarr.enable = true;
+      cockpit = {
+        expose.enable = true;
+        auth.stripAuthorizationHeader = true;
+      };
       "llama-cpp-agent" = {
         apiKeySecretName = "llama_cpp_agent_api_key";
         runtime = "native";

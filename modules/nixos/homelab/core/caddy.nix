@@ -135,11 +135,16 @@ let
       authImport =
         optionalString (authGroup != null)
           "import ${config.sops.templates."caddy-basic-auth-${authGroup}".path}";
+      proxyExtraConfig = appendCaddyConfig reverseProxyExtraConfig (
+        optionalString svc.auth.stripAuthorizationHeader ''
+          header_up -Authorization
+        ''
+      );
       reverseProxy =
         if pathPrefix == null then
-          mkReverseProxy upstream reverseProxyExtraConfig
+          mkReverseProxy upstream proxyExtraConfig
         else
-          mkPrefixedProxy pathPrefix upstream reverseProxyExtraConfig;
+          mkPrefixedProxy pathPrefix upstream proxyExtraConfig;
       apiBypassConfig =
         let
           apiPrefix = if pathPrefix != null then "${pathPrefix}/" else "/";
@@ -147,7 +152,7 @@ let
         optionalString bypassForApi ''
           @api path ${apiPrefix}api/*
           handle @api {
-            ${mkReverseProxy upstream reverseProxyExtraConfig}
+            ${mkReverseProxy upstream proxyExtraConfig}
           }
         '';
       baseHandle =
@@ -201,9 +206,11 @@ let
       ) "import ${config.sops.templates.caddy-bearer-auth-llama-cpp-agent.path}";
       authHandle = optionalString (svc.apiKeySecretName != null) ''
         handle @llamaCppAgentBearerAuth {
-          reverse_proxy ${upstream} {
-            header_up -Authorization
-          }
+          ${mkReverseProxy upstream (
+            optionalString svc.auth.stripAuthorizationHeader ''
+              header_up -Authorization
+            ''
+          )}
         }
       '';
     in
@@ -247,9 +254,6 @@ in
             }
             // optionalAttrs (name == "llama-cpp-agent" && svc.defaultModel != null) {
               rootRedirect = "/upstream/${svc.defaultModel}/?new_chat=true#/";
-              reverseProxyExtraConfig = appendCaddyConfig svc.expose.reverseProxyExtraConfig ''
-                header_up -Authorization
-              '';
             }
           )
         );

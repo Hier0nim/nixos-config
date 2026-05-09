@@ -13,6 +13,7 @@ let
       redirectToPrefix ? false,
       openFirewall ? false,
       dataGroups ? [ ],
+      stripAuthorizationHeader ? false,
     }:
     {
       enable = mkEnableOption "${name} service";
@@ -98,6 +99,16 @@ let
           type = types.bool;
           default = false;
           description = "Bypass proxy auth for /api/* on ${name}.";
+        };
+
+        stripAuthorizationHeader = mkOption {
+          type = types.bool;
+          default = stripAuthorizationHeader;
+          description = ''
+            Remove the Authorization request header before proxying to ${name}.
+            Enable this when Caddy handles auth and the upstream service treats
+            forwarded Basic or Bearer credentials as its own invalid API token.
+          '';
         };
       };
 
@@ -581,6 +592,7 @@ in
             port = 8080;
             authGroup = "infra-admin";
             exposeEnable = false;
+            stripAuthorizationHeader = true;
           };
         in
         base
