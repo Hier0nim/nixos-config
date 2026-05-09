@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 {
   home.packages = with pkgs; [
     gcc
@@ -12,8 +8,5 @@
     ripgrep
     wget
     devenv
-    codex
-    claude-code
-    inputs.serena.packages.${pkgs.stdenv.hostPlatform.system}.serena
   ];
 }
