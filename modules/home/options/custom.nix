@@ -24,6 +24,11 @@ in
       description = "Path to the flake repository.";
     };
 
+    worktreePath = lib.mkOption {
+      type = types.str;
+      description = "Mutable checkout path for tools that should operate on the live flake worktree.";
+    };
+
     wallpaper = lib.mkOption {
       type = types.path;
       description = "Default wallpaper image.";

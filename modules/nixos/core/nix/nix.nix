@@ -64,6 +64,6 @@ in
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 20d --keep 20";
-    flake = toString config.custom.repoPath;
+    flake = config.custom.worktreePath;
   };
 }

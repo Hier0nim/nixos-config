@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 let
   inherit (lib) types;
 in
@@ -26,6 +26,12 @@ in
       type = types.path;
       default = lib.custom.relativeToRoot ".";
       description = "Path to the flake repository.";
+    };
+
+    worktreePath = lib.mkOption {
+      type = types.str;
+      default = "/home/${config.custom.username}/Projects/nixos-config";
+      description = "Mutable checkout path for tools that should operate on the live flake worktree.";
     };
   };
 }

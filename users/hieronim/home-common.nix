@@ -5,6 +5,7 @@
     fullName = "Hier0nim";
     email = "hieronimdaniel@proton.me";
     repoPath = lib.custom.relativeToRoot ".";
+    worktreePath = "/home/${config.custom.username}/Projects/nixos-config";
     wallpaper = lib.custom.relativeToRoot "assets/wallpapers/koi.png";
   };
 
@@ -17,7 +18,7 @@
       TERM = "ghostty";
       BROWSER = "firefox";
       SHELL = "nu";
-      FLAKE = toString config.custom.repoPath;
+      FLAKE = config.custom.worktreePath;
       USERNAME = config.custom.username;
     };
 
