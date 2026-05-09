@@ -7,8 +7,11 @@
 let
   mountPoint = "${config.home.homeDirectory}/Network/server-legion";
   copypartyUrl = "https://pliki.pieczarkowo.me";
-  copypartyRoot = "/nas";
   logDir = "${config.xdg.stateHome}/rclone";
+  copypartyVolumes = {
+    hieronim = "/nas/hieronim";
+    shared = "/nas/shared";
+  };
 
   runtimeConfig = pkgs.writeShellScript "copyparty-rclone-config" ''
             set -eu
@@ -33,6 +36,48 @@ let
         ${pkgs.coreutils}/bin/chmod 600 "$config_file"
   '';
 
+  mkCopypartyDriveService =
+    name: copypartyRoot:
+    let
+      volumeMountPoint = "${mountPoint}/${name}";
+    in
+    {
+      Unit = {
+        Description = "Mount Copyparty ${name} WebDAV as a local drive";
+        After = [
+          "graphical-session.target"
+          "network-online.target"
+        ];
+        Wants = [
+          "graphical-session.target"
+          "network-online.target"
+        ];
+        StartLimitIntervalSec = 0;
+      };
+
+      Service = {
+        Type = "simple";
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/mkdir -p ${volumeMountPoint}"
+          "${pkgs.coreutils}/bin/mkdir -p ${logDir}"
+          "${runtimeConfig}"
+        ];
+        ExecStart = "${pkgs.rclone}/bin/rclone mount --config=%t/rclone/copyparty.conf --vfs-cache-mode=writes --dir-cache-time=5s --cache-dir=%h/.cache/rclone --log-level=INFO --log-file=${logDir}/copyparty-drive-${name}.log serverlegion-dav:${copypartyRoot} ${volumeMountPoint}";
+        ExecStop = "/run/wrappers/bin/fusermount3 -u ${volumeMountPoint}";
+        Restart = "on-failure";
+        RestartSec = 60;
+        TimeoutStartSec = 45;
+        Environment = [
+          "PATH=${
+            lib.makeBinPath [
+              pkgs.util-linux
+            ]
+          }:/run/wrappers/bin"
+        ];
+      };
+
+      Install.WantedBy = [ "default.target" ];
+    };
 in
 {
   sops.secrets.copyparty_hieronim_password = {
@@ -47,43 +92,12 @@ in
   home.activation.ensureCopypartyMountpoint = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p "${mountPoint}"
     mkdir -p "${logDir}"
+    mkdir -p "${mountPoint}/hieronim"
+    mkdir -p "${mountPoint}/shared"
   '';
 
-  systemd.user.services.copyparty-drive = {
-    Unit = {
-      Description = "Mount Copyparty WebDAV as a local drive";
-      After = [
-        "graphical-session.target"
-        "network-online.target"
-      ];
-      Wants = [
-        "graphical-session.target"
-        "network-online.target"
-      ];
-      StartLimitIntervalSec = 0;
-    };
-
-    Service = {
-      Type = "simple";
-      ExecStartPre = [
-        "${pkgs.coreutils}/bin/mkdir -p ${mountPoint}"
-        "${pkgs.coreutils}/bin/mkdir -p ${logDir}"
-        "${runtimeConfig}"
-      ];
-      ExecStart = "${pkgs.rclone}/bin/rclone mount --config=%t/rclone/copyparty.conf --vfs-cache-mode=writes --dir-cache-time=5s --cache-dir=%h/.cache/rclone --log-level=INFO --log-file=${logDir}/copyparty-drive.log serverlegion-dav:${copypartyRoot} ${mountPoint}";
-      ExecStop = "/run/wrappers/bin/fusermount3 -u ${mountPoint}";
-      Restart = "on-failure";
-      RestartSec = 60;
-      TimeoutStartSec = 45;
-      Environment = [
-        "PATH=${
-          lib.makeBinPath [
-            pkgs.util-linux
-          ]
-        }:/run/wrappers/bin"
-      ];
-    };
-
-    Install.WantedBy = [ "default.target" ];
-  };
+  systemd.user.services = lib.mapAttrs' (
+    name: copypartyRoot:
+    lib.nameValuePair "copyparty-drive-${name}" (mkCopypartyDriveService name copypartyRoot)
+  ) copypartyVolumes;
 }
