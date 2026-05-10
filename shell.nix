@@ -1,24 +1,46 @@
 # Shell for bootstrapping flake-enabled nix and other tooling
+let
+  lockFile = builtins.fromJSON (builtins.readFile ./flake.lock);
+
+  lockedInput =
+    name:
+    let
+      nodeName = lockFile.nodes.${lockFile.root}.inputs.${name};
+    in
+    lockFile.nodes.${nodeName}.locked;
+
+  nixpkgsFromLock =
+    name:
+    let
+      lock = lockedInput name;
+    in
+    fetchTarball (
+      {
+        sha256 = lock.narHash;
+      }
+      // (
+        if lock ? url then
+          { inherit (lock) url; }
+        else
+          { url = "https://github.com/${lock.owner}/${lock.repo}/archive/${lock.rev}.tar.gz"; }
+      )
+    );
+in
 {
-  system ? pkgs.stdenv.hostPlatform.system or builtins.currentSystem,
+  system ? builtins.currentSystem,
   pkgs ?
     # If pkgs is not defined, instantiate nixpkgs from locked commit
     let
-      lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
-      nixpkgs = fetchTarball {
-        url = "https://github.com/nixos/nixpkgs/archive/${lock.rev}.tar.gz";
-        sha256 = lock.narHash;
-      };
+      nixpkgs = nixpkgsFromLock "nixpkgs";
     in
-    import nixpkgs { overlays = [ ]; },
+    import nixpkgs {
+      inherit system;
+      overlays = [ ];
+    },
   pkgsUnstable ?
     # Optional package set for pulling selected tools from unstable when pkgs is stable.
     let
-      lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
-      nixpkgs = fetchTarball {
-        url = "https://github.com/nixos/nixpkgs/archive/${lock.rev}.tar.gz";
-        sha256 = lock.narHash;
-      };
+      nixpkgs = nixpkgsFromLock "nixpkgs";
     in
     import nixpkgs {
       inherit system;

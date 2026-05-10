@@ -83,6 +83,7 @@
       devShells = forAllSystems (
         system:
         import ./shell.nix {
+          inherit system;
           pkgs = nixpkgs.legacyPackages.${system};
           checks = self.checks.${system};
         }
