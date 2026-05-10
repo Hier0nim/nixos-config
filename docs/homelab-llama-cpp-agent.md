@@ -1,8 +1,9 @@
 # llama-cpp-agent
 
-`llama-cpp-agent` runs `llama-swap` as the always-on lightweight proxy. Model
-processes are started by `llama-swap` on demand and stopped after their
-configured TTL.
+`llama-cpp-agent` is the homelab-facing configuration for the native
+`services.llama-swap` daemon. `llama-swap` stays running as the lightweight
+proxy; model processes are started on demand and stopped after their configured
+TTL.
 
 ## URLs
 
@@ -78,8 +79,8 @@ curl -sS https://ai-api.pieczarkowo.me/v1/chat/completions \
 ## Post-Rebuild Checks
 
 ```sh
-systemctl status llama-cpp-agent
-journalctl -u llama-cpp-agent -b --no-pager
+systemctl status llama-swap
+journalctl -u llama-swap -b --no-pager
 ss -ltnp | grep llama
 
 API_KEY="$(sudo cat /run/secrets/llama_cpp_agent_api_key | tr -d '\r\n')"

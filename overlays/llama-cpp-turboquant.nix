@@ -20,7 +20,9 @@ final: prev: {
         };
 
         cmakeFlags = old.cmakeFlags ++ [
-          "-DCMAKE_CUDA_ARCHITECTURES=61"
+          "-DCMAKE_CUDA_ARCHITECTURES=61;89"
         ];
+
+        npmDepsHash = "sha256-RAFtsbBGBjteCt5yXhrmHL39rIDJMCFBETgzId2eRRk=";
       });
 }

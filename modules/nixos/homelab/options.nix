@@ -613,49 +613,10 @@ in
             };
           };
 
-          image = mkOption {
-            type = types.str;
-            default = "ghcr.io/ggml-org/llama.cpp:server-cuda-b6725";
-            description = "OCI image used for the llama.cpp CUDA server.";
-          };
-
-          runtime = mkOption {
-            type = types.enum [
-              "docker"
-              "native"
-            ];
-            default = "docker";
-            description = "Runtime used for the llama.cpp server process.";
-          };
-
           package = mkOption {
             type = types.package;
             default = pkgs.llama-cpp-turboquant;
-            description = "llama.cpp package used when runtime is native.";
-          };
-
-          command = mkOption {
-            type = types.listOf types.str;
-            default = [ ];
-            description = "Optional command inserted after the OCI image and before llama.cpp server arguments.";
-          };
-
-          workDir = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Optional container working directory for the llama.cpp server command.";
-          };
-
-          extraVolumes = mkOption {
-            type = types.listOf types.str;
-            default = [ ];
-            description = "Additional Docker volume mounts passed to the llama.cpp server container.";
-          };
-
-          extraRunOptions = mkOption {
-            type = types.listOf types.str;
-            default = [ ];
-            description = "Additional Docker run options passed before the image name.";
+            description = "llama.cpp package used for native llama-server model processes.";
           };
 
           autoStart = mkOption {
@@ -818,20 +779,6 @@ in
             );
             default = { };
             description = "llama-swap models keyed by API model id.";
-          };
-
-          gpu = {
-            enable = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Whether to expose NVIDIA GPU access to the llama.cpp container.";
-            };
-
-            useCdi = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Whether to expose the NVIDIA GPU using the container toolkit CDI device option.";
-            };
           };
         };
     };

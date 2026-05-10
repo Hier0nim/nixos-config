@@ -99,7 +99,6 @@
       };
       "llama-cpp-agent" = {
         apiKeySecretName = "llama_cpp_agent_api_key";
-        runtime = "native";
         defaultModel = "qwen";
         modelDir = "/var/lib/homelab/models/llm";
 

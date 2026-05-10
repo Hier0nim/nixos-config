@@ -32,6 +32,10 @@
 
   networking.hostName = "zephyrus-g14";
 
+  nixpkgs.overlays = [
+    (import ../../overlays/llama-cpp-turboquant.nix)
+  ];
+
   custom.wifi.networks = {
     pieczarkowo = {
       enable = true;
@@ -63,9 +67,47 @@
     tmp.cleanOnBoot = true;
     kernelPackages = pkgs.linuxPackages_latest;
   };
-  hardware.nvidia.open = false;
+  hardware.nvidia = {
+    open = false;
+    prime = {
+      sync.enable = lib.mkForce false;
+      offload = {
+        enable = lib.mkForce true;
+        enableOffloadCmd = lib.mkForce true;
+      };
+    };
+  };
 
   services = {
+    llama-cpp-swap = {
+      enable = true;
+      package = pkgs.llama-cpp-turboquant;
+      listenAddress = "127.0.0.1";
+      port = 8080;
+      openFirewall = false;
+      modelDir = "/var/lib/llama-cpp/models";
+      defaultModel = "qwen";
+      idleStopMinutes = 5;
+
+      models.qwen = {
+        name = "Qwen 3.6 35B A3B";
+        file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
+        url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
+        sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
+
+        contextSize = 98304;
+        gpuLayers = 99;
+        cpuMoeLayers = 30;
+        cacheTypeK = "turbo4";
+        cacheTypeV = "turbo4";
+        jinja = true;
+        extraArgs = [
+          "--parallel"
+          "1"
+        ];
+      };
+    };
+
     # ASUS specific software. This also installs asusctl.
     asusd = {
       enable = true;
@@ -79,6 +121,16 @@
 
     openssh.enable = lib.mkForce false;
     fail2ban.enable = lib.mkForce false;
+
+    asus-px-keyboard-tool = {
+      enable = true;
+      settings = {
+        kb_brightness_cycle = {
+          enabled = true;
+          keycode = "KEY_PROG3";
+        };
+      };
+    };
   };
 
   programs.rog-control-center = {
@@ -129,16 +181,6 @@
 
   # Optional: override defaults written to /etc/asus-px-keyboard-tool.conf
   # Note: Nix integers are decimal; convert hex (e.g. 0x7e) to decimal (126).
-  services.asus-px-keyboard-tool = {
-    enable = true;
-    settings = {
-      kb_brightness_cycle = {
-        enabled = true;
-        keycode = "KEY_PROG3";
-      };
-    };
-
-  };
   powerManagement.powertop.enable = true;
   custom.programs.winboat.enable = false;
 
@@ -162,6 +204,7 @@
       "dir_mode=0755"
       "file_mode=0644"
       "nofail"
+      "noauto"
       "x-systemd.automount"
       "x-systemd.idle-timeout=60"
     ];
