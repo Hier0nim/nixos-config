@@ -44,6 +44,7 @@ in
     # Provide flake inputs to Home Manager modules.
     extraSpecialArgs = {
       inherit inputs stablePkgs;
+      systemConfig = config;
     };
   };
 }

@@ -95,17 +95,18 @@
         url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
         sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
 
-        contextSize = 98304;
+        contextSize = 131072;
         gpuLayers = 99;
-        cpuMoeLayers = 30;
+        cpuMoeLayers = 32;
         cacheTypeK = "turbo4";
-        cacheTypeV = "turbo4";
+        cacheTypeV = "turbo3";
         jinja = true;
         extraArgs = [
           "--parallel"
           "1"
         ];
       };
+
     };
 
     # ASUS specific software. This also installs asusctl.

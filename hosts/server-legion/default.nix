@@ -114,6 +114,11 @@
           cacheTypeK = "turbo4";
           cacheTypeV = "turbo3";
           jinja = true;
+
+          extraArgs = [
+            "--parallel"
+            "1"
+          ];
         };
 
         expose = {

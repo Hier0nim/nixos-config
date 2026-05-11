@@ -707,73 +707,15 @@ in
                       default = null;
                       description = "Seconds before llama-swap unloads ${name}. Defaults to dynamicStart.idleStopMinutes.";
                     };
-
-                    contextSize = mkOption {
-                      type = types.int;
-                      default = 8192;
-                      description = "Maximum llama.cpp context size in tokens for ${name}.";
-                    };
-
-                    gpuLayers = mkOption {
-                      type = types.int;
-                      default = 999;
-                      description = "Number of ${name} model layers to offload to GPU.";
-                    };
-
-                    cpuMoeLayers = mkOption {
-                      type = types.nullOr types.int;
-                      default = 35;
-                      description = "Number of ${name} MoE layers to keep on CPU. Set to null to omit --n-cpu-moe.";
-                    };
-
-                    cacheTypeK = mkOption {
-                      type = types.str;
-                      default = "q8_0";
-                      description = "llama.cpp KV cache type for ${name} K cache.";
-                    };
-
-                    cacheTypeV = mkOption {
-                      type = types.str;
-                      default = "q8_0";
-                      description = "llama.cpp KV cache type for ${name} V cache.";
-                    };
-
-                    noMmap = mkOption {
-                      type = types.bool;
-                      default = true;
-                      description = "Whether to pass --no-mmap for ${name}.";
-                    };
-
-                    mlock = mkOption {
-                      type = types.bool;
-                      default = true;
-                      description = "Whether to pass --mlock for ${name}.";
-                    };
-
-                    flashAttention = mkOption {
-                      type = types.nullOr (
-                        types.enum [
-                          "on"
-                          "off"
-                          "auto"
-                        ]
-                      );
-                      default = "auto";
-                      description = "Flash Attention mode for ${name}; null omits --flash-attn.";
-                    };
-
-                    jinja = mkOption {
-                      type = types.bool;
-                      default = false;
-                      description = "Whether to pass --jinja for ${name}.";
-                    };
-
-                    extraArgs = mkOption {
-                      type = types.listOf types.str;
-                      default = [ ];
-                      description = "Additional llama-server arguments appended for ${name}.";
-                    };
-                  };
+                  }
+                  //
+                    (import ../shared/llama-cpp-model.nix {
+                      inherit lib types;
+                    })
+                      {
+                        inherit name;
+                        descriptionPrefix = "llama-swap";
+                      };
                 }
               )
             );
