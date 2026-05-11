@@ -5,7 +5,7 @@
       modelId = "qwen";
       baseUrl = "http://127.0.0.1:8080/v1";
       displayName = "Qwen 3.6 35B A3B (local)";
-      contextWindow = 131072;
+      contextWindow = 65536;
       compat = {
         supportsDeveloperRole = false;
         supportsReasoningEffort = false;
@@ -18,7 +18,7 @@
       modelId = "qwen-legion";
       baseUrl = "https://ai-api.pieczarkowo.me/v1";
       displayName = "Qwen 3.6 35B A3B (Legion)";
-      contextWindow = 256000;
+      contextWindow = 65536;
       apiKeySecret = "pi_legion_api_key";
       authHeader = true;
       compat = {

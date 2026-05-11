@@ -102,24 +102,39 @@
         defaultModel = "qwen";
         modelDir = "/var/lib/homelab/models/llm";
 
-        models.qwen = {
-          name = "Qwen 3.6 35B A3B";
-          file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
-          url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
-          sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
+        models =
+          let
+            qwenModel = {
+              name = "Qwen 3.6 35B A3B";
+              file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
+              url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
+              sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
 
-          contextSize = 256000;
-          gpuLayers = 99;
-          cpuMoeLayers = 36;
-          cacheTypeK = "turbo4";
-          cacheTypeV = "turbo3";
-          jinja = true;
+              gpuLayers = 99;
+              cpuMoeLayers = 36;
+              batchSize = 4096;
+              ubatchSize = 512;
+              cacheTypeK = "turbo4";
+              cacheTypeV = "turbo4";
+              temperature = 0.6;
+              topP = 0.95;
+              topK = 20;
+              minP = 0.0;
+              presencePenalty = 0.0;
+              repeatPenalty = 1.0;
+              jinja = true;
 
-          extraArgs = [
-            "--parallel"
-            "1"
-          ];
-        };
+              extraArgs = [
+                "--parallel"
+                "1"
+              ];
+            };
+          in
+          {
+            qwen = qwenModel // {
+              contextSize = 65536;
+            };
+          };
 
         expose = {
           enable = true;

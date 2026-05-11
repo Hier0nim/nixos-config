@@ -40,6 +40,18 @@
     description = "Maximum llama.cpp context size in tokens for ${name}.";
   };
 
+  batchSize = lib.mkOption {
+    type = types.int;
+    default = 4096;
+    description = "llama.cpp logical batch size for ${name}.";
+  };
+
+  ubatchSize = lib.mkOption {
+    type = types.int;
+    default = 512;
+    description = "llama.cpp physical batch size for ${name}.";
+  };
+
   gpuLayers = lib.mkOption {
     type = types.int;
     default = 999;
@@ -86,6 +98,42 @@
     );
     default = "auto";
     description = "Flash Attention mode for ${name}; null omits --flash-attn.";
+  };
+
+  temperature = lib.mkOption {
+    type = types.float;
+    default = 0.6;
+    description = "Sampling temperature for ${name}.";
+  };
+
+  topP = lib.mkOption {
+    type = types.float;
+    default = 0.95;
+    description = "Top-p sampling threshold for ${name}.";
+  };
+
+  topK = lib.mkOption {
+    type = types.int;
+    default = 20;
+    description = "Top-k sampling threshold for ${name}.";
+  };
+
+  minP = lib.mkOption {
+    type = types.float;
+    default = 0.0;
+    description = "Min-p sampling threshold for ${name}.";
+  };
+
+  presencePenalty = lib.mkOption {
+    type = types.float;
+    default = 0.0;
+    description = "Presence penalty for ${name}.";
+  };
+
+  repeatPenalty = lib.mkOption {
+    type = types.float;
+    default = 1.0;
+    description = "Repeat penalty for ${name}.";
   };
 
   jinja = lib.mkOption {

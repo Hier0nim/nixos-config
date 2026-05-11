@@ -96,6 +96,10 @@ let
       (toString model.gpuLayers)
       "-c"
       (toString model.contextSize)
+      "--batch-size"
+      (toString model.batchSize)
+      "--ubatch-size"
+      (toString model.ubatchSize)
       "--host"
       "127.0.0.1"
       "--port"
@@ -104,6 +108,18 @@ let
       model.cacheTypeK
       "--cache-type-v"
       model.cacheTypeV
+      "--temp"
+      (toString model.temperature)
+      "--top-p"
+      (toString model.topP)
+      "--top-k"
+      (toString model.topK)
+      "--min-p"
+      (toString model.minP)
+      "--presence-penalty"
+      (toString model.presencePenalty)
+      "--repeat-penalty"
+      (toString model.repeatPenalty)
     ]
     ++ lib.optionals (model.cpuMoeLayers != null) [
       "--n-cpu-moe"
