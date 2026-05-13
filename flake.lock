@@ -806,6 +806,21 @@
         "url": "https://flakehub.com/f/AshleyYakeley/NixVirt/%2A.tar.gz"
       }
     },
+    "pi-config": {
+      "locked": {
+        "lastModified": 1778677788,
+        "narHash": "sha256-t+U1b/I4uMW7PqE3YZKGEc6l9i8r9PB4Osa2G5LgWZw=",
+        "ref": "refs/heads/main",
+        "rev": "ea8c78149ce7a398a09393f260530caee0e7c90d",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
+      }
+    },
     "plugins-auto-dark-mode-nvim": {
       "flake": false,
       "locked": {
@@ -1002,6 +1017,7 @@
         "nixpkgs": "nixpkgs_5",
         "nixpkgs-stable": "nixpkgs-stable_2",
         "nixvirt": "nixvirt",
+        "pi-config": "pi-config",
         "pre-commit-hooks": "pre-commit-hooks",
         "serena": "serena",
         "sops-nix": "sops-nix",
