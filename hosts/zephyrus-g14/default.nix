@@ -76,6 +76,11 @@
         enableOffloadCmd = lib.mkForce true;
       };
     };
+
+    powerManagement = {
+      enable = lib.mkForce true;
+      finegrained = lib.mkForce false;
+    };
   };
 
   services = {

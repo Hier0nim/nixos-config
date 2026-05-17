@@ -5,7 +5,7 @@
   programs = {
     steam = {
       enable = true;
-      gamescopeSession.enable = true;
+      gamescopeSession.enable = false; # disabled: appears before niri in greeter (S-01)
       remotePlay.openFirewall = true;
       dedicatedServer.openFirewall = true;
     };
