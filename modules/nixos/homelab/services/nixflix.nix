@@ -33,8 +33,11 @@ in
         format = "binary";
       };
       sonarr_api_key = mkMediaSecret "sonarr_api_key";
+      sonarr_password = mkMediaSecret "sonarr_password";
       radarr_api_key = mkMediaSecret "radarr_api_key";
+      radarr_password = mkMediaSecret "radarr_password";
       prowlarr_api_key = mkMediaSecret "prowlarr_api_key";
+      prowlarr_password = mkMediaSecret "prowlarr_password";
       jellyfin_api_key = mkMediaSecret "jellyfin_api_key";
       seerr_api_key = mkMediaSecret "seerr_api_key";
       jellyfin_admin_password = mkMediaSecret "jellyfin_admin_password";
@@ -69,21 +72,30 @@ in
       # Sonarr — declarative API config via nixflix
       sonarr = {
         inherit (cfg.services.sonarr) enable;
-        config.apiKey = secretRef "sonarr_api_key";
+        config = {
+          apiKey = secretRef "sonarr_api_key";
+          hostConfig.password = secretRef "sonarr_password";
+        };
         reverseProxy.expose = false;
       };
 
       # Radarr
       radarr = {
         inherit (cfg.services.radarr) enable;
-        config.apiKey = secretRef "radarr_api_key";
+        config = {
+          apiKey = secretRef "radarr_api_key";
+          hostConfig.password = secretRef "radarr_password";
+        };
         reverseProxy.expose = false;
       };
 
       # Prowlarr
       prowlarr = {
         inherit (cfg.services.prowlarr) enable;
-        config.apiKey = secretRef "prowlarr_api_key";
+        config = {
+          apiKey = secretRef "prowlarr_api_key";
+          hostConfig.password = secretRef "prowlarr_password";
+        };
         reverseProxy.expose = false;
       };
 
