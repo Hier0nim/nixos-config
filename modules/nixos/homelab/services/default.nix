@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   imports = lib.flatten [
-    ./nixarr.nix
+    ./nixflix.nix
     ./tdarr.nix
     ./immich.nix
     ./copyparty.nix

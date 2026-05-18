@@ -187,10 +187,10 @@ in
         description = "Root directory for homelab service state.";
       };
 
-      nixarr = mkOption {
+      nixflix = mkOption {
         type = types.path;
-        default = "/var/lib/homelab/nixarr";
-        description = "State directory for nixarr-managed services.";
+        default = "/var/lib/homelab/nixflix";
+        description = "State directory for nixflix-managed services.";
       };
 
       jellyfin = mkOption {
@@ -361,16 +361,6 @@ in
         exposeEnable = true;
       };
 
-      transmission = mkServiceOptions {
-        name = "transmission";
-        subdomain = "pobieralnia";
-        port = 9091;
-        authGroup = "media-admin";
-        pathPrefix = "/transmission";
-        redirectToPrefix = true;
-        dataGroups = [ "media" ];
-      };
-
       jellyfin =
         (mkServiceOptions {
           name = "jellyfin";
@@ -487,6 +477,16 @@ in
         dataGroups = [ ];
       };
 
+      # qBittorrent
+      qbittorrent = mkServiceOptions {
+        name = "qbittorrent";
+        subdomain = "pobieralnia";
+        port = 8080;
+        authGroup = "media-admin";
+        pathPrefix = "/qbittorrent";
+        redirectToPrefix = true;
+        dataGroups = [ "media" ];
+      };
       immich =
         (mkServiceOptions {
           name = "immich";
@@ -728,7 +728,7 @@ in
     media.vpn.wgConfSecretName = mkOption {
       type = types.str;
       default = "nixarr_wireguard";
-      description = "SOPS secret name for the WireGuard config used by Transmission.";
+      description = "SOPS secret name for the WireGuard config used by qBittorrent.";
     };
   };
 }

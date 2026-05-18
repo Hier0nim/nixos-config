@@ -51,7 +51,7 @@
             inputs.determinate.nixosModules.default
             inputs.disko.nixosModules.default
             inputs.home-manager-stable.nixosModules.default
-            inputs.nixarr.nixosModules.default
+            inputs.nixflix.nixosModules.default
             inputs.copyparty.nixosModules.default
 
             ./hosts/server-legion
@@ -109,6 +109,10 @@
     };
     nixarr = {
       url = "github:nix-media-server/nixarr/077bb8a83d6d07b25e098638db50d0ac80456174";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+    nixflix = {
+      url = "github:kiriwalawren/nixflix/17738063b822d002194dc3c213f119600d2d6fb8";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     copyparty = {

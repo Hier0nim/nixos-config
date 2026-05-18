@@ -12,14 +12,10 @@ in
       sonarr.enable = true;
       radarr.enable = true;
       prowlarr.enable = true;
-      bazarr.enable = true;
-      transmission.enable = true;
       jellyfin.enable = true;
       jellyseerr.enable = true;
-      audiobookshelf.enable = true;
-      readarr.enable = true;
-      "readarr-audiobook".enable = true;
       recyclarr.enable = true;
+      qbittorrent.enable = true;
     };
   };
 }

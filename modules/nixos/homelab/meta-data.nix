@@ -3,58 +3,42 @@
     "sonarr"
     "radarr"
     "prowlarr"
-    "bazarr"
-    "transmission"
     "jellyfin"
     "jellyseerr"
     "tdarr"
-    "audiobookshelf"
-    "readarr"
-    "readarr-audiobook"
     "immich"
     "copyparty"
     "cockpit"
     "actual"
     "enable-actual"
+    "qbittorrent"
   ];
 
-  nixarrStateServices = [
+  nixflixStateServices = [
     "sonarr"
     "radarr"
     "prowlarr"
-    "bazarr"
-    "transmission"
     "jellyseerr"
-    "audiobookshelf"
-    "readarr"
-    "readarr-audiobook"
     "recyclarr"
+    "qbittorrent"
   ];
 
   sharedRoles = {
     media = [
       "sonarr"
       "radarr"
-      "bazarr"
-      "transmission"
       "jellyfin"
       "tdarr"
-      "audiobookshelf"
-      "readarr"
-      "readarr-audiobook"
+      "qbittorrent"
     ];
     photos = [ "immich" ];
     nas = [ "copyparty" ];
   };
 
   umaskSharedWriters = [
-    "transmission"
     "sonarr"
     "radarr"
-    "bazarr"
-    "readarr"
-    "readarr-audiobook"
-    "audiobookshelf"
+    "qbittorrent"
   ];
 
   immichBindTargets = [

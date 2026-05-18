@@ -7,33 +7,36 @@ let
   cfg = config.homelab;
   homelabMeta = import ../meta-data.nix;
   inherit (cfg) state;
-  inherit (homelabMeta) immichBindTargets nixarrStateServices;
+  inherit (homelabMeta) immichBindTargets nixflixStateServices;
 
   mkStateDir = path: user: group: [
     "d ${path} 0750 ${user} ${group} - -"
     "Z ${path} 0750 ${user} ${group} - -"
   ];
 
-  mkNixarrState =
+  mkNixflixState =
     name:
     let
       svc = cfg.services.${name};
     in
-    lib.optionals svc.enable (mkStateDir "${state.nixarr}/${name}" svc.user svc.group);
+    lib.optionals svc.enable (mkStateDir "${state.nixflix}/${name}" svc.user svc.group);
 
-  # Private state under /var/lib/homelab/nixarr must stay svc.user:svc.group.
+  # Private state under /var/lib/homelab/nixflix must stay svc.user:svc.group.
   # Shared groups are only for shared data paths under /data.
-  mkNixarrStateOwnership =
+  mkNixflixStateOwnership =
     name:
     let
       svc = cfg.services.${name};
-      statePath = "${state.nixarr}/${name}";
+      statePath = "${state.nixflix}/${name}";
       owner = "${svc.user}:${svc.group}";
       esc = lib.escapeShellArg;
     in
     lib.mkIf svc.enable {
       users.groups.${svc.group} = { };
-      users.users.${svc.user}.group = lib.mkForce svc.group;
+      users.users.${svc.user} = {
+        group = lib.mkForce svc.group;
+        isSystemUser = lib.mkDefault true;
+      };
       systemd.services.${name} = {
         serviceConfig = {
           PermissionsStartOnly = lib.mkForce true;
@@ -85,10 +88,10 @@ in
             "Z ${state.root} 0755 root root - -"
           ]
           (lib.optionals cfg.profiles.media.enable [
-            "d ${state.nixarr} 0755 root root - -"
-            "Z ${state.nixarr} 0755 root root - -"
+            "d ${state.nixflix} 0755 root root - -"
+            "Z ${state.nixflix} 0755 root root - -"
           ])
-          (lib.concatMap mkNixarrState nixarrStateServices)
+          (lib.concatMap mkNixflixState nixflixStateServices)
           (lib.optionals cfg.services.jellyfin.enable (
             [
               "d ${state.jellyfin} 0750 ${cfg.services.jellyfin.user} ${cfg.services.jellyfin.group} - -"
@@ -125,7 +128,7 @@ in
         ];
 
       }
-      (lib.mkMerge (map mkNixarrStateOwnership nixarrStateServices))
+      (lib.mkMerge (map mkNixflixStateOwnership nixflixStateServices))
       mkJellyfinPrivateIdentity
     ]
   );
