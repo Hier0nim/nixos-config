@@ -355,6 +355,14 @@ in
         exposeEnable = true;
       };
 
+      sonarr-anime = mkServiceOptions {
+        name = "sonarr-anime";
+        subdomain = "sonarr-anime";
+        port = 8990;
+        authGroup = "media-admin";
+        dataGroups = [ "media" ];
+      };
+
       jellyfin =
         (mkServiceOptions {
           name = "jellyfin";

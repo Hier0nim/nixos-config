@@ -1,6 +1,7 @@
 {
   proxiedServices = [
     "sonarr"
+    "sonarr-anime"
     "radarr"
     "prowlarr"
     "jellyfin"
@@ -16,6 +17,7 @@
 
   nixflixStateServices = [
     "sonarr"
+    "sonarr-anime"
     "radarr"
     "prowlarr"
     "seerr"
@@ -26,6 +28,7 @@
   sharedRoles = {
     media = [
       "sonarr"
+      "sonarr-anime"
       "radarr"
       "jellyfin"
       "tdarr"
@@ -37,6 +40,7 @@
 
   umaskSharedWriters = [
     "sonarr"
+    "sonarr-anime"
     "radarr"
     "qbittorrent"
   ];

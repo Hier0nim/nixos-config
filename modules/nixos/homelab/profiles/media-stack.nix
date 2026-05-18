@@ -10,6 +10,7 @@ in
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable) {
     homelab.services = {
       sonarr.enable = true;
+      "sonarr-anime".enable = true;
       radarr.enable = true;
       prowlarr.enable = true;
       jellyfin.enable = true;

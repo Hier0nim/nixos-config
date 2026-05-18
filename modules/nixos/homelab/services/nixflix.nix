@@ -44,6 +44,9 @@ in
       qbittorrent_password = mkMediaSecret "qbittorrent_password";
       opensubtitles_username = mkMediaSecret "opensubtitles_username";
       opensubtitles_password = mkMediaSecret "opensubtitles_password";
+      sonarr_anime_api_key = mkMediaSecret "sonarr_anime_api_key";
+      sonarr_anime_password = mkMediaSecret "sonarr_anime_password";
+      jellyfin_pieczarkowo_password = mkMediaSecret "jellyfin_pieczarkowo_password";
     };
 
     # ===== nixflix global configuration =====
@@ -77,6 +80,8 @@ in
           hostConfig.password = secretRef "sonarr_password";
         };
         reverseProxy.expose = false;
+        # Align with storage: /data/media/shows (not /data/media/tv)
+        mediaDirs = [ "${data.media}/shows" ];
       };
 
       # Radarr
@@ -89,12 +94,36 @@ in
         reverseProxy.expose = false;
       };
 
+      # Sonarr-Anime — separate instance for anime
+      sonarr-anime = {
+        inherit (cfg.services.sonarr-anime) enable;
+        config = {
+          apiKey = secretRef "sonarr_anime_api_key";
+          hostConfig.password = secretRef "sonarr_anime_password";
+        };
+        reverseProxy.expose = false;
+      };
+
       # Prowlarr
       prowlarr = {
         inherit (cfg.services.prowlarr) enable;
         config = {
           apiKey = secretRef "prowlarr_api_key";
           hostConfig.password = secretRef "prowlarr_password";
+
+          indexers = [
+            {
+              name = "1337x";
+              tags = [ "flaresolverr" ];
+            }
+            {
+              name = "YTS";
+            }
+            {
+              name = "Nyaa";
+              tags = [ "anime" ];
+            }
+          ];
         };
         reverseProxy.expose = false;
       };
@@ -110,6 +139,15 @@ in
         users.admin = {
           policy.isAdministrator = true;
           password = secretRef "jellyfin_admin_password";
+        };
+
+        # Regular viewer user
+        users.pieczarkowo = {
+          password = secretRef "jellyfin_pieczarkowo_password";
+          configuration = {
+            displayMissingEpisodes = false;
+            enableNextEpisodeAutoPlay = true;
+          };
         };
 
         # Subtitle plugins replace Bazarr
@@ -159,6 +197,7 @@ in
         categories = {
           "tv-sonarr" = "${data.downloads}/torrent/tv";
           "radarr" = "${data.downloads}/torrent/movies";
+          "sonarr-anime" = "${data.downloads}/torrent/anime";
         };
 
         reverseProxy.expose = false;
