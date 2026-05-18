@@ -80,8 +80,6 @@ in
           hostConfig.password = secretRef "sonarr_password";
         };
         reverseProxy.expose = false;
-        # Align with storage: /data/media/shows (not /data/media/tv)
-        mediaDirs = [ "${data.media}/shows" ];
       };
 
       # Radarr
