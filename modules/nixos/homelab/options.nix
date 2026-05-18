@@ -193,12 +193,6 @@ in
         description = "State directory for nixflix-managed services.";
       };
 
-      jellyfin = mkOption {
-        type = types.path;
-        default = "/var/lib/homelab/jellyfin";
-        description = "State directory for Jellyfin.";
-      };
-
       tdarr = mkOption {
         type = types.path;
         default = "/var/lib/homelab/tdarr";

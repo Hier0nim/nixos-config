@@ -13,7 +13,7 @@ in
       radarr.enable = true;
       prowlarr.enable = true;
       jellyfin.enable = true;
-      jellyseerr.enable = true;
+      seerr.enable = true;
       recyclarr.enable = true;
       qbittorrent.enable = true;
     };

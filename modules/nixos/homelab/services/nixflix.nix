@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.homelab;
-  inherit (cfg) data state;
+  inherit (cfg) data;
   inherit (config.networking) hostName;
   inherit (cfg.media.vpn) wgConfSecretName;
   jellyfinHwAccel = cfg.services.jellyfin.hardwareAcceleration;
@@ -153,14 +153,7 @@ in
       };
     };
 
-    # ===== Jellyfin overrides (unchanged) =====
-    services.jellyfin = lib.mkIf cfg.services.jellyfin.enable {
-      configDir = lib.mkForce "${state.jellyfin}/config";
-      dataDir = lib.mkForce "${state.jellyfin}/data";
-      cacheDir = lib.mkForce "${state.jellyfin}/cache";
-      logDir = lib.mkForce "${state.jellyfin}/log";
-    };
-
+    # Jellyfin — nixflix manages stateDir, our old overrides are removed
     users.users.${cfg.services.jellyfin.user}.extraGroups =
       lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
         [
