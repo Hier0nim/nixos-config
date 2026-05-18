@@ -157,8 +157,8 @@ in
     systemd.services.jellyfin.preStart = lib.mkIf cfg.services.jellyfin.enable (
       let
         jfDir = "/var/lib/homelab/nixflix/jellyfin";
-        jfUser = cfg.services.jellyfin.user;
-        jfGroup = cfg.services.jellyfin.group;
+        jfUser = config.nixflix.jellyfin.user;
+        jfGroup = config.nixflix.jellyfin.group;
       in
       lib.mkBefore ''
         if [ -d ${jfDir} ]; then
