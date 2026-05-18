@@ -153,30 +153,41 @@ in
       };
     };
 
-    # Jellyfin — fix state dir ownership before startup (tmpfiles create as root)
-    systemd.services.jellyfin.preStart = lib.mkIf cfg.services.jellyfin.enable (
-      let
-        jfDir = "/var/lib/homelab/nixflix/jellyfin";
-        jfUser = config.nixflix.jellyfin.user;
-        jfGroup = config.nixflix.jellyfin.group;
-      in
-      lib.mkBefore ''
-        if [ -d ${jfDir} ]; then
-          chown -R ${jfUser}:${jfGroup} ${jfDir}
-        fi
-      ''
-    );
-
-    users.users.${cfg.services.jellyfin.user}.extraGroups =
-      lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
-        [
-          "render"
-          "video"
-        ];
-
-    systemd.services.jellyfin.serviceConfig =
-      lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable)
+    # Jellyfin — ensure state dirs exist before systemd CHDIR/preStart.
+    systemd = {
+      tmpfiles.settings."20-homelab-jellyfin" = lib.mkIf cfg.services.jellyfin.enable (
+        let
+          jf = config.nixflix.jellyfin;
+          dir = {
+            mode = "0755";
+            inherit (jf) user group;
+          };
+        in
         {
+          "${jf.dataDir}".d = dir;
+          "${jf.configDir}".d = dir;
+          "${jf.cacheDir}".d = dir;
+          "${jf.logDir}".d = dir;
+          "${jf.system.metadataPath}".d = dir;
+          "${jf.dataDir}/plugins".d = dir;
+        }
+      );
+
+      services.jellyfin = {
+        preStart = lib.mkIf cfg.services.jellyfin.enable (
+          let
+            jfDir = config.nixflix.jellyfin.dataDir;
+            jfUser = config.nixflix.jellyfin.user;
+            jfGroup = config.nixflix.jellyfin.group;
+          in
+          lib.mkBefore ''
+            if [ -d ${jfDir} ]; then
+              chown -R ${jfUser}:${jfGroup} ${jfDir}
+            fi
+          ''
+        );
+
+        serviceConfig = lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable) {
           DeviceAllow = lib.mkAfter (
             [
               "${toString jellyfinHwAccel.device} rw"
@@ -189,5 +200,14 @@ in
             ]
           );
         };
+      };
+    };
+
+    users.users.${cfg.services.jellyfin.user}.extraGroups =
+      lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
+        [
+          "render"
+          "video"
+        ];
   };
 }
