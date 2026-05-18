@@ -153,7 +153,20 @@ in
       };
     };
 
-    # Jellyfin — nixflix manages stateDir, our old overrides are removed
+    # Jellyfin — fix state dir ownership before startup (tmpfiles create as root)
+    systemd.services.jellyfin.preStart = lib.mkIf cfg.services.jellyfin.enable (
+      let
+        jfDir = "/var/lib/homelab/nixflix/jellyfin";
+        jfUser = cfg.services.jellyfin.user;
+        jfGroup = cfg.services.jellyfin.group;
+      in
+      lib.mkBefore ''
+        if [ -d ${jfDir} ]; then
+          chown -R ${jfUser}:${jfGroup} ${jfDir}
+        fi
+      ''
+    );
+
     users.users.${cfg.services.jellyfin.user}.extraGroups =
       lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
         [
