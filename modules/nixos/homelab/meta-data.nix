@@ -4,7 +4,7 @@
     "radarr"
     "prowlarr"
     "jellyfin"
-    "jellyseerr"
+    "seerr"
     "tdarr"
     "immich"
     "copyparty"
@@ -18,7 +18,7 @@
     "sonarr"
     "radarr"
     "prowlarr"
-    "jellyseerr"
+    "seerr"
     "recyclarr"
     "qbittorrent"
   ];

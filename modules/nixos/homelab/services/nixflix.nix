@@ -115,7 +115,7 @@ in
 
       # Jellyseerr → nixflix calls it 'seerr'
       seerr = {
-        inherit (cfg.services.jellyseerr) enable;
+        inherit (cfg.services.seerr) enable;
         package = lib.mkForce pkgs.jellyseerr; # nixpkgs name vs nixflix's pkgs.seerr
         apiKey = secretRef "seerr_api_key";
 
@@ -136,6 +136,9 @@ in
         enable = true;
 
         vpn.enable = true;
+
+        # WebUI port — match our Caddy proxy (pobieralnia:8080)
+        webuiPort = 8080;
 
         # Download client password for Sonarr/Radarr/Prowlarr integration
         password = secretRef "qbittorrent_password";

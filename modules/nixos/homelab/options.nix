@@ -394,8 +394,8 @@ in
           };
         };
 
-      jellyseerr = mkServiceOptions {
-        name = "jellyseerr";
+      seerr = mkServiceOptions {
+        name = "seerr";
         subdomain = "chciejnik";
         port = 5055;
       };
