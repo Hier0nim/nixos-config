@@ -1,6 +1,5 @@
 {
   config,
-  inputs,
   pkgs,
   ...
 }:
@@ -58,7 +57,6 @@ let
   };
 in
 {
-
   sops.secrets.pi_legion_api_key = {
     sopsFile = config.custom.repoPath + "/secrets/server-legion/llama-cpp-agent.yaml";
     key = "llama_cpp_agent_api_key";
@@ -68,7 +66,6 @@ in
     packages = with pkgs; [
       claude-code
       codex
-      inputs.serena.packages.${pkgs.stdenv.hostPlatform.system}.serena
       socat
     ];
 

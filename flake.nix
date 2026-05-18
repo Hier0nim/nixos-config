@@ -191,11 +191,6 @@
 
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
 
-    serena = {
-      url = "github:oraios/serena";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     pi-config.url = "git+ssh://git@github.com/Hier0nim/dot_pi.git";
   };
 }
