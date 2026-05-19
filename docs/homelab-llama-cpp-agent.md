@@ -11,10 +11,10 @@ TTL.
 - API: `https://ai-api.pieczarkowo.me/v1`
 
 The browser hostname is protected by the homelab Caddy auth group configured on
-the service. Its root path redirects to the default model chat:
+the service. Its root path redirects to the llama-swap UI:
 
 ```text
-/upstream/<defaultModel>/?new_chat=true#/
+/ui/
 ```
 
 The API hostname proxies to `llama-swap` itself, not to a raw model upstream.
@@ -35,7 +35,10 @@ request, so upstream API-key auth can break UI routes such as `/cors-proxy` and
 Public API auth is handled before requests reach `llama-swap`. The packaged
 `llama-swap` version in this repo does not support top-level `apiKeys`, so
 Caddy checks `Authorization: Bearer <secret>` with a SOPS-rendered template.
-The secret is not written to the Nix store.
+Before proxying to `llama-swap`, Caddy strips `Authorization`,
+`Proxy-Authorization`, and common API-key headers so llama.cpp does not treat
+proxy credentials as a model-server API key. The secret is not written to the
+Nix store.
 
 ## Dynamic Loading
 

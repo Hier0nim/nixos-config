@@ -75,6 +75,10 @@ in
       "video"
     ];
 
+    systemd.services.immich-server.unitConfig.RequiresMountsFor = map (
+      name: "${photos}/${name}"
+    ) immichBindTargets;
+
     fileSystems = lib.listToAttrs (
       map (name: {
         name = "${photos}/${name}";

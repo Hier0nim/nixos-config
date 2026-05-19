@@ -8,7 +8,6 @@
     ./cockpit.nix
     ./actual.nix
     ./enable-actual.nix
-    ./llama-cpp-agent.nix
     ./backup.nix
   ];
 }

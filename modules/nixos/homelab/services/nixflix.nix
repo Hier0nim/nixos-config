@@ -75,6 +75,7 @@ in
       # Sonarr — declarative API config via nixflix
       sonarr = {
         inherit (cfg.services.sonarr) enable;
+        vpn.enable = true;
         config = {
           apiKey = secretRef "sonarr_api_key";
           hostConfig.password = secretRef "sonarr_password";
@@ -85,6 +86,7 @@ in
       # Radarr
       radarr = {
         inherit (cfg.services.radarr) enable;
+        vpn.enable = true;
         config = {
           apiKey = secretRef "radarr_api_key";
           hostConfig.password = secretRef "radarr_password";
@@ -95,6 +97,7 @@ in
       # Sonarr-Anime — separate instance for anime
       sonarr-anime = {
         inherit (cfg.services.sonarr-anime) enable;
+        vpn.enable = true;
         config = {
           apiKey = secretRef "sonarr_anime_api_key";
           hostConfig.password = secretRef "sonarr_anime_password";
@@ -105,20 +108,17 @@ in
       # Prowlarr
       prowlarr = {
         inherit (cfg.services.prowlarr) enable;
+        vpn.enable = true;
         config = {
           apiKey = secretRef "prowlarr_api_key";
           hostConfig.password = secretRef "prowlarr_password";
 
           indexers = [
             {
-              name = "1337x";
-              tags = [ "flaresolverr" ];
-            }
-            {
               name = "YTS";
             }
             {
-              name = "Nyaa";
+              name = "Nyaa.si";
               tags = [ "anime" ];
             }
           ];
@@ -148,7 +148,7 @@ in
           };
         };
 
-        # Subtitle plugins replace Bazarr
+        # Subtitle plugins handle subtitles directly in Jellyfin.
         plugins = {
           "Open Subtitles" = {
             enable = true;
@@ -191,14 +191,45 @@ in
         # Download client password for Sonarr/Radarr/Prowlarr integration
         password = secretRef "qbittorrent_password";
 
-        # Download/watch categories
+        serverConfig = {
+          LegalNotice.Accepted = true;
+          Preferences.WebUI = {
+            Username = "admin";
+            Password_PBKDF2 = "@ByteArray(dI5bnX+DU48zW531C2d97g==:B9Q6zq47r0mGzMLhbsLZqzN8z6lhi3GORGve8YWhd/kSrln30iXxxT2OsXJ0H6mzWiL7N6DAA078qi7nslp2Ew==)";
+          };
+        };
+
+        # Keep category names aligned with nixflix downloadarr defaults.
         categories = {
-          "tv-sonarr" = "${data.downloads}/torrent/tv";
+          "sonarr" = "${data.downloads}/torrent/tv";
           "radarr" = "${data.downloads}/torrent/movies";
           "sonarr-anime" = "${data.downloads}/torrent/anime";
+          "prowlarr" = "${data.downloads}/torrent/prowlarr";
         };
 
         reverseProxy.expose = false;
+      };
+    };
+
+    homelab.services = {
+      sonarr.upstream.host = config.nixflix.sonarr.connectionAddress;
+      radarr.upstream.host = config.nixflix.radarr.connectionAddress;
+      sonarr-anime.upstream.host = config.nixflix.sonarr-anime.connectionAddress;
+      prowlarr.upstream.host = config.nixflix.prowlarr.connectionAddress;
+      qbittorrent = {
+        upstream.host = config.nixflix.torrentClients.qbittorrent.connectionAddress;
+        auth.bypassForApi = true;
+        expose = {
+          pathPrefix = null;
+          redirectToPrefix = false;
+        };
+      };
+    };
+
+    systemd.services.flaresolverr = lib.mkIf cfg.services.prowlarr.enable {
+      vpnConfinement = {
+        enable = true;
+        vpnNamespace = "wg";
       };
     };
 
@@ -223,32 +254,40 @@ in
       );
 
       services.jellyfin = {
-        preStart = lib.mkIf cfg.services.jellyfin.enable (
-          let
-            jfDir = config.nixflix.jellyfin.dataDir;
-            jfUser = config.nixflix.jellyfin.user;
-            jfGroup = config.nixflix.jellyfin.group;
-          in
-          lib.mkBefore ''
-            if [ -d ${jfDir} ]; then
-              chown -R ${jfUser}:${jfGroup} ${jfDir}
-            fi
-          ''
-        );
+        serviceConfig = lib.mkMerge [
+          (lib.mkIf cfg.services.jellyfin.enable {
+            # Jellyfin keeps mutable SQLite state. With PrivateUsers enabled,
+            # ownership repair runs in a user namespace and leaves host files
+            # as nobody:nogroup, which makes authentication writes fail.
+            PrivateUsers = lib.mkForce false;
 
-        serviceConfig = lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable) {
-          DeviceAllow = lib.mkAfter (
-            [
-              "${toString jellyfinHwAccel.device} rw"
-            ]
-            ++ lib.optionals (jellyfinHwAccel.type == "nvenc") [
-              "/dev/nvidiactl rw"
-              "/dev/nvidia-modeset rw"
-              "/dev/nvidia-uvm rw"
-              "/dev/nvidia-uvm-tools rw"
-            ]
-          );
-        };
+            ExecStartPre =
+              let
+                jfDir = config.nixflix.jellyfin.dataDir;
+                jfUser = config.nixflix.jellyfin.user;
+                jfGroup = config.nixflix.jellyfin.group;
+                fixJellyfinState = pkgs.writeShellScript "jellyfin-fix-state-ownership" ''
+                  if [ -d ${lib.escapeShellArg jfDir} ]; then
+                    chown -R ${lib.escapeShellArg "${jfUser}:${jfGroup}"} ${lib.escapeShellArg jfDir}
+                  fi
+                '';
+              in
+              lib.mkBefore [ "+${fixJellyfinState}" ];
+          })
+          (lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable) {
+            DeviceAllow = lib.mkAfter (
+              [
+                "${toString jellyfinHwAccel.device} rw"
+              ]
+              ++ lib.optionals (jellyfinHwAccel.type == "nvenc") [
+                "/dev/nvidiactl rw"
+                "/dev/nvidia-modeset rw"
+                "/dev/nvidia-uvm rw"
+                "/dev/nvidia-uvm-tools rw"
+              ]
+            );
+          })
+        ];
       };
     };
 

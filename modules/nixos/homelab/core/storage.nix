@@ -11,8 +11,6 @@ let
   mediaEnabled = cfg.profiles.media.enable;
   photosEnabled = cfg.profiles.photos.enable;
   filesEnabled = cfg.profiles.files.enable;
-  aiEnabled = cfg.profiles.ai.enable;
-  llamaSvc = cfg.services."llama-cpp-agent";
 
   inherit (homelabMeta) immichBindTargets;
 in
@@ -66,14 +64,6 @@ in
       "Z ${data.nas}/hieronim 2770 root nas - -"
       "d ${data.nas}/sarka 2770 root nas - -"
       "Z ${data.nas}/sarka 2770 root nas - -"
-    ]
-    ++ lib.optionals aiEnabled [
-      "d ${data.models} 0755 root root - -"
-      "Z ${data.models} 0755 root root - -"
-      "d ${data.models}/llm 0755 root root - -"
-      "Z ${data.models}/llm 0755 root root - -"
-      "d ${llamaSvc.modelDir} 0755 root root - -"
-      "Z ${llamaSvc.modelDir} 0755 root root - -"
     ];
   };
 }

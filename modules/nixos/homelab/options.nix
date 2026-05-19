@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 
@@ -105,9 +105,9 @@ let
           type = types.bool;
           default = stripAuthorizationHeader;
           description = ''
-            Remove the Authorization request header before proxying to ${name}.
+            Remove Authorization-style request headers before proxying to ${name}.
             Enable this when Caddy handles auth and the upstream service treats
-            forwarded Basic or Bearer credentials as its own invalid API token.
+            forwarded Basic, Bearer, or API-key credentials as its own invalid API token.
           '';
         };
       };
@@ -289,7 +289,6 @@ in
       photos.enable = mkEnableOption "photos stack profile";
       files.enable = mkEnableOption "files stack profile";
       admin.enable = mkEnableOption "admin stack profile";
-      ai.enable = mkEnableOption "local AI stack profile";
     };
 
     auth.groups = mkOption {
@@ -344,15 +343,6 @@ in
         subdomain = "indexers";
         port = 9696;
         authGroup = "media-admin";
-      };
-
-      bazarr = mkServiceOptions {
-        name = "bazarr";
-        subdomain = "bazarr";
-        port = 6767;
-        authGroup = "media-admin";
-        dataGroups = [ "media" ];
-        exposeEnable = true;
       };
 
       sonarr-anime = mkServiceOptions {
@@ -443,33 +433,6 @@ in
           };
         };
 
-      audiobookshelf = mkServiceOptions {
-        name = "audiobookshelf";
-        subdomain = "czytelnia";
-        port = 9292;
-        pathPrefix = "/audiobookshelf";
-        redirectToPrefix = true;
-        dataGroups = [ "media" ];
-      };
-
-      readarr = mkServiceOptions {
-        name = "readarr";
-        subdomain = "readarr";
-        port = 8787;
-        authGroup = "media-admin";
-        dataGroups = [ "media" ];
-        exposeEnable = true;
-      };
-
-      "readarr-audiobook" = mkServiceOptions {
-        name = "readarr-audiobook";
-        subdomain = "readarr-audiobook";
-        port = 9494;
-        authGroup = "media-admin";
-        dataGroups = [ "media" ];
-        exposeEnable = true;
-      };
-
       # Internal nixarr-managed helper with private state, not a proxied web app.
       recyclarr = mkServiceOptions {
         name = "recyclarr";
@@ -553,178 +516,6 @@ in
           };
         };
 
-      # Example host config:
-      #
-      # {
-      #   homelab.profiles.ai.enable = true;
-      #
-      #   homelab.services."llama-cpp-agent" = {
-      #     apiKeySecretName = "llama_cpp_agent_api_key";
-      #     defaultModel = "qwen";
-      #
-      #     models.qwen = {
-      #       name = "Qwen 3.6 35B A3B";
-      #       file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
-      #       url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
-      #       sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
-      #
-      #       contextSize = 32768;
-      #       gpuLayers = 99;
-      #       cpuMoeLayers = 36;
-      #       cacheTypeK = "turbo4";
-      #       cacheTypeV = "turbo3";
-      #       jinja = true;
-      #     };
-      #
-      #     expose = {
-      #       enable = true;
-      #       subdomain = "ai";
-      #       api = {
-      #         enable = true;
-      #         subdomain = "ai-api";
-      #       };
-      #     };
-      #   };
-      # }
-      "llama-cpp-agent" =
-        let
-          base = mkServiceOptions {
-            name = "llama-cpp-agent";
-            subdomain = "ai";
-            port = 8080;
-            authGroup = "infra-admin";
-            exposeEnable = false;
-            stripAuthorizationHeader = true;
-          };
-        in
-        base
-        // {
-          expose = base.expose // {
-            api = {
-              enable = mkOption {
-                type = types.bool;
-                default = false;
-                description = "Expose a separate API hostname for the llama.cpp server.";
-              };
-
-              subdomain = mkOption {
-                type = types.str;
-                default = "ai-api";
-                description = "Subdomain used for the llama.cpp API hostname.";
-              };
-            };
-          };
-
-          package = mkOption {
-            type = types.package;
-            default = pkgs.llama-cpp-turboquant;
-            description = "llama.cpp package used for native llama-server model processes.";
-          };
-
-          autoStart = mkOption {
-            type = types.bool;
-            default = false;
-            description = "Whether to start the llama.cpp stack automatically during boot.";
-          };
-
-          dynamicStart = {
-            idleStopMinutes = mkOption {
-              type = types.int;
-              default = 15;
-              description = "Minutes of inactivity before llama-swap unloads the model. Set to 0 to keep it loaded.";
-            };
-          };
-
-          apiKeySecretName = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Name of SOPS secret used for the llama.cpp API key.";
-          };
-
-          bindAddress = mkOption {
-            type = types.str;
-            default = "127.0.0.1";
-            description = "Host address used for publishing the llama.cpp server port.";
-          };
-
-          modelDir = mkOption {
-            type = types.path;
-            default = "/data/models/llm";
-            description = ''
-              Host directory containing GGUF model files. Prefer an SSD/NVMe-backed path for
-              dynamic model loading because llama.cpp must read the GGUF during cold starts.
-            '';
-          };
-
-          defaultModel = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Default model id used for browser chat root redirects and examples.";
-          };
-
-          models = mkOption {
-            type = types.attrsOf (
-              types.submodule (
-                { name, ... }:
-                {
-                  options = {
-                    enable = mkOption {
-                      type = types.bool;
-                      default = true;
-                      description = "Expose ${name} through llama-swap.";
-                    };
-
-                    download.enable = mkOption {
-                      type = types.bool;
-                      default = true;
-                      description = "Download ${name} into modelDir before starting llama-swap.";
-                    };
-
-                    name = mkOption {
-                      type = types.str;
-                      default = name;
-                      description = "Display name for ${name}.";
-                    };
-
-                    file = mkOption {
-                      type = types.str;
-                      default = "";
-                      description = "GGUF model filename for ${name} inside modelDir.";
-                    };
-
-                    url = mkOption {
-                      type = types.nullOr types.str;
-                      default = null;
-                      description = "Optional URL used by systemd to download ${name}.";
-                    };
-
-                    sha256 = mkOption {
-                      type = types.nullOr types.str;
-                      default = null;
-                      description = "Optional SHA256 checksum for the downloaded ${name} GGUF file.";
-                    };
-
-                    ttl = mkOption {
-                      type = types.nullOr types.int;
-                      default = null;
-                      description = "Seconds before llama-swap unloads ${name}. Defaults to dynamicStart.idleStopMinutes.";
-                    };
-                  }
-                  //
-                    (import ../shared/llama-cpp-model.nix {
-                      inherit lib types;
-                    })
-                      {
-                        inherit name;
-                        descriptionPrefix = "llama-swap";
-                      };
-                }
-              )
-            );
-            default = { };
-            description = "llama-swap models keyed by API model id.";
-          };
-        };
     };
 
     media.vpn.wgConfSecretName = mkOption {

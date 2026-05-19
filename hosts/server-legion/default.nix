@@ -1,6 +1,5 @@
 {
   inputs,
-  config,
   pkgs,
   lib,
   ...
@@ -31,7 +30,6 @@
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
-    (import ../../overlays/llama-cpp-turboquant.nix)
   ];
 
   boot = {
@@ -84,66 +82,18 @@
       photos.enable = true;
       files.enable = true;
       admin.enable = true;
-      ai.enable = true;
     };
 
     services = {
       actual.enable = true;
       "enable-actual".enable = true;
       sonarr.auth.bypassForApi = true;
+      sonarr-anime.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
       tdarr.enable = true;
       cockpit = {
         expose.enable = true;
         auth.stripAuthorizationHeader = true;
-      };
-      "llama-cpp-agent" = {
-        apiKeySecretName = "llama_cpp_agent_api_key";
-        defaultModel = "qwen";
-        modelDir = "/var/lib/homelab/models/llm";
-
-        models =
-          let
-            qwenModel = {
-              name = "Qwen 3.6 35B A3B";
-              file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
-              url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
-              sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
-
-              gpuLayers = 99;
-              cpuMoeLayers = 36;
-              batchSize = 4096;
-              ubatchSize = 512;
-              cacheTypeK = "turbo4";
-              cacheTypeV = "turbo4";
-              temperature = 0.6;
-              topP = 0.95;
-              topK = 20;
-              minP = 0.0;
-              presencePenalty = 0.0;
-              repeatPenalty = 1.0;
-              jinja = true;
-
-              extraArgs = [
-                "--parallel"
-                "1"
-              ];
-            };
-          in
-          {
-            qwen = qwenModel // {
-              contextSize = 65536;
-            };
-          };
-
-        expose = {
-          enable = true;
-          subdomain = "ai";
-          api = {
-            enable = true;
-            subdomain = "ai-api";
-          };
-        };
       };
       jellyfin.hardwareAcceleration = {
         enable = true;
@@ -163,52 +113,6 @@
     };
 
     backup.enable = true;
-  };
-
-  sops = {
-    secrets = {
-      llama_cpp_agent_api_key = {
-        sopsFile = ../../secrets/server-legion/llama-cpp-agent.yaml;
-        key = "llama_cpp_agent_api_key";
-        owner = "root";
-        group = "keys";
-        mode = "0440";
-      };
-
-      cloudflare_dns_api_token = {
-        sopsFile = ../../secrets/server-legion/cloudflare.yaml;
-        key = "cloudflare_dns_api_token";
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      };
-    };
-
-    templates."acme-cloudflare.env" = {
-      owner = "root";
-      group = "root";
-      mode = "0400";
-      content = ''
-        CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder.cloudflare_dns_api_token}
-      '';
-    };
-  };
-
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = lib.mkDefault "hieronimdaniel@proton.me";
-
-    certs."ai.pieczarkowo.me" = {
-      extraDomainNames = [ "ai-api.pieczarkowo.me" ];
-      dnsProvider = "cloudflare";
-      environmentFile = config.sops.templates."acme-cloudflare.env".path;
-      group = "caddy";
-    };
-  };
-
-  homelab.services."llama-cpp-agent".expose.tls = {
-    certFile = "/var/lib/acme/ai.pieczarkowo.me/fullchain.pem";
-    keyFile = "/var/lib/acme/ai.pieczarkowo.me/key.pem";
   };
 
   custom.wifi.networks = {

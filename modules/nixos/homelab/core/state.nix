@@ -89,6 +89,10 @@ in
             ++ lib.concatMap (
               name: mkStateDir "${state.immichHot}/${name}" cfg.services.immich.user cfg.services.immich.group
             ) immichBindTargets
+            ++ map (
+              name:
+              "f ${state.immichHot}/${name}/.immich 0640 ${cfg.services.immich.user} ${cfg.services.immich.group} - -"
+            ) immichBindTargets
           ))
         ];
 

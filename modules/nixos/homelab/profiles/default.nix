@@ -5,6 +5,5 @@
     ./photos-stack.nix
     ./files-stack.nix
     ./admin-stack.nix
-    ./ai-stack.nix
   ];
 }
