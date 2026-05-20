@@ -5,8 +5,8 @@
 }:
 let
   cfg = config.homelab;
-  homelabMeta = import ../meta-data.nix;
   inherit (cfg) state;
+  homelabMeta = import ../meta-data.nix;
   inherit (homelabMeta) immichBindTargets nixflixStateServices;
 
   mkStateDir = path: user: group: [
@@ -21,8 +21,6 @@ let
     in
     lib.optionals svc.enable (mkStateDir "${state.nixflix}/${name}" svc.user svc.group);
 
-  # Private state under /var/lib/homelab/nixflix must stay svc.user:svc.group.
-  # Shared groups are only for shared data paths under /data.
   mkNixflixStateOwnership =
     name:
     let

@@ -5,13 +5,18 @@
 }:
 let
   cfg = config.homelab;
-  homelabMeta = import ../meta-data.nix;
   immichService = cfg.services.immich;
   inherit (immichService.upstream) port;
   inherit (cfg.data) photos;
   inherit (cfg.state) immichHot;
   immichFqdn = "${immichService.expose.subdomain}.${cfg.domain}";
-  inherit (homelabMeta) immichBindTargets;
+
+  immichBindTargets = [
+    "upload"
+    "thumbs"
+    "encoded-video"
+    "profile"
+  ];
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.photos.enable && immichService.enable) {

@@ -17,7 +17,6 @@ let
   mediaSharedServices = media;
   photosSharedServices = photos;
   nasSharedServices = nas;
-  # Only shared-media writers get UMask=0002; Jellyfin keeps default UMask despite media access.
 
   mkServiceUserGroups =
     serviceName:

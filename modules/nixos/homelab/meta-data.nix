@@ -1,48 +1,49 @@
 {
   proxiedServices = [
+    "actual"
+    "cockpit"
+    "copyparty"
+    "enable-actual"
+    "immich"
+    "jellyfin"
+    "prowlarr"
+    "qbittorrent"
+    "radarr"
+    "seerr"
     "sonarr"
     "sonarr-anime"
-    "radarr"
-    "prowlarr"
-    "jellyfin"
-    "seerr"
     "tdarr"
-    "immich"
-    "copyparty"
-    "cockpit"
-    "actual"
-    "enable-actual"
-    "qbittorrent"
   ];
 
   nixflixStateServices = [
+    "prowlarr"
+    "qbittorrent"
+    "radarr"
+    "recyclarr"
+    "seerr"
     "sonarr"
     "sonarr-anime"
-    "radarr"
-    "prowlarr"
-    "seerr"
-    "recyclarr"
-    "qbittorrent"
   ];
 
   sharedRoles = {
     media = [
+      "jellyfin"
+      "qbittorrent"
+      "radarr"
       "sonarr"
       "sonarr-anime"
-      "radarr"
-      "jellyfin"
       "tdarr"
-      "qbittorrent"
     ];
     photos = [ "immich" ];
     nas = [ "copyparty" ];
   };
 
   umaskSharedWriters = [
+    "prowlarr"
+    "qbittorrent"
+    "radarr"
     "sonarr"
     "sonarr-anime"
-    "radarr"
-    "qbittorrent"
   ];
 
   immichBindTargets = [

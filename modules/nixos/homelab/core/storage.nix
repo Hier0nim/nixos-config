@@ -5,14 +5,18 @@
 }:
 let
   cfg = config.homelab;
-  homelabMeta = import ../meta-data.nix;
   inherit (cfg) data;
 
   mediaEnabled = cfg.profiles.media.enable;
   photosEnabled = cfg.profiles.photos.enable;
   filesEnabled = cfg.profiles.files.enable;
 
-  inherit (homelabMeta) immichBindTargets;
+  immichBindTargets = [
+    "upload"
+    "thumbs"
+    "encoded-video"
+    "profile"
+  ];
 in
 {
   config = lib.mkIf cfg.enable {

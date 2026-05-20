@@ -2,6 +2,30 @@
 let
   inherit (lib) mkEnableOption mkOption types;
 
+  mkHwAccelOptions =
+    {
+      accelTypes ? [
+        "nvenc"
+        "vaapi"
+      ],
+      defaultType ? "nvenc",
+    }:
+    {
+      enable = mkEnableOption "hardware-accelerated transcoding";
+
+      type = mkOption {
+        type = types.enum accelTypes;
+        default = defaultType;
+        description = "Hardware acceleration backend.";
+      };
+
+      device = mkOption {
+        type = types.path;
+        default = "/dev/nvidia0";
+        description = "Primary GPU device node.";
+      };
+    };
+
   mkServiceOptions =
     {
       name,
@@ -14,6 +38,8 @@ let
       openFirewall ? false,
       dataGroups ? [ ],
       stripAuthorizationHeader ? false,
+      runsUnderNixflix ? false,
+      umaskSharedWriter ? false,
     }:
     {
       enable = mkEnableOption "${name} service";
@@ -34,6 +60,22 @@ let
         type = types.listOf types.str;
         default = dataGroups;
         description = "Shared data-role groups granted to ${name}.";
+      };
+
+      runsUnderNixflix = mkOption {
+        type = types.bool;
+        default = runsUnderNixflix;
+        readOnly = true;
+        internal = true;
+        description = "Whether ${name} state is managed by nixflix.";
+      };
+
+      umaskSharedWriter = mkOption {
+        type = types.bool;
+        default = umaskSharedWriter;
+        readOnly = true;
+        internal = true;
+        description = "Whether ${name} needs UMask=0002 for shared-data writes.";
       };
 
       expose = {
@@ -328,6 +370,8 @@ in
         port = 8989;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
       };
 
       radarr = mkServiceOptions {
@@ -336,6 +380,8 @@ in
         port = 7878;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
       };
 
       prowlarr = mkServiceOptions {
@@ -343,6 +389,8 @@ in
         subdomain = "indexers";
         port = 9696;
         authGroup = "media-admin";
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
       };
 
       sonarr-anime = mkServiceOptions {
@@ -351,38 +399,28 @@ in
         port = 8990;
         authGroup = "media-admin";
         dataGroups = [ "media" ];
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
       };
 
       jellyfin =
-        (mkServiceOptions {
+        mkServiceOptions {
           name = "jellyfin";
           subdomain = "grzybflix";
           port = 8096;
           dataGroups = [ "media" ];
-        })
+        }
         // {
-          hardwareAcceleration = {
-            enable = mkEnableOption "Jellyfin hardware-accelerated transcoding";
-
-            type = mkOption {
-              type = types.enum [
-                "amf"
-                "nvenc"
-                "qsv"
-                "rkmpp"
-                "v4l2m2m"
-                "vaapi"
-              ];
-              default = "nvenc";
-              description = "Hardware acceleration backend for Jellyfin transcoding.";
-            };
-
-            device = mkOption {
-              type = types.path;
-              default = "/dev/nvidia0";
-              description = "Device node used by Jellyfin for hardware acceleration.";
-            };
-
+          hardwareAcceleration = mkHwAccelOptions {
+            accelTypes = [
+              "amf"
+              "nvenc"
+              "qsv"
+              "rkmpp"
+              "v4l2m2m"
+              "vaapi"
+            ];
+            defaultType = "nvenc";
           };
         };
 
@@ -390,16 +428,17 @@ in
         name = "seerr";
         subdomain = "chciejnik";
         port = 5055;
+        runsUnderNixflix = true;
       };
 
       tdarr =
-        (mkServiceOptions {
+        mkServiceOptions {
           name = "tdarr";
           subdomain = "tdarr";
           port = 8265;
           authGroup = "media-admin";
           dataGroups = [ "media" ];
-        })
+        }
         // {
           image = mkOption {
             type = types.str;
@@ -413,36 +452,18 @@ in
             description = "Temporary working directory used by Tdarr while transcoding.";
           };
 
-          hardwareAcceleration = {
-            enable = mkEnableOption "Tdarr hardware-accelerated transcoding";
-
-            type = mkOption {
-              type = types.enum [
-                "nvenc"
-                "vaapi"
-              ];
-              default = "nvenc";
-              description = "Hardware acceleration backend exposed to Tdarr.";
-            };
-
-            device = mkOption {
-              type = types.path;
-              default = "/dev/nvidia0";
-              description = "Primary hardware acceleration device path exposed to Tdarr.";
-            };
-          };
+          hardwareAcceleration = mkHwAccelOptions { };
         };
 
-      # Internal nixarr-managed helper with private state, not a proxied web app.
       recyclarr = mkServiceOptions {
         name = "recyclarr";
         subdomain = "recyclarr";
         port = 1;
         exposeEnable = false;
         dataGroups = [ ];
+        runsUnderNixflix = true;
       };
 
-      # qBittorrent
       qbittorrent = mkServiceOptions {
         name = "qbittorrent";
         subdomain = "pobieralnia";
@@ -451,33 +472,19 @@ in
         pathPrefix = "/qbittorrent";
         redirectToPrefix = true;
         dataGroups = [ "media" ];
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
       };
+
       immich =
-        (mkServiceOptions {
+        mkServiceOptions {
           name = "immich";
           subdomain = "fotki";
           port = 2283;
           dataGroups = [ "photos" ];
-        })
+        }
         // {
-          hardwareAcceleration = {
-            enable = mkEnableOption "Immich hardware-accelerated transcoding";
-
-            type = mkOption {
-              type = types.enum [
-                "nvenc"
-                "vaapi"
-              ];
-              default = "nvenc";
-              description = "Hardware acceleration backend used by Immich transcoding.";
-            };
-
-            device = mkOption {
-              type = types.path;
-              default = "/dev/nvidia0";
-              description = "Primary device node exposed to Immich for hardware acceleration.";
-            };
-          };
+          hardwareAcceleration = mkHwAccelOptions { };
         };
 
       copyparty = mkServiceOptions {
@@ -502,12 +509,12 @@ in
       };
 
       "enable-actual" =
-        (mkServiceOptions {
+        mkServiceOptions {
           name = "enable-actual";
           subdomain = "actual-sync";
           port = 3000;
           authGroup = "infra-admin";
-        })
+        }
         // {
           image = mkOption {
             type = types.str;
@@ -515,7 +522,6 @@ in
             description = "OCI image used for the Enable Actual container.";
           };
         };
-
     };
 
     media.vpn.wgConfSecretName = mkOption {
@@ -524,4 +530,5 @@ in
       description = "SOPS secret name for the WireGuard config used by qBittorrent.";
     };
   };
+
 }

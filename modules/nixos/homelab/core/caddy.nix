@@ -5,10 +5,10 @@
 }:
 let
   cfg = config.homelab;
-  homelabMeta = import ../meta-data.nix;
   inherit (config.networking) hostName;
   inherit (lib) mkIf optionalAttrs optionalString;
   inherit (config.custom) repoPath;
+  homelabMeta = import ../meta-data.nix;
 
   caddySecretsFile = "${repoPath}/secrets/${hostName}/caddy.yaml";
 
@@ -50,8 +50,8 @@ let
     };
 
   inherit (cfg.auth) groups;
-  authNames = builtins.attrNames groups;
-  authAttrs = builtins.map (name: mkAuth name groups.${name}) authNames;
+  authNames = lib.attrNames groups;
+  authAttrs = lib.map (name: mkAuth name groups.${name}) authNames;
   authSecrets = lib.foldl' (acc: item: acc // item.secrets) { } authAttrs;
   authTemplates = lib.foldl' (acc: item: acc // item.template) { } authAttrs;
   caddyQuote = value: "\"${lib.escape [ "\\" "\"" ] value}\"";
@@ -97,12 +97,7 @@ let
     {
       svc,
       subdomain,
-      authGroup ? svc.auth.group,
-      pathPrefix ? svc.expose.pathPrefix,
-      redirectToPrefix ? svc.expose.redirectToPrefix,
       rootRedirect ? null,
-      reverseProxyExtraConfig ? svc.expose.reverseProxyExtraConfig,
-      bypassForApi ? svc.auth.bypassForApi,
     }:
     let
       fqdn = "${subdomain}.${cfg.domain}";
@@ -111,21 +106,21 @@ let
         tls ${svc.expose.tls.certFile} ${svc.expose.tls.keyFile}
       '';
       authImport =
-        optionalString (authGroup != null)
-          "import ${config.sops.templates."caddy-basic-auth-${authGroup}".path}";
-      proxyExtraConfig = appendCaddyConfig reverseProxyExtraConfig (
+        optionalString (svc.auth.group != null)
+          "import ${config.sops.templates."caddy-basic-auth-${svc.auth.group}".path}";
+      proxyExtraConfig = appendCaddyConfig svc.expose.reverseProxyExtraConfig (
         optionalString svc.auth.stripAuthorizationHeader stripUpstreamAuthHeaders
       );
       reverseProxy =
-        if pathPrefix == null then
+        if svc.expose.pathPrefix == null then
           mkReverseProxy upstream proxyExtraConfig
         else
-          mkPrefixedProxy pathPrefix upstream proxyExtraConfig;
+          mkPrefixedProxy svc.expose.pathPrefix upstream proxyExtraConfig;
       apiBypassConfig =
         let
-          apiPrefix = if pathPrefix != null then "${pathPrefix}/" else "/";
+          apiPrefix = if svc.expose.pathPrefix != null then "${svc.expose.pathPrefix}/" else "/";
         in
-        optionalString bypassForApi ''
+        optionalString svc.auth.bypassForApi ''
           @api path ${apiPrefix}api*
           handle @api {
             ${mkReverseProxy upstream proxyExtraConfig}
@@ -144,7 +139,7 @@ let
               ${reverseProxy}
             }
           ''
-        else if bypassForApi then
+        else if svc.auth.bypassForApi then
           ''
             handle {
               ${authImport}
@@ -156,8 +151,8 @@ let
             ${authImport}
             ${reverseProxy}
           '';
-      redirectConfig = optionalString (pathPrefix != null && redirectToPrefix) ''
-        redir / ${pathPrefix}/
+      redirectConfig = optionalString (svc.expose.pathPrefix != null && svc.expose.redirectToPrefix) ''
+        redir / ${svc.expose.pathPrefix}/
       '';
     in
     {
@@ -190,7 +185,7 @@ in
         svc = cfg.services.${name};
         baseVhost = optionalAttrs (svc.enable && svc.expose.enable) (mkVhost {
           inherit svc;
-          inherit (svc.expose) subdomain;
+          subdomain = svc.expose.subdomain;
         });
       in
       acc // baseVhost
