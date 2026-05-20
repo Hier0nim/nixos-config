@@ -35,6 +35,7 @@ let
     "qbittorrent_password"
     "opensubtitles_username"
     "opensubtitles_password"
+    "opensubtitles_api_key"
     "sonarr_anime_api_key"
     "sonarr_anime_password"
     "jellyfin_pieczarkowo_password"
@@ -159,6 +160,9 @@ in
               "eng"
               "pol"
             ];
+            saveSubtitlesWithMedia = true;
+            requirePerfectSubtitleMatch = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
           };
           "TV Shows" = {
             paths = [ "${data.media}/tv" ];
@@ -168,6 +172,9 @@ in
               "eng"
               "pol"
             ];
+            saveSubtitlesWithMedia = true;
+            requirePerfectSubtitleMatch = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
           };
           Anime = {
             paths = [ "${data.media}/anime" ];
@@ -177,6 +184,9 @@ in
               "eng"
               "pol"
             ];
+            saveSubtitlesWithMedia = true;
+            requirePerfectSubtitleMatch = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
           };
           Audiobooks = {
             paths = [ "${data.media}/audiobooks" ];
@@ -196,7 +206,23 @@ in
               Password._secret = config.sops.secrets.opensubtitles_password.path;
             };
           };
-          subbuzz.enable = true;
+          subbuzz = {
+            enable = true;
+            config = {
+              OpenSubUserName = config.sops.placeholder.opensubtitles_username;
+              OpenSubPassword._secret = config.sops.secrets.opensubtitles_password.path;
+              OpenSubApiKey._secret = config.sops.secrets.opensubtitles_api_key.path;
+              EnableOpenSubtitles = true;
+              EnableYifySubtitles = true;
+              Cache.SubLifeInMinutes = 43200;
+            };
+          };
+          "Subtitle Extract" = {
+            enable = true;
+            config = {
+              ExtractionDuringLibraryScan = true;
+            };
+          };
         };
       };
 
