@@ -46,6 +46,7 @@ let
     "radarr"
     "prowlarr"
   ];
+
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable) {
@@ -67,6 +68,9 @@ in
         wgConfFile = config.sops.secrets.${wgConfSecretName}.path;
       };
 
+      theme.enable = true;
+      theme.name = "overseerr";
+
       flaresolverr.enable = true;
     }
     // lib.genAttrs arrServices (
@@ -87,6 +91,23 @@ in
             {
               name = "Nyaa.si";
               tags = [ "anime" ];
+            }
+          ];
+          applications = [
+            {
+              name = "Sonarr";
+              implementationName = "Sonarr";
+              apiKey = secretRef "sonarr_api_key";
+            }
+            {
+              name = "Sonarr Anime";
+              implementationName = "Sonarr";
+              apiKey = secretRef "sonarr_anime_api_key";
+            }
+            {
+              name = "Radarr";
+              implementationName = "Radarr";
+              apiKey = secretRef "radarr_api_key";
             }
           ];
         };
@@ -112,6 +133,62 @@ in
           };
         };
 
+        encoding = {
+          hardwareAccelerationType = jellyfinHwAccel.type;
+          enableHardwareEncoding = true;
+          allowHevcEncoding = true;
+          enableTonemapping = true;
+          tonemappingAlgorithm = "bt2390";
+          hardwareDecodingCodecs = [
+            "h264"
+            "hevc"
+            "mpeg2video"
+            "vc1"
+            "vp8"
+            "vp9"
+            "av1"
+          ];
+        };
+
+        libraries = {
+          Movies = {
+            paths = [ "${data.media}/movies" ];
+            collectionType = "movies";
+            enableRealtimeMonitor = true;
+            saveLocalMetadata = false;
+            subtitleDownloadLanguages = [
+              "eng"
+              "pol"
+            ];
+          };
+          "TV Shows" = {
+            paths = [ "${data.media}/tv" ];
+            collectionType = "tvshows";
+            enableRealtimeMonitor = true;
+            subtitleDownloadLanguages = [
+              "eng"
+              "pol"
+            ];
+          };
+          Anime = {
+            paths = [ "${data.media}/anime" ];
+            collectionType = "tvshows";
+            enableRealtimeMonitor = true;
+            subtitleDownloadLanguages = [
+              "eng"
+              "pol"
+            ];
+          };
+          Audiobooks = {
+            paths = [ "${data.media}/audiobooks" ];
+            collectionType = "books";
+          };
+          Books = {
+            paths = [ "${data.media}/books" ];
+            collectionType = "books";
+          };
+        };
+
         plugins = {
           "Open Subtitles" = {
             enable = true;
@@ -131,10 +208,114 @@ in
         jellyfin.adminUsername = "admin";
         jellyfin.adminPassword = secretRef "jellyfin_admin_password";
         reverseProxy.expose = false;
+
+        settings.users.defaultPermissions = 160; # REQUEST + AUTO_APPROVE
       };
 
       recyclarr = {
         inherit (cfg.services.recyclarr) enable;
+        config = {
+          radarr.radarr = {
+            base_url = "http://127.0.0.1:7878";
+            api_key._secret = config.sops.secrets.radarr_api_key.path;
+            quality_definition.type = "movie";
+            delete_old_custom_formats = true;
+            custom_formats =
+              map
+                (
+                  { trash_id, score }:
+                  {
+                    trash_ids = [ trash_id ];
+                    assign_scores_to = [
+                      {
+                        name = "HD - 720p/1080p";
+                        inherit score;
+                      }
+                    ];
+                  }
+                )
+                [
+                  # AAC, DD, MULTi (radarr), DD+, DTS, TrueHD
+                  {
+                    trash_id = "240770601cc226190c367ef59aba7463";
+                    score = 300;
+                  }
+                  {
+                    trash_id = "c2998bd0d90ed5621d8df281e839436e";
+                    score = 150;
+                  }
+                  {
+                    trash_id = "4b900e171accbfb172729b63323ea8ca";
+                    score = 100;
+                  }
+                  {
+                    trash_id = "185f1dd7264c4562b9022d963ac37424";
+                    score = -50;
+                  }
+                  {
+                    trash_id = "1c1a4c5e823891c75bc50380a6866f73";
+                    score = -300;
+                  }
+                  {
+                    trash_id = "3cafb66171b47f226146a0770576870f";
+                    score = -500;
+                  }
+                ];
+          };
+          sonarr.sonarr = {
+            base_url = "http://127.0.0.1:8989";
+            api_key._secret = config.sops.secrets.sonarr_api_key.path;
+            quality_definition.type = "series";
+            delete_old_custom_formats = true;
+            custom_formats =
+              map
+                (
+                  { trash_id, score }:
+                  {
+                    trash_ids = [ trash_id ];
+                    assign_scores_to = [
+                      {
+                        name = "HD - 720p/1080p";
+                        inherit score;
+                      }
+                    ];
+                  }
+                )
+                [
+                  # AAC, DD, MULTi (sonarr), DD+, DTS, TrueHD
+                  {
+                    trash_id = "a50b8a0c62274a7c38b09a9619ba9d86";
+                    score = 300;
+                  }
+                  {
+                    trash_id = "dbe00161b08a25ac6154c55f95e6318d";
+                    score = 150;
+                  }
+                  {
+                    trash_id = "7ba05c6e0e14e793538174c679126996";
+                    score = 100;
+                  }
+                  {
+                    trash_id = "63487786a8b01b7f20dd2bc90dd4a477";
+                    score = -50;
+                  }
+                  {
+                    trash_id = "5964f2a8b3be407d083498e4459d05d0";
+                    score = -300;
+                  }
+                  {
+                    trash_id = "1808e4b9cee74e064dfae3f1db99dbfe";
+                    score = -500;
+                  }
+                ];
+          };
+          sonarr.sonarr_anime = {
+            base_url = "http://127.0.0.1:8990";
+            api_key._secret = config.sops.secrets.sonarr_anime_api_key.path;
+            quality_definition.type = "anime";
+            delete_old_custom_formats = true;
+          };
+        };
       };
 
       torrentClients.qbittorrent = {
