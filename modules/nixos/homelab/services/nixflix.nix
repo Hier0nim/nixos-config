@@ -128,13 +128,23 @@ in
         users.admin = {
           policy.isAdministrator = true;
           password = secretRef "jellyfin_admin_password";
+          mutable = false;
+          configuration = {
+            audioLanguagePreference = "pol";
+            subtitleLanguagePreference = "eng";
+            subtitleMode = "Smart";
+          };
         };
 
         users.pieczarkowo = {
           password = secretRef "jellyfin_pieczarkowo_password";
+          mutable = false;
           configuration = {
             displayMissingEpisodes = false;
             enableNextEpisodeAutoPlay = true;
+            audioLanguagePreference = "pol";
+            subtitleLanguagePreference = "eng";
+            subtitleMode = "Smart";
           };
         };
 
