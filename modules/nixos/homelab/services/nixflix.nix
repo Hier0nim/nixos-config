@@ -120,6 +120,11 @@ in
         reverseProxy.expose = false;
         apiKey = secretRef "jellyfin_api_key";
 
+        system.pluginRepositories."Intro Skipper" = {
+          url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
+          hash = "sha256-bcH/fPOGD/ILbX/Ln0YZv/kscsRwTDTGAKtNY6MOhTs=";
+        };
+
         users.admin = {
           policy.isAdministrator = true;
           password = secretRef "jellyfin_admin_password";
@@ -221,6 +226,14 @@ in
             enable = true;
             config = {
               ExtractionDuringLibraryScan = true;
+            };
+          };
+          "Intro Skipper" = {
+            enable = true;
+            package = {
+              version = "1.10.11.17";
+              hash = lib.fakeHash; # rebuild once, replace with hash from error
+              repository = "Intro Skipper";
             };
           };
         };
