@@ -33,7 +33,6 @@
   networking.hostName = "zephyrus-g14";
 
   nixpkgs.overlays = [
-    (import ../../overlays/llama-cpp-turboquant.nix)
   ];
 
   custom.wifi.networks = {
@@ -86,7 +85,7 @@
   services = {
     llama-cpp-swap = {
       enable = true;
-      package = pkgs.llama-cpp-turboquant;
+      package = pkgs.llama-cpp.override { cudaSupport = true; };
       listenAddress = "127.0.0.1";
       port = 8080;
       openFirewall = false;
@@ -106,8 +105,8 @@
             cpuMoeLayers = 32;
             batchSize = 4096;
             ubatchSize = 512;
-            cacheTypeK = "turbo4";
-            cacheTypeV = "turbo4";
+            cacheTypeK = "q4_0";
+            cacheTypeV = "q4_0";
             temperature = 0.6;
             topP = 0.95;
             topK = 20;
@@ -123,7 +122,7 @@
         in
         {
           qwen = qwenModel // {
-            contextSize = 131072;
+            contextSize = 65536;
           };
         };
     };

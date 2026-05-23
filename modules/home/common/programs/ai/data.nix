@@ -5,7 +5,7 @@
       modelId = "qwen";
       baseUrl = "http://127.0.0.1:8080/v1";
       displayName = "Qwen 3.6 35B A3B (local)";
-      contextWindow = 131072;
+      contextWindow = 65536;
       compat = {
         supportsDeveloperRole = false;
         supportsReasoningEffort = false;

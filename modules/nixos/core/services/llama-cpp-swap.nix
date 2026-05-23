@@ -167,7 +167,7 @@ in
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.llama-cpp-turboquant or (pkgs.llama-cpp.override { cudaSupport = true; });
+      default = pkgs.llama-cpp.override { cudaSupport = true; };
       description = "llama.cpp package used for llama-server model processes.";
     };
 

@@ -19,7 +19,7 @@ let
   mkBenchScript = model: ''
     set -euo pipefail
 
-    exec ${pkgs.llama-cpp-turboquant}/bin/llama-bench \
+    exec ${pkgs.llama-cpp.override { cudaSupport = true; }}/bin/llama-bench \
       -m ${lib.escapeShellArg "${llamaCfg.modelDir}/${model.file}"} \
       -ngl ${toString model.gpuLayers} \
       -ncmoe ${toString model.cpuMoeLayers} \
