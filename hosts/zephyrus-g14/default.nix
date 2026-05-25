@@ -105,8 +105,8 @@
             cpuMoeLayers = 32;
             batchSize = 4096;
             ubatchSize = 512;
-            cacheTypeK = "q4_0";
-            cacheTypeV = "q4_0";
+            cacheTypeK = "q8_0";
+            cacheTypeV = "q8_0";
             temperature = 0.6;
             topP = 0.95;
             topK = 20;
@@ -122,7 +122,7 @@
         in
         {
           qwen = qwenModel // {
-            contextSize = 65536;
+            contextSize = 131072;
           };
         };
     };
