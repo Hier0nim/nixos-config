@@ -13,6 +13,7 @@ let
   sharedModules = [
     (lib.custom.relativeToRoot "modules/home")
     inputs.sops-nix.homeManagerModules.sops
+    inputs.open-design.homeManagerModules.default
     {
       # Home Manager shares the canonical sops-nix key via group access.
       sops.age.keyFile = "/var/lib/sops-nix/key.txt";

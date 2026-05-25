@@ -62,6 +62,12 @@ in
     key = "llama_cpp_agent_api_key";
   };
 
+  services.open-design = {
+    enable = true;
+    autoStart = true;
+    webFrontend.enable = true;
+  };
+
   home = {
     packages = with pkgs; [
       claude-code

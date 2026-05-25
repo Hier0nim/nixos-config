@@ -196,5 +196,7 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
 
     pi-config.url = "git+ssh://git@github.com/Hier0nim/dot_pi.git";
+
+    open-design.url = "github:nexu-io/open-design";
   };
 }
