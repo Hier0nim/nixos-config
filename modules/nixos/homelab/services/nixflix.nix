@@ -122,8 +122,10 @@ in
 
         system.pluginRepositories."Intro Skipper" = {
           url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-bcH/fPOGD/ILbX/Ln0YZv/kscsRwTDTGAKtNY6MOhTs=";
+          hash = "sha256-No+tOXFUA5JfxQd6aUng/BhSEdUxH6Orb6xjft3IzqU=";
         };
+        system.pluginRepositories."Jellyfin Stable".hash =
+          lib.mkForce "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
 
         users.admin = {
           policy.isAdministrator = true;
@@ -139,6 +141,7 @@ in
         users.pieczarkowo = {
           password = secretRef "jellyfin_pieczarkowo_password";
           mutable = false;
+          policy.enableSubtitleManagement = true;
           configuration = {
             displayMissingEpisodes = false;
             enableNextEpisodeAutoPlay = true;
@@ -179,7 +182,7 @@ in
             requirePerfectSubtitleMatch = false;
             skipSubtitlesIfEmbeddedSubtitlesPresent = false;
           };
-          "TV Shows" = {
+          Shows = {
             paths = [ "${data.media}/tv" ];
             collectionType = "tvshows";
             enableRealtimeMonitor = true;
@@ -203,14 +206,6 @@ in
             requirePerfectSubtitleMatch = false;
             skipSubtitlesIfEmbeddedSubtitlesPresent = false;
           };
-          Audiobooks = {
-            paths = [ "${data.media}/audiobooks" ];
-            collectionType = "books";
-          };
-          Books = {
-            paths = [ "${data.media}/books" ];
-            collectionType = "books";
-          };
         };
 
         plugins = {
@@ -228,6 +223,8 @@ in
               OpenSubPassword._secret = config.sops.secrets.opensubtitles_password.path;
               OpenSubApiKey._secret = config.sops.secrets.opensubtitles_api_key.path;
               EnableOpenSubtitles = true;
+              EnablePodnapisiNet = true;
+              EnableSubdlCom = true;
               EnableYifySubtitles = true;
               Cache.SubLifeInMinutes = 43200;
             };
@@ -242,7 +239,7 @@ in
             enable = true;
             package = {
               version = "1.10.11.17";
-              hash = lib.fakeHash; # rebuild once, replace with hash from error
+              hash = "sha256-cfEnLqKeEGpQSth3NPjDnxCkgv2pePfgCXfVIOrYSiQ=";
               repository = "Intro Skipper";
             };
           };
@@ -363,6 +360,21 @@ in
             );
           })
         ];
+      };
+
+      services.jellyfin-libraries = lib.mkIf cfg.services.jellyfin.enable {
+        serviceConfig.ExecStartPre =
+          let
+            jfDir = config.nixflix.jellyfin.dataDir;
+            jfUser = config.nixflix.jellyfin.user;
+            jfGroup = config.nixflix.jellyfin.group;
+            fixJellyfinState = pkgs.writeShellScript "jellyfin-libraries-fix-state-ownership" ''
+              if [ -d ${lib.escapeShellArg jfDir} ]; then
+                chown -R ${lib.escapeShellArg "${jfUser}:${jfGroup}"} ${lib.escapeShellArg jfDir}
+              fi
+            '';
+          in
+          lib.mkBefore [ "+${fixJellyfinState}" ];
       };
     };
 

@@ -945,11 +945,11 @@
     },
     "pi-config": {
       "locked": {
-        "lastModified": 1779043633,
-        "narHash": "sha256-+djdCqS9RAF/honz2vRZuMfTODAM/giIPacmeMimdn4=",
+        "lastModified": 1779961202,
+        "narHash": "sha256-ZR2dL46a9ebE3BArxI/bw3z4AgBDPA88c8fTxn9p6QU=",
         "ref": "refs/heads/main",
-        "rev": "d31bdeb28f089de5dbedf917f7b4c329cfb20e40",
-        "revCount": 28,
+        "rev": "3728dee5eb1da46d78cad546c0c8c9e6128dc528",
+        "revCount": 33,
         "type": "git",
         "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
       },

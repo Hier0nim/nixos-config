@@ -499,7 +499,7 @@ in
         subdomain = "admin";
         port = 9090;
         authGroup = "infra-admin";
-        exposeEnable = false;
+        exposeEnable = true;
       };
 
       actual = mkServiceOptions {

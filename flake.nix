@@ -42,6 +42,7 @@
           nixpkgs = inputs.nixpkgs-stable;
           specialArgs = {
             inputs = inputs // {
+              nixpkgs-unstable = inputs.nixpkgs;
               nixpkgs = inputs.nixpkgs-stable;
               home-manager = inputs.home-manager-stable;
             };

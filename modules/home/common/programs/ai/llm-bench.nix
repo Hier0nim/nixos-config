@@ -1,5 +1,4 @@
 {
-  hostName,
   lib,
   pkgs,
   systemConfig,
@@ -8,13 +7,9 @@
 let
   ai = import ./data.nix;
 
-  llamaCfg =
-    if hostName == "server-legion" then
-      systemConfig.homelab.services."llama-cpp-agent"
-    else
-      systemConfig.services.llama-cpp-swap;
+  llamaCfg = systemConfig.services.llama-cpp-swap;
 
-  qwenModel = llamaCfg.models.qwen;
+  qwenModel = llamaCfg.models.qwen or null;
 
   mkBenchScript = model: ''
     set -euo pipefail
@@ -42,7 +37,7 @@ let
     };
 in
 {
-  home.packages = [
+  home.packages = lib.optionals (qwenModel != null) [
     (mkBenchWrapper {
       inherit (ai.bench.qwen) name;
       model = qwenModel;
