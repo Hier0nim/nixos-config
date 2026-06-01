@@ -36,6 +36,7 @@ let
     "opensubtitles_username"
     "opensubtitles_password"
     "opensubtitles_api_key"
+    "subdl_api_key"
     "sonarr_anime_api_key"
     "sonarr_anime_password"
     "jellyfin_pieczarkowo_password"
@@ -88,10 +89,9 @@ in
         // lib.optionalAttrs (name == "prowlarr") {
           indexers = [
             { name = "YTS"; }
-            {
-              name = "Nyaa.si";
-              tags = [ "anime" ];
-            }
+            { name = "Nyaa.si"; }
+            { name = "LimeTorrents"; }
+            { name = "AnimeTosho"; }
           ];
           applications = [
             {
@@ -122,7 +122,7 @@ in
 
         system.pluginRepositories."Intro Skipper" = {
           url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-No+tOXFUA5JfxQd6aUng/BhSEdUxH6Orb6xjft3IzqU=";
+          hash = "sha256-Bg/udki8pFkLuYksk+eSQPVjw2LBkxdAs+blZIaR9mM=";
         };
         system.pluginRepositories."Jellyfin Stable".hash =
           lib.mkForce "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
@@ -209,13 +209,6 @@ in
         };
 
         plugins = {
-          "Open Subtitles" = {
-            enable = true;
-            config = {
-              Username = config.sops.placeholder.opensubtitles_username;
-              Password._secret = config.sops.secrets.opensubtitles_password.path;
-            };
-          };
           subbuzz = {
             enable = true;
             config = {
@@ -223,8 +216,8 @@ in
               OpenSubPassword._secret = config.sops.secrets.opensubtitles_password.path;
               OpenSubApiKey._secret = config.sops.secrets.opensubtitles_api_key.path;
               EnableOpenSubtitles = true;
-              EnablePodnapisiNet = true;
               EnableSubdlCom = true;
+              SubdlApiKey._secret = config.sops.secrets.subdl_api_key.path;
               EnableYifySubtitles = true;
               Cache.SubLifeInMinutes = 43200;
             };
