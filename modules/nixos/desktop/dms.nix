@@ -43,6 +43,9 @@
     ];
   };
 
+  # Disable niri-flake's polkit agent to avoid conflict with DMS polkit
+  systemd.user.services.niri-flake-polkit.enable = false;
+
   services = {
     accounts-daemon.enable = true;
 

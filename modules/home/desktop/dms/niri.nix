@@ -48,8 +48,11 @@ in
 
     settings = {
       environment = {
+        QT_QPA_PLATFORM = "wayland";
         QT_QPA_PLATFORMTHEME = "qt6ct";
         QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
+        ELECTRON_OZONE_PLATFORM_HINT = "auto";
+        DMS_SCREENSHOT_EDITOR = "swappy";
       };
 
       spawn-at-startup = [
@@ -137,6 +140,41 @@ in
             bottom-left = 10.0;
           };
           clip-to-geometry = true;
+        }
+        {
+          matches = [
+            { app-id = "^org\\.gnome\\."; }
+          ];
+          draw-border-with-background = false;
+          geometry-corner-radius = {
+            top-left = 12.0;
+            top-right = 12.0;
+            bottom-right = 12.0;
+            bottom-left = 12.0;
+          };
+          clip-to-geometry = true;
+        }
+        {
+          matches = [
+            { app-id = "^org\\.wezfurlong\\.wezterm$"; }
+            { app-id = "Alacritty"; }
+            { app-id = "zen"; }
+            { app-id = "com\\.mitchellh\\.ghostty"; }
+            { app-id = "kitty"; }
+          ];
+          draw-border-with-background = false;
+        }
+        {
+          matches = [
+            { is-active = false; }
+          ];
+          opacity = 0.9;
+        }
+        {
+          matches = [
+            { app-id = "^org\\.quickshell$"; }
+          ];
+          open-floating = true;
         }
       ];
 
