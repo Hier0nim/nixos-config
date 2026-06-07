@@ -201,6 +201,7 @@
   custom.programs.winboat.enable = false;
 
   environment.systemPackages = with pkgs; [
+    inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent
     stress-ng
     mprime
     glmark2

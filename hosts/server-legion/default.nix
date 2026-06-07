@@ -30,10 +30,6 @@
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
-    (final: prev: {
-      pi-coding-agent =
-        inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.pi-coding-agent;
-    })
   ];
 
   boot = {
@@ -60,7 +56,10 @@
     kernelPackages = pkgs.linuxPackages;
   };
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = [
+    inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent
+  ]
+  ++ (with pkgs; [
     btrfs-progs
     cifs-utils
     hdparm
@@ -69,7 +68,7 @@
     nvme-cli
     usbutils
     pciutils
-  ];
+  ]);
 
   homelab = {
     ssh.authorizedKeys = [

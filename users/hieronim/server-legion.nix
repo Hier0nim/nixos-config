@@ -1,5 +1,7 @@
 { lib, pkgs, ... }:
 {
+  services.open-design.enable = lib.mkForce false;
+
   imports = [
     ./home-common.nix
     (lib.custom.relativeToRoot "modules/home/common/programs/nvim.nix")
