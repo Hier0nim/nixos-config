@@ -108,10 +108,6 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
-    nixarr = {
-      url = "github:nix-media-server/nixarr/077bb8a83d6d07b25e098638db50d0ac80456174";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
     nixflix = {
       url = "github:kiriwalawren/nixflix/17738063b822d002194dc3c213f119600d2d6fb8";
       inputs.nixpkgs.follows = "nixpkgs-stable";
@@ -130,11 +126,6 @@
     # Secrets management.
     sops-nix = {
       url = "github:mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # Declarative vms using libvirt
-    nixvirt = {
-      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Pre-commit
