@@ -10,12 +10,14 @@
   };
 
   xdg.configFile."zellij/config.kdl".text =
-    builtins.replaceStrings [ "@PROJECTS_DIR@" ] [ "${config.home.homeDirectory}/Projects" ]
+    builtins.replaceStrings
+      [ "@PROJECTS_DIR@" "@HOME_DIR@" ]
+      [ "${config.home.homeDirectory}/Projects" "${config.home.homeDirectory}" ]
       (builtins.readFile ./config.kdl);
 
   xdg.configFile."zellij/plugins/zellij-sessionizer.wasm".source = pkgs.fetchurl {
-    url = "https://github.com/laperlej/zellij-sessionizer/releases/download/v0.4.3/zellij-sessionizer.wasm";
-    hash = "sha256-AGuWbuRX7Yi9tPdZTzDKULXh3XLUs4navuieCimUgzQ=";
+    url = "https://github.com/laperlej/zellij-sessionizer/releases/download/v0.5.0/zellij-sessionizer.wasm";
+    hash = "sha256-xBhBwCPnToH5mg/Y2V4FBO0gLfLNuSYE31HJ5OoLoFs=";
   };
 
   systemd.user.services.zellij-cleanup = {

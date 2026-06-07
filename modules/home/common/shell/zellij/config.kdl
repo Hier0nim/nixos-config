@@ -132,6 +132,7 @@ keybinds clear-defaults=true {
                 move_to_focused_tab true
                 cwd "/"
                 root_dirs "@PROJECTS_DIR@"
+                individual_dirs "@HOME_DIR@/.pi"
                 session_layout ":compact"
             }; SwitchToMode "Locked";
         }
@@ -173,6 +174,7 @@ keybinds clear-defaults=true {
                 move_to_focused_tab true
                 cwd "/"
                 root_dirs "@PROJECTS_DIR@"
+                individual_dirs "@HOME_DIR@/.pi"
                 session_layout ":compact"
             }; SwitchToMode "Locked";
         }
@@ -297,6 +299,8 @@ load_plugins {
 // Default: default
 //
 theme "kanagawa"
+theme_dark "kanagawa"
+theme_light "catppuccin-latte"
 
 // Choose the base input mode of zellij.
 // Default: normal

@@ -23,6 +23,30 @@
       path = "${config.home.homeDirectory}/.ssh/id_ed25519_server_legion";
       mode = "0600";
     };
+    ssh_hetzner_punktia = {
+      sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
+      key = "key";
+      path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_punktia";
+      mode = "0600";
+    };
+    ssh_hetzner_punktia_host = {
+      sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
+      key = "host";
+    };
+  };
+
+  sops.templates."ssh-punktia-prod" = {
+    content = ''
+      Host punktia-prod
+        HostName ${config.sops.placeholder."ssh_hetzner_punktia_host"}
+        User root
+        IdentityFile ~/.ssh/id_ed25519_hetzner_punktia
+        IdentitiesOnly yes
+        ServerAliveInterval 60
+        ServerAliveCountMax 3
+    '';
+    path = "${config.home.homeDirectory}/.ssh/config.d/punktia-prod.conf";
+    mode = "0600";
   };
 
   programs.ssh = {
