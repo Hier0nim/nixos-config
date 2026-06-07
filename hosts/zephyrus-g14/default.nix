@@ -8,7 +8,6 @@
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.disko.nixosModules.disko
-    inputs.monique.nixosModules.default
 
     ./disko.nix
     ./hardware-configuration.nix
@@ -156,8 +155,6 @@
     enable = true;
     autoStart = false;
   };
-
-  programs.monique.enable = true;
 
   systemd.user.services.rog-control-center = {
     description = "rog-control-center";
