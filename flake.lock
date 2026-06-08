@@ -950,11 +950,11 @@
         "nix-pi-agent": "nix-pi-agent"
       },
       "locked": {
-        "lastModified": 1780944617,
-        "narHash": "sha256-OLYBZ6R1tsW7lm89xpNfgRC5/FId2HNqP1y55Vw63i0=",
+        "lastModified": 1780952336,
+        "narHash": "sha256-7w4VuobKE2UzsMrGJqdZekCszxWnpu+EQIVZeG5Ne8g=",
         "ref": "refs/heads/main",
-        "rev": "6c8326b01a849a8116552fc79be6628df6657e57",
-        "revCount": 42,
+        "rev": "fead74529647bdc322640aef5a2235cf791f1deb",
+        "revCount": 44,
         "type": "git",
         "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
       },
