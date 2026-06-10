@@ -32,9 +32,6 @@
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
-    (_final: _prev: {
-      pi-coding-agent = inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent;
-    })
   ];
 
   boot = {

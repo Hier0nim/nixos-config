@@ -5,22 +5,12 @@
   pkgs,
   ...
 }:
-let
-  overlaysDir = lib.custom.relativeToRoot "overlays";
-  overlayFiles =
-    if builtins.pathExists overlaysDir then
-      map (name: overlaysDir + "/${name}") (
-        lib.filter (name: lib.strings.hasSuffix ".nix" name) (
-          builtins.attrNames (builtins.readDir overlaysDir)
-        )
-      )
-    else
-      [ ];
-in
 {
   nix = {
     # This will add each flake input as a registry
-    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
+    registry = lib.mapAttrs (_: value: { flake = value; }) (
+      lib.filterAttrs (_: value: value ? _type && value._type == "flake") inputs
+    );
 
     # This will add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
@@ -53,7 +43,7 @@ in
       allowUnfree = true;
     };
 
-    overlays = map import overlayFiles;
+    overlays = lib.attrValues (import ../../../../overlays/default.nix { });
   };
 
   # We need git for flakes

@@ -25,7 +25,12 @@
       # ========= Host Configurations =========
       nixosConfigurations = {
         zephyrus-g14 = lib.custom.mkHost {
-          inherit inputs outputs nixpkgs;
+          inherit
+            inputs
+            outputs
+            self
+            nixpkgs
+            ;
           system = "x86_64-linux";
           modules = [
             inputs.determinate.nixosModules.default
@@ -38,7 +43,7 @@
         };
         # server-legion intentionally uses nixpkgs-stable + home-manager-stable.
         server-legion = lib.custom.mkHost {
-          inherit inputs outputs;
+          inherit inputs outputs self;
           nixpkgs = inputs.nixpkgs-stable;
           specialArgs = {
             inputs = inputs // {
