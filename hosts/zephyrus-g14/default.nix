@@ -32,6 +32,9 @@
   networking.hostName = "zephyrus-g14";
 
   nixpkgs.overlays = [
+    (_final: _prev: {
+      pi-coding-agent = inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent;
+    })
   ];
 
   custom.wifi.networks = {

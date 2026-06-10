@@ -22,6 +22,8 @@
   networking.hostName = "server-legion";
   networking.networkmanager.wifi.powersave = lib.mkForce false;
 
+  virtualisation.docker.package = pkgs.docker_29;
+
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";
     HandleLidSwitchExternalPower = "ignore";
@@ -30,6 +32,9 @@
 
   nixpkgs.overlays = [
     inputs.copyparty.overlays.default
+    (_final: _prev: {
+      pi-coding-agent = inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent;
+    })
   ];
 
   boot = {
