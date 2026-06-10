@@ -491,14 +491,10 @@
   "displayNameMode": "system",
   "screenPreferences": {},
   "showOnLastDisplay": {},
-  "niriOutputSettings": {
-    "eDP-1": {}
-  },
+  "niriOutputSettings": {},
   "hyprlandOutputSettings": {},
   "displayProfiles": {},
-  "activeDisplayProfile": {
-    "niri": "auto_5af6115"
-  },
+  "activeDisplayProfile": {},
   "displayProfileAutoSelect": true,
   "displayShowDisconnected": false,
   "displaySnapToEdge": true,

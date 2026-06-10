@@ -61,10 +61,7 @@
     kernelPackages = pkgs.linuxPackages;
   };
 
-  environment.systemPackages = [
-    inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent
-  ]
-  ++ (with pkgs; [
+  environment.systemPackages = with pkgs; [
     btrfs-progs
     cifs-utils
     hdparm
@@ -73,7 +70,7 @@
     nvme-cli
     usbutils
     pciutils
-  ]);
+  ];
 
   homelab = {
     ssh.authorizedKeys = [

@@ -68,6 +68,9 @@
 
     tmp.cleanOnBoot = true;
     kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [
+      "amdgpu.dcdebugmask=0x10"
+    ];
   };
   hardware.nvidia = {
     open = false;
@@ -205,7 +208,6 @@
   custom.programs.winboat.enable = false;
 
   environment.systemPackages = with pkgs; [
-    inputs.nix-pi-agent.packages.${pkgs.system}.pi-agent
     stress-ng
     mprime
     glmark2

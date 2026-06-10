@@ -184,8 +184,6 @@
 
     pi-config.url = "git+ssh://git@github.com/Hier0nim/dot_pi.git";
 
-    nix-pi-agent.url = "github:rbright/nix-pi-agent";
-
     open-design.url = "github:nexu-io/open-design";
   };
 }
