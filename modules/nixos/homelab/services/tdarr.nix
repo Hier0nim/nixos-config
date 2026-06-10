@@ -9,7 +9,7 @@ let
   inherit (config.networking) hostName;
   inherit (config.time) timeZone;
   inherit (cfg) data state;
-  inherit (tdarrService) group image user;
+  inherit (tdarrService) image;
   usingNvenc =
     tdarrService.hardwareAcceleration.enable && tdarrService.hardwareAcceleration.type == "nvenc";
   usingVaapi =
