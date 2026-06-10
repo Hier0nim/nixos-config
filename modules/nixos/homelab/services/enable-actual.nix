@@ -11,6 +11,15 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && enableActualService.enable) {
+    homelab.apps."enable-actual" = {
+      enable = true;
+      user = "root";
+      group = "root";
+      serviceNames = [ "docker-enable-actual" ];
+      state.paths = [ cfg.state.enableActual ];
+      state.mode = "0750";
+    };
+
     homelab.services."enable-actual".backup = {
       enable = lib.mkDefault true;
       paths = lib.mkDefault [ cfg.state.enableActual ];

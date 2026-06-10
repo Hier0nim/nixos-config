@@ -363,6 +363,109 @@ in
       description = "Auth groups available to the proxy.";
     };
 
+    apps = mkOption {
+      type = types.attrsOf (
+        types.submodule (
+          { name, ... }:
+          {
+            options = {
+              enable = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Whether the homelab framework should manage integration for this app.";
+              };
+
+              user = mkOption {
+                type = types.str;
+                default = name;
+                description = "Runtime user for this app.";
+              };
+
+              group = mkOption {
+                type = types.str;
+                default = name;
+                description = "Primary runtime group for this app.";
+              };
+
+              manageUser = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Create and own the app's system user and primary group.";
+              };
+
+              serviceNames = mkOption {
+                type = types.listOf types.str;
+                default = [ name ];
+                description = "Systemd service names that must wait for this app's guardrail units.";
+              };
+
+              storageAccess = mkOption {
+                type = types.listOf (
+                  types.enum [
+                    "media"
+                    "downloads"
+                    "photos"
+                    "nas"
+                  ]
+                );
+                default = [ ];
+                description = "Shared storage trees this app consumes.";
+              };
+
+              supplementaryGroups = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "Extra groups added to the app user.";
+              };
+
+              sharedWriter = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Set UMask=0002 on this app's systemd services for group-writable shared data.";
+              };
+
+              state = {
+                paths = mkOption {
+                  type = types.listOf types.str;
+                  default = [ ];
+                  description = "Private state paths owned recursively by the app.";
+                };
+
+                mode = mkOption {
+                  type = types.str;
+                  default = "0750";
+                  description = "Mode applied to declared state directories.";
+                };
+
+                managedFiles = mkOption {
+                  type = types.listOf (
+                    types.submodule {
+                      options = {
+                        path = mkOption {
+                          type = types.str;
+                          description = "Exact file path created and owned by the app.";
+                        };
+
+                        mode = mkOption {
+                          type = types.str;
+                          default = "0640";
+                          description = "Mode applied to the managed file.";
+                        };
+                      };
+                    }
+                  );
+                  default = [ ];
+                  description = "Required app-owned files normalized before service startup.";
+                };
+              };
+            };
+          }
+        )
+      );
+      default = { };
+      description = "Declarative app registry used to generate homelab users, groups, storage, and state guardrails.";
+    };
+
     services = {
       sonarr = mkServiceOptions {
         name = "sonarr";

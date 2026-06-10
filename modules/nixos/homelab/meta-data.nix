@@ -25,27 +25,6 @@
     "sonarr-anime"
   ];
 
-  sharedRoles = {
-    media = [
-      "jellyfin"
-      "qbittorrent"
-      "radarr"
-      "sonarr"
-      "sonarr-anime"
-      "tdarr"
-    ];
-    photos = [ "immich" ];
-    nas = [ "copyparty" ];
-  };
-
-  umaskSharedWriters = [
-    "prowlarr"
-    "qbittorrent"
-    "radarr"
-    "sonarr"
-    "sonarr-anime"
-  ];
-
   immichBindTargets = [
     "upload"
     "thumbs"

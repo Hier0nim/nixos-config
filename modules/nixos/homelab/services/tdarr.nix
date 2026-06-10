@@ -10,7 +10,6 @@ let
   inherit (config.time) timeZone;
   inherit (cfg) data state;
   inherit (tdarrService) group image user;
-  mediaGroupId = config.users.groups.media.gid;
   usingNvenc =
     tdarrService.hardwareAcceleration.enable && tdarrService.hardwareAcceleration.type == "nvenc";
   usingVaapi =
@@ -18,11 +17,22 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable && tdarrService.enable) {
-    users.groups.${group} = { };
-    users.users.${user} = {
-      isSystemUser = true;
-      inherit group;
+    homelab.apps.tdarr = {
+      enable = true;
+      inherit (tdarrService) user group;
+      manageUser = true;
+      serviceNames = [ "docker-tdarr" ];
+      storageAccess = [ "media" ];
+      state.paths = [
+        state.tdarr
+        "${state.tdarr}/server"
+        "${state.tdarr}/configs"
+        "${state.tdarr}/logs"
+        tdarrService.cacheDir
+      ];
     };
+
+    # User and group are created by homelab.apps.tdarr.manageUser
 
     virtualisation = {
       docker.enable = true;
@@ -44,8 +54,8 @@ in
             "${data.media}:${data.media}"
           ];
           environment = {
-            PUID = "0";
-            PGID = toString mediaGroupId;
+            PUID = "988";
+            PGID = "169";
             TZ = timeZone;
             UMASK_SET = "002";
             serverIP = "0.0.0.0";

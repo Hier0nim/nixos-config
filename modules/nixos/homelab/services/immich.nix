@@ -10,16 +10,33 @@ let
   inherit (cfg.data) photos;
   inherit (cfg.state) immichHot;
   immichFqdn = "${immichService.expose.subdomain}.${cfg.domain}";
-
-  immichBindTargets = [
-    "upload"
-    "thumbs"
-    "encoded-video"
-    "profile"
-  ];
+  homelabMeta = import ../meta-data.nix;
+  inherit (homelabMeta) immichBindTargets;
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.photos.enable && immichService.enable) {
+    homelab.apps.immich = {
+      enable = true;
+      inherit (immichService) user group;
+      serviceNames = [ "immich-server" ];
+      storageAccess = [ "photos" ];
+      supplementaryGroups = lib.optionals immichService.hardwareAcceleration.enable [
+        "render"
+        "video"
+      ];
+      state.paths = [
+        immichHot
+      ]
+      ++ map (name: "${immichHot}/${name}") immichBindTargets;
+      state.managedFiles = [
+        { path = "${photos}/library/.immich"; }
+        { path = "${photos}/backups/.immich"; }
+      ]
+      ++ map (name: {
+        path = "${immichHot}/${name}/.immich";
+      }) immichBindTargets;
+    };
+
     homelab.services.immich.backup = {
       enable = lib.mkDefault true;
       paths = lib.mkDefault [
@@ -75,14 +92,19 @@ in
       };
     };
 
-    users.users.${immichService.user}.extraGroups = lib.mkIf immichService.hardwareAcceleration.enable [
-      "render"
-      "video"
-    ];
+    systemd = {
+      services.immich-server.unitConfig.RequiresMountsFor = map (
+        name: "${photos}/${name}"
+      ) immichBindTargets;
 
-    systemd.services.immich-server.unitConfig.RequiresMountsFor = map (
-      name: "${photos}/${name}"
-    ) immichBindTargets;
+      # Immich needs host UID/GID semantics for group-owned media and bind-mounted
+      # hot storage. A private user namespace remaps those owners to nobody:nogroup.
+      services.immich-server.serviceConfig.PrivateUsers = lib.mkForce false;
+
+      # The upstream module assumes a private 0700 media root. Shared photo
+      # storage is instead owned exclusively by the homelab storage policy.
+      tmpfiles.settings.immich = lib.mkForce { };
+    };
 
     fileSystems = lib.listToAttrs (
       map (name: {

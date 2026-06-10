@@ -9,6 +9,8 @@ let
   inherit (cfg) data;
   inherit (config.networking) hostName;
   inherit (cfg.media.vpn) wgConfSecretName;
+  homelabMeta = import ../meta-data.nix;
+  inherit (homelabMeta) nixflixStateServices;
   jellyfinHwAccel = cfg.services.jellyfin.hardwareAcceleration;
 
   mediaSecretsFile = "${config.custom.repoPath}/secrets/${hostName}/media.yaml";
@@ -48,6 +50,38 @@ let
     "radarr"
     "prowlarr"
   ];
+
+  mkNixflixApp =
+    name:
+    let
+      svc = cfg.services.${name};
+      needsDownloads = builtins.elem name [
+        "qbittorrent"
+        "radarr"
+        "sonarr"
+        "sonarr-anime"
+      ];
+      baseStorageAccess = lib.filter (
+        role:
+        builtins.elem role [
+          "media"
+          "photos"
+          "nas"
+        ]
+      ) svc.dataGroups;
+      storageAccess = lib.unique (baseStorageAccess ++ lib.optional needsDownloads "downloads");
+    in
+    lib.mkIf svc.enable {
+      ${name} = {
+        enable = true;
+        inherit (svc) user group;
+        manageUser = true;
+        serviceNames = [ name ];
+        inherit storageAccess;
+        sharedWriter = svc.umaskSharedWriter && storageAccess != [ ];
+        state.paths = [ "${cfg.state.nixflix}/${name}" ];
+      };
+    };
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.media.enable) {
@@ -122,7 +156,7 @@ in
 
         system.pluginRepositories."Intro Skipper" = {
           url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-Bg/udki8pFkLuYksk+eSQPVjw2LBkxdAs+blZIaR9mM=";
+          hash = "sha256-+PzDcniirXO2P2mgZhL1K8eJRz6LkSqeYxLuzrQ6XXs=";
         };
         system.pluginRepositories."Jellyfin Stable".hash =
           lib.mkForce "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
@@ -294,88 +328,85 @@ in
         };
       };
 
-    systemd.services.flaresolverr = lib.mkIf cfg.services.prowlarr.enable {
-      vpnConfinement = {
-        enable = true;
-        vpnNamespace = "wg";
-      };
-    };
+    homelab.apps = lib.mkMerge [
+      (lib.mkMerge (map mkNixflixApp nixflixStateServices))
+      (lib.mkIf cfg.services.jellyfin.enable {
+        jellyfin = {
+          enable = true;
+          user = config.nixflix.jellyfin.user;
+          group = config.nixflix.jellyfin.group;
+          serviceNames = [
+            "jellyfin"
+            "jellyfin-libraries"
+          ];
+          storageAccess = [ "media" ];
+          state = {
+            mode = "0755";
+            paths = [
+              config.nixflix.jellyfin.dataDir
+              config.nixflix.jellyfin.configDir
+              config.nixflix.jellyfin.cacheDir
+              config.nixflix.jellyfin.logDir
+              config.nixflix.jellyfin.system.metadataPath
+              "${config.nixflix.jellyfin.dataDir}/plugins"
+            ];
+          };
+        };
+      })
+    ];
 
     systemd = {
-      tmpfiles.settings."20-homelab-jellyfin" = lib.mkIf cfg.services.jellyfin.enable (
-        let
-          jf = config.nixflix.jellyfin;
-          dir = {
-            mode = "0755";
-            inherit (jf) user group;
+      services = {
+        nixflix-setup-dirs = {
+          script = lib.mkForce ''
+            ${pkgs.systemd}/bin/systemd-tmpfiles --create \
+              --prefix=${lib.escapeShellArg cfg.state.nixflix} \
+              --prefix=${lib.escapeShellArg data.media} \
+              --prefix=${lib.escapeShellArg data.downloads}
+          '';
+        };
+
+        flaresolverr = lib.mkIf cfg.services.prowlarr.enable {
+          vpnConfinement = {
+            enable = true;
+            vpnNamespace = "wg";
           };
-        in
-        {
-          "${jf.dataDir}".d = dir;
-          "${jf.configDir}".d = dir;
-          "${jf.cacheDir}".d = dir;
-          "${jf.logDir}".d = dir;
-          "${jf.system.metadataPath}".d = dir;
-          "${jf.dataDir}/plugins".d = dir;
-        }
-      );
+        };
 
-      services.jellyfin = {
-        serviceConfig = lib.mkMerge [
-          (lib.mkIf cfg.services.jellyfin.enable {
-            # PrivateUsers makes chown in the container fall on host as nobody:nogroup,
-            # which breaks SQLite writes for Jellyfin auth.
-            PrivateUsers = lib.mkForce false;
-            ExecStartPre =
-              let
-                jfDir = config.nixflix.jellyfin.dataDir;
-                jfUser = config.nixflix.jellyfin.user;
-                jfGroup = config.nixflix.jellyfin.group;
-                fixJellyfinState = pkgs.writeShellScript "jellyfin-fix-state-ownership" ''
-                  if [ -d ${lib.escapeShellArg jfDir} ]; then
-                    chown -R ${lib.escapeShellArg "${jfUser}:${jfGroup}"} ${lib.escapeShellArg jfDir}
-                  fi
-                '';
-              in
-              lib.mkBefore [ "+${fixJellyfinState}" ];
-          })
-          (lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable) {
-            DeviceAllow = lib.mkAfter (
-              [
-                "${toString jellyfinHwAccel.device} rw"
-              ]
-              ++ lib.optionals (jellyfinHwAccel.type == "nvenc") [
-                "/dev/nvidiactl rw"
-                "/dev/nvidia-modeset rw"
-                "/dev/nvidia-uvm rw"
-                "/dev/nvidia-uvm-tools rw"
-              ]
-            );
-          })
-        ];
-      };
+        seerr-jellyfin = lib.mkIf (cfg.services.seerr.enable && cfg.services.jellyfin.enable) {
+          after = [
+            "seerr.service"
+            "jellyfin.service"
+          ];
+          requires = [
+            "seerr.service"
+            "jellyfin.service"
+          ];
+        };
 
-      services.jellyfin-libraries = lib.mkIf cfg.services.jellyfin.enable {
-        serviceConfig.ExecStartPre =
-          let
-            jfDir = config.nixflix.jellyfin.dataDir;
-            jfUser = config.nixflix.jellyfin.user;
-            jfGroup = config.nixflix.jellyfin.group;
-            fixJellyfinState = pkgs.writeShellScript "jellyfin-libraries-fix-state-ownership" ''
-              if [ -d ${lib.escapeShellArg jfDir} ]; then
-                chown -R ${lib.escapeShellArg "${jfUser}:${jfGroup}"} ${lib.escapeShellArg jfDir}
-              fi
-            '';
-          in
-          lib.mkBefore [ "+${fixJellyfinState}" ];
+        jellyfin = {
+          serviceConfig = lib.mkMerge [
+            (lib.mkIf cfg.services.jellyfin.enable {
+              # PrivateUsers makes chown in the container fall on host as nobody:nogroup,
+              # which breaks SQLite writes for Jellyfin auth.
+              PrivateUsers = lib.mkForce false;
+            })
+            (lib.mkIf (cfg.services.jellyfin.enable && jellyfinHwAccel.enable) {
+              DeviceAllow = lib.mkAfter (
+                [
+                  "${toString jellyfinHwAccel.device} rw"
+                ]
+                ++ lib.optionals (jellyfinHwAccel.type == "nvenc") [
+                  "/dev/nvidiactl rw"
+                  "/dev/nvidia-modeset rw"
+                  "/dev/nvidia-uvm rw"
+                  "/dev/nvidia-uvm-tools rw"
+                ]
+              );
+            })
+          ];
+        };
       };
     };
-
-    users.users.${cfg.services.jellyfin.user}.extraGroups =
-      lib.mkIf (cfg.services.jellyfin.enable && cfg.services.jellyfin.hardwareAcceleration.enable)
-        [
-          "render"
-          "video"
-        ];
   };
 }
