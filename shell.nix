@@ -110,7 +110,6 @@ in
           ;
       }
       ++ [
-        pkgsUnstable.codex
         sopsBootstrap
       ]
       ++ selectedUnstablePackages;

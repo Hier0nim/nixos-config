@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   ...
 }:
 {
@@ -15,10 +14,4 @@
     webFrontend.enable = true;
   };
 
-  home = {
-    packages = with pkgs; [
-      codex
-      socat
-    ];
-  };
 }
