@@ -86,7 +86,7 @@ in
 
   config = lib.mkIf config.custom.services.copypartyDrive.enable {
     sops.secrets.${"copyparty_${config.custom.username}_password"} = {
-      sopsFile = config.custom.repoPath + "/secrets/${config.custom.hostName}/copyparty.yaml";
+      sopsFile = config.custom.repoPath + "/secrets/common/copyparty.yaml";
       key = "${config.custom.username}_password";
     };
 
