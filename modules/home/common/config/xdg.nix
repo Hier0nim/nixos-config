@@ -6,6 +6,7 @@
     userDirs = {
       enable = true;
       createDirectories = true;
+      setSessionVariables = false;
     };
 
     desktopEntries.nvim-ghostty = {
