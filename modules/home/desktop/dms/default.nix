@@ -43,6 +43,23 @@ in
   dconf.enable = true;
   services.kdeconnect.enable = true;
 
+  gtk = {
+    enable = true;
+    theme = {
+      name = "adw-gtk3";
+      package = pkgs.adw-gtk3;
+    };
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
+    cursorTheme = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+      size = 24;
+    };
+  };
+
   home = {
     activation.seedDankMaterialShellConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       dms_config_dir="${config.xdg.configHome}/DankMaterialShell"
