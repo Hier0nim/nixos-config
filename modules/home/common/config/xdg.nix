@@ -3,6 +3,11 @@
   xdg = {
     enable = true;
 
+    userDirs = {
+      enable = true;
+      createDirectories = true;
+    };
+
     desktopEntries.nvim-ghostty = {
       name = "Neovim (Ghostty)";
       exec = "ghostty -e nvim %F";
@@ -59,6 +64,7 @@
           // {
             "inode/directory" = fileBrowser;
 
+            "x-scheme-handler/mailto" = [ "protonmail.desktop" ];
             "x-scheme-handler/spotify" = [ "spotify.desktop" ];
             "x-scheme-handler/discord" = [ "vesktop.desktop" ];
           };
