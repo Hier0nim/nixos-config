@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   imports = [
     ../fonts
@@ -8,4 +8,6 @@
     ../services/openssh.nix
     ../services/wsdd.nix
   ];
+
+  custom.services.openssh.enable = lib.mkDefault true;
 }

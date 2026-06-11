@@ -1,6 +1,9 @@
-{ ... }:
+{ lib, ... }:
 {
   imports = [
-    ../gaming
+    ../gaming/controllers.nix
+    ../gaming/gaming.nix
   ];
+
+  custom.profiles.gaming.enable = lib.mkDefault true;
 }

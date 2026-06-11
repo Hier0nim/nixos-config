@@ -32,11 +32,16 @@
 
   networking.hostName = "zephyrus-g14";
 
-  custom.wifi.networks = {
-    pieczarkowo = {
-      enable = true;
-      autoconnect = true;
+  custom = {
+    wifi.networks = {
+      pieczarkowo = {
+        enable = true;
+        autoconnect = true;
+      };
     };
+
+    services.openssh.enable = false;
+    programs.winboat.enable = false;
   };
 
   boot = {
@@ -138,9 +143,6 @@
       enable = true;
     };
 
-    openssh.enable = lib.mkForce false;
-    fail2ban.enable = lib.mkForce false;
-
     asus-px-keyboard-tool = {
       enable = true;
       settings = {
@@ -199,7 +201,6 @@
   # Optional: override defaults written to /etc/asus-px-keyboard-tool.conf
   # Note: Nix integers are decimal; convert hex (e.g. 0x7e) to decimal (126).
   powerManagement.powertop.enable = true;
-  custom.programs.winboat.enable = false;
 
   environment.systemPackages = with pkgs; [
     stress-ng

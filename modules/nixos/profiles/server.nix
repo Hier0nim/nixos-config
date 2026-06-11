@@ -6,4 +6,5 @@
   ];
 
   custom.hostRole = lib.mkDefault "server";
+  custom.services.openssh.enable = lib.mkDefault true;
 }
