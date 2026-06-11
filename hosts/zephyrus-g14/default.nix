@@ -26,6 +26,8 @@
     ../../modules/nixos/input-devices
     ../../modules/nixos/programs/neovim.nix
     ../../modules/nixos/services/winboat.nix
+    ../../modules/nixos/hardware/asus.nix
+    ../../modules/nixos/services/local-llama.nix
 
     # ../../modules/nixos/services/howdy.nix
   ];
@@ -41,8 +43,15 @@
     };
 
     services.openssh.enable = false;
+    hardware.asus = {
+      enable = true;
+      asusdConfigPath = ./asusd.ron;
+    };
+    services.localLlama.enable = true;
     programs.winboat.enable = false;
   };
+
+  services.supergfxd.enable = lib.mkForce false;
 
   boot = {
     initrd = {
@@ -84,100 +93,6 @@
     powerManagement = {
       enable = lib.mkForce true;
       finegrained = lib.mkForce false;
-    };
-  };
-
-  services = {
-    llama-cpp-swap = {
-      enable = true;
-      package = pkgs.llama-cpp.override { cudaSupport = true; };
-      listenAddress = "127.0.0.1";
-      port = 8080;
-      openFirewall = false;
-      modelDir = "/var/lib/llama-cpp/models";
-      defaultModel = "qwen";
-      idleStopMinutes = 5;
-
-      models =
-        let
-          qwenModel = {
-            name = "Qwen 3.6 35B A3B";
-            file = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
-            url = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf?download=true";
-            sha256 = "6f5c72e2cde7fb0a1584cc009cdb4513f26733740369d3e2df0e7d7247112d05";
-
-            gpuLayers = 99;
-            cpuMoeLayers = 32;
-            batchSize = 4096;
-            ubatchSize = 512;
-            cacheTypeK = "q8_0";
-            cacheTypeV = "q8_0";
-            temperature = 0.6;
-            topP = 0.95;
-            topK = 20;
-            minP = 0.0;
-            presencePenalty = 0.0;
-            repeatPenalty = 1.0;
-            jinja = true;
-            extraArgs = [
-              "--parallel"
-              "1"
-            ];
-          };
-        in
-        {
-          qwen = qwenModel // {
-            contextSize = 131072;
-          };
-        };
-    };
-
-    # ASUS specific software. This also installs asusctl.
-    asusd = {
-      enable = true;
-      asusdConfig.source = ./asusd.ron;
-    };
-    supergfxd.enable = lib.mkForce false;
-
-    lact = {
-      enable = true;
-    };
-
-    asus-px-keyboard-tool = {
-      enable = true;
-      settings = {
-        kb_brightness_cycle = {
-          enabled = true;
-          keycode = "KEY_PROG3";
-        };
-      };
-    };
-  };
-
-  programs.rog-control-center = {
-    enable = true;
-    autoStart = false;
-  };
-
-  systemd.user.services.rog-control-center = {
-    description = "rog-control-center";
-
-    after = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    wantedBy = [ "graphical-session.target" ];
-
-    startLimitBurst = 5;
-    startLimitIntervalSec = 120;
-
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = lib.getExe' pkgs.asusctl "rog-control-center";
-      Restart = "always";
-      RestartSec = 1;
-      TimeoutStopSec = 10;
-
-      # Optional: keep your delay
-      ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
     };
   };
 
