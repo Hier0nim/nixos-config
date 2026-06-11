@@ -10,6 +10,8 @@
     (lib.custom.relativeToRoot "modules/home/common/services/copyparty-drive.nix")
   ];
 
+  custom.hostName = "zephyrus-g14";
+
   home.packages = with pkgs; [
     teams-for-linux
     proton-pass

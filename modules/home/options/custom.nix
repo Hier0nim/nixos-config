@@ -33,5 +33,17 @@ in
       type = types.path;
       description = "Default wallpaper image.";
     };
+
+    hostName = lib.mkOption {
+      type = types.str;
+      description = "Host name for host-specific paths (e.g. secrets).";
+    };
+
+    home.profiles = {
+      desktop.enable = lib.mkEnableOption "desktop home profile";
+      dev.enable = lib.mkEnableOption "developer tools profile";
+      gaming.enable = lib.mkEnableOption "gaming apps profile";
+      remoteAdmin.enable = lib.mkEnableOption "remote admin SSH config";
+    };
   };
 }

@@ -12,6 +12,9 @@
     (lib.custom.relativeToRoot "modules/home/profiles/remote-admin.nix")
   ];
 
+  custom.hostName = "server-legion";
+  custom.services.codingAgents.enable = true;
+
   home.packages = with pkgs; [
     comma
   ];

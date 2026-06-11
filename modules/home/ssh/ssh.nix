@@ -81,7 +81,7 @@
 
         Host homelab
           HostName 192.168.8.2
-          User hieronim
+          User ${config.custom.username}
           IdentityFile ~/.ssh/id_ed25519_server_legion
 
         Host router

@@ -5,11 +5,11 @@
   ...
 }:
 let
-  mountPoint = "${config.home.homeDirectory}/Network/server-legion";
+  mountPoint = "${config.home.homeDirectory}/Network/${config.custom.hostName}";
   copypartyUrl = "https://pliki.pieczarkowo.me";
   logDir = "${config.xdg.stateHome}/rclone";
   copypartyVolumes = {
-    hieronim = "/nas/hieronim";
+    ${config.custom.username} = "/nas/${config.custom.username}";
     shared = "/nas/shared";
   };
 
@@ -19,7 +19,9 @@ let
             runtime_dir="''${XDG_RUNTIME_DIR:?}"
             config_dir="$runtime_dir/rclone"
             config_file="$config_dir/copyparty.conf"
-            password_file=${lib.escapeShellArg config.sops.secrets.copyparty_hieronim_password.path}
+            password_file=${
+              lib.escapeShellArg config.sops.secrets."copyparty_${config.custom.username}_password".path
+            }
             password="$(${pkgs.coreutils}/bin/tr -d '\n' < "$password_file")"
             obscured_password="$(${pkgs.rclone}/bin/rclone obscure "$password")"
 
@@ -30,7 +32,7 @@ let
         url = ${copypartyUrl}
         vendor = owncloud
         pacer_min_sleep = 0.01ms
-        user = hieronim
+        user = ${config.custom.username}
         pass = $obscured_password
     EOF
         ${pkgs.coreutils}/bin/chmod 600 "$config_file"
@@ -80,24 +82,28 @@ let
     };
 in
 {
-  sops.secrets.copyparty_hieronim_password = {
-    sopsFile = config.custom.repoPath + "/secrets/server-legion/copyparty.yaml";
-    key = "hieronim_password";
+  options.custom.services.copypartyDrive.enable = lib.mkEnableOption "Copyparty WebDAV drive mount";
+
+  config = lib.mkIf config.custom.services.copypartyDrive.enable {
+    sops.secrets.${"copyparty_${config.custom.username}_password"} = {
+      sopsFile = config.custom.repoPath + "/secrets/${config.custom.hostName}/copyparty.yaml";
+      key = "${config.custom.username}_password";
+    };
+
+    home.packages = with pkgs; [
+      rclone
+    ];
+
+    home.activation.ensureCopypartyMountpoint = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "${mountPoint}"
+      mkdir -p "${logDir}"
+      mkdir -p "${mountPoint}/${config.custom.username}"
+      mkdir -p "${mountPoint}/shared"
+    '';
+
+    systemd.user.services = lib.mapAttrs' (
+      name: copypartyRoot:
+      lib.nameValuePair "copyparty-drive-${name}" (mkCopypartyDriveService name copypartyRoot)
+    ) copypartyVolumes;
   };
-
-  home.packages = with pkgs; [
-    rclone
-  ];
-
-  home.activation.ensureCopypartyMountpoint = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "${mountPoint}"
-    mkdir -p "${logDir}"
-    mkdir -p "${mountPoint}/hieronim"
-    mkdir -p "${mountPoint}/shared"
-  '';
-
-  systemd.user.services = lib.mapAttrs' (
-    name: copypartyRoot:
-    lib.nameValuePair "copyparty-drive-${name}" (mkCopypartyDriveService name copypartyRoot)
-  ) copypartyVolumes;
 }

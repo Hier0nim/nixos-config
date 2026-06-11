@@ -5,6 +5,13 @@
   inputs,
   ...
 }:
+let
+  templatedSettings = pkgs.writeText "dms-settings.json" (
+    builtins.replaceStrings [ "/home/hieronim/" ] [ "${config.home.homeDirectory}/" ] (
+      builtins.readFile ./settings.json
+    )
+  );
+in
 {
   imports = [
     inputs.dms.homeModules.dank-material-shell
@@ -41,7 +48,7 @@
       dms_config_dir="${config.xdg.configHome}/DankMaterialShell"
 
       if [ ! -e "$dms_config_dir/settings.json" ]; then
-        run install -Dm0644 "${./settings.json}" "$dms_config_dir/settings.json"
+        run install -Dm0644 "${templatedSettings}" "$dms_config_dir/settings.json"
       fi
 
       if [ ! -e "$dms_config_dir/themes/kanagawa-paper/theme.json" ]; then
