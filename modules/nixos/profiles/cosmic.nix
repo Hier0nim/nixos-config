@@ -4,5 +4,5 @@
     ../desktop/cosmic.nix
   ];
 
-  desktopManager.cosmicCustom.enable = true;
+  custom.desktop.cosmic.enable = true;
 }

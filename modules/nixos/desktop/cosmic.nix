@@ -6,9 +6,10 @@
 }:
 with lib;
 {
-  options.desktopManager.cosmicCustom.enable = mkEnableOption "System76 COSMIC desktop with greeter and tweaks";
+  options.custom.desktop.cosmic.enable =
+    mkEnableOption "System76 COSMIC desktop with greeter and tweaks";
 
-  config = mkIf config.desktopManager.cosmicCustom.enable {
+  config = mkIf config.custom.desktop.cosmic.enable {
     environment = {
       sessionVariables = {
         COSMIC_DATA_CONTROL_ENABLED = 1;
