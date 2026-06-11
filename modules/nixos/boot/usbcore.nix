@@ -1,3 +1,3 @@
 {
-  boot.kernelParams = [ "usbcore.autosuspend=-1" ];
+  boot.kernelParams = [ "usbcore.autosuspend=2" ];
 }
