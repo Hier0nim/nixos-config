@@ -400,13 +400,16 @@ in
         };
 
         "Mod+Shift+S" = hidden // {
-          action.screenshot = { };
+          hotkey-overlay.title = "Screenshot (interactive)";
+          action.spawn = dmsIpc "niri" "screenshot" [ ];
         };
         "Ctrl+Mod+Shift+S" = hidden // {
-          action.screenshot-screen = { };
+          hotkey-overlay.title = "Screenshot (screen)";
+          action.spawn = dmsIpc "niri" "screenshotScreen" [ ];
         };
         "Alt+Mod+Shift+S" = hidden // {
-          action.screenshot-window = { };
+          hotkey-overlay.title = "Screenshot (window)";
+          action.spawn = dmsIpc "niri" "screenshotWindow" [ ];
         };
         "Mod+Escape" = hidden // {
           allow-inhibiting = false;
