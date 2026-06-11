@@ -11,6 +11,7 @@
   ];
 
   custom.hostName = "zephyrus-g14";
+  custom.services.codingAgents.enable = true;
 
   home.packages = with pkgs; [
     teams-for-linux

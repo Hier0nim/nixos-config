@@ -5,11 +5,11 @@
 }:
 {
   options.custom.services.codingAgents.enable =
-    lib.mkEnableOption "AI coding agents and open-design service";
+    lib.mkEnableOption "AI coding agents (sops secret + open-design service)";
 
   config = lib.mkIf config.custom.services.codingAgents.enable {
-    sops.secrets.pi_legion_api_key = {
-      sopsFile = config.custom.repoPath + "/secrets/${config.custom.hostName}/llama-cpp-agent.yaml";
+    sops.secrets.pi_legion_api_key = lib.mkIf (config.custom.hostName == "server-legion") {
+      sopsFile = config.custom.repoPath + "/secrets/server-legion/llama-cpp-agent.yaml";
       key = "llama_cpp_agent_api_key";
     };
 
