@@ -23,47 +23,18 @@
     in
     {
       # ========= Host Configurations =========
-      nixosConfigurations = {
-        zephyrus-g14 = lib.custom.mkHost {
-          inherit
-            inputs
-            outputs
-            self
-            nixpkgs
-            ;
-          system = "x86_64-linux";
-          modules = [
-            inputs.determinate.nixosModules.default
-            inputs.disko.nixosModules.default
-            inputs.home-manager.nixosModules.default
-            inputs.asus-px-keyboard-tool.nixosModules.default
-
-            ./hosts/zephyrus-g14
-          ];
-        };
-        # server-legion intentionally uses nixpkgs-stable + home-manager-stable.
-        server-legion = lib.custom.mkHost {
-          inherit inputs outputs self;
-          nixpkgs = inputs.nixpkgs-stable;
-          specialArgs = {
-            inputs = inputs // {
-              nixpkgs-unstable = inputs.nixpkgs;
-              nixpkgs = inputs.nixpkgs-stable;
-              home-manager = inputs.home-manager-stable;
-            };
-          };
-          system = "x86_64-linux";
-          modules = [
-            inputs.determinate.nixosModules.default
-            inputs.disko.nixosModules.default
-            inputs.home-manager-stable.nixosModules.default
-            inputs.nixflix.nixosModules.default
-            inputs.copyparty.nixosModules.default
-
-            ./hosts/server-legion
-          ];
-        };
-      };
+      nixosConfigurations =
+        let
+          hosts = import ./hosts { inherit inputs; };
+        in
+        lib.mapAttrs (
+          _name: host:
+          lib.custom.mkHost {
+            inherit inputs outputs self;
+            inherit (host) nixpkgs system modules;
+            specialArgs = host.specialArgs or { };
+          }
+        ) hosts;
 
       # ========= Formatting =========
       # Nix formatter available through 'nix fmt' https://github.com/NixOS/nixfmt
@@ -75,13 +46,16 @@
         pkgs.nixfmt
       );
 
-      # Pre-commit checks
+      # Pre-commit checks + host build checks
       checks = forAllSystems (
         system:
         let
           pkgs = import nixpkgs { inherit system; };
         in
-        import ./checks.nix { inherit inputs system pkgs; }
+        import ./checks.nix {
+          inherit inputs system pkgs;
+          inherit (self) nixosConfigurations;
+        }
       );
 
       # ========= DevShell =========

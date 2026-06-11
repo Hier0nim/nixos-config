@@ -1,8 +1,16 @@
 {
   inputs,
   system,
+  nixosConfigurations,
   ...
 }:
+let
+  lib = inputs.nixpkgs.lib;
+  # Only check hosts matching the current system
+  hostChecks = lib.mapAttrs' (
+    name: cfg: lib.nameValuePair "nixos-${name}" cfg.config.system.build.toplevel
+  ) (lib.filterAttrs (_: cfg: cfg.config.nixpkgs.hostPlatform.system == system) nixosConfigurations);
+in
 {
   pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
     src = ./.;
@@ -38,3 +46,4 @@
     };
   };
 }
+// hostChecks
