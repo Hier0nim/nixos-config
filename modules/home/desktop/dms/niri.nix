@@ -200,7 +200,22 @@ in
         "Mod+Shift+Comma" = dmsToggleWithArgs "Open bar settings" "settings" "openWith" [ "dankbar" ];
         "Mod+Ctrl+L" = dmsToggle "Lock screen" "lock" "lock";
         "Mod+Ctrl+E" = dmsToggle "Open session menu" "powermenu" "toggle";
-        "Mod+B" = dmsToggleWithArgs "Open dashboard" "dash" "open" [ "overview" ];
+        "Mod+B" = hidden // {
+          hotkey-overlay.title = "Open Firefox";
+          action.spawn = [ (lib.getExe pkgs.firefox) ];
+        };
+        "Mod+Shift+G" = hidden // {
+          hotkey-overlay.title = "Record screen";
+          action.spawn = [
+            (lib.getExe pkgs.gpu-screen-recorder)
+            "-w"
+            "screen"
+            "-f"
+            "60"
+            "-o"
+            "~/Videos/Recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"
+          ];
+        };
         "Mod+Slash" = dmsToggle "Open system monitor" "processlist" "focusOrToggle";
         "Mod+V" = dmsToggle "Open clipboard launcher" "clipboard" "toggle";
         "Mod+P" = dmsToggle "Open notepad" "notepad" "toggle";
