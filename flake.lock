@@ -79,6 +79,22 @@
         "type": "github"
       }
     },
+    "creamlinux-installer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779501972,
+        "narHash": "sha256-gH2Yyl8IEVgACimMb5G+EWUWyJtu5yBDqKjOdZ5gyts=",
+        "owner": "Novattz",
+        "repo": "creamlinux-installer",
+        "rev": "a1be636a8c00bc1c077cd37fa6a83f5cc8e5e17f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Novattz",
+        "repo": "creamlinux-installer",
+        "type": "github"
+      }
+    },
     "danksearch": {
       "inputs": {
         "nixpkgs": [
@@ -1101,6 +1117,7 @@
         "asus-px-keyboard-tool": "asus-px-keyboard-tool",
         "copyparty": "copyparty",
         "cosmic-manager": "cosmic-manager",
+        "creamlinux-installer": "creamlinux-installer",
         "danksearch": "danksearch",
         "determinate": "determinate",
         "disko": "disko",

@@ -1,4 +1,9 @@
-{ stablePkgs, pkgs, ... }:
+{
+  stablePkgs,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   gamewrapAuto = pkgs.writeTextFile {
     name = "gamewrap-auto";
@@ -386,6 +391,7 @@ in
     })
     prismlauncher
     stablePkgs.lutris
+    (import inputs.creamlinux-installer { inherit pkgs; })
   ];
 
   xdg.configFile."gamescope/scripts/gamescope-explicit-sync-off.lua" = {
