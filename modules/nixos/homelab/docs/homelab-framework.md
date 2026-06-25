@@ -292,6 +292,7 @@ The bind mount setup:
 ```nix
 fileSystems."/data/photos/upload" = {
   device = "/var/lib/homelab/immich-hot/upload";
+  fsType = "none";
   options = [ "bind" ];
 };
 # ... same for thumbs, encoded-video, profile

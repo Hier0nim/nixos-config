@@ -111,6 +111,7 @@ in
         name = "${photos}/${name}";
         value = {
           device = "${immichHot}/${name}";
+          fsType = "none";
           options = [
             "bind"
             "x-systemd.requires-mounts-for=${immichHot}/${name}"

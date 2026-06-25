@@ -1,4 +1,3 @@
-{ lib }:
 {
   nixpkgs,
   inputs,
@@ -8,15 +7,18 @@
   modules,
   specialArgs ? { },
 }:
+let
+  hostLib = nixpkgs.lib.extend (self: _super: { custom = import ./. { lib = self; }; });
+in
 nixpkgs.lib.nixosSystem {
   inherit system modules;
   specialArgs = {
     inherit
       inputs
       outputs
-      lib
       self
       ;
+    lib = hostLib;
   }
   // specialArgs;
 }
