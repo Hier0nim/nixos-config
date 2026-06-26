@@ -58,6 +58,32 @@
         }
       );
 
+      # ========= Utility Apps =========
+      apps = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          update-plugin-hashes = {
+            type = "app";
+            program =
+              let
+                app = pkgs.writeShellApplication {
+                  name = "update-plugin-hashes";
+                  runtimeInputs = with pkgs; [
+                    curl
+                    nix
+                    gnused
+                  ];
+                  text = builtins.readFile ./scripts/update-plugin-hashes.sh;
+                };
+              in
+              "${app}/bin/update-plugin-hashes";
+          };
+        }
+      );
+
       # ========= DevShell =========
       # Custom shell for bootstrapping on new hosts, modifying nix-config, and secrets management
       devShells = forAllSystems (

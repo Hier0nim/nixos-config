@@ -10,4 +10,5 @@
   ];
 
   custom.services.openssh.enable = lib.mkDefault true;
+  custom.hardware.audio.enable = lib.mkDefault true;
 }

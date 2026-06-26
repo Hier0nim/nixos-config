@@ -59,7 +59,7 @@ in
       displayManager.dms-greeter = {
         enable = true;
         compositor.name = "niri";
-        configHome = config.users.users.hieronim.home;
+        configHome = config.users.users.${config.custom.username}.home;
         package = inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.default;
       };
 

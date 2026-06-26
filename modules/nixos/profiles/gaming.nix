@@ -6,4 +6,5 @@
   ];
 
   custom.profiles.gaming.enable = lib.mkDefault true;
+  custom.hardware.audio.support32Bit = lib.mkDefault true;
 }
