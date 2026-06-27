@@ -321,6 +321,7 @@ in
         qbittorrent = {
           upstream.host = lib.mkDefault config.nixflix.torrentClients.qbittorrent.connectionAddress;
           auth.bypassForApi = true;
+          auth.stripAuthorizationHeader = true;
           expose = {
             pathPrefix = null;
             redirectToPrefix = false;
