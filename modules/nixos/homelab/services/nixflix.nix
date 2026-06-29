@@ -296,6 +296,16 @@ in
         password = secretRef "qbittorrent_password";
 
         serverConfig = {
+          # Separate download/upload queues so seeding never blocks downloading.
+          # MaxActiveTorrents = MaxActiveDownloads + MaxActiveUploads ensures
+          # the two pools don't share slots.
+          BitTorrent.Session = {
+            QueueingEnabled = true;
+            MaxActiveDownloads = 10;
+            MaxActiveUploads = 10;
+            MaxActiveTorrents = 20;
+            DoNotCountSlowTorrents = true;
+          };
           LegalNotice.Accepted = true;
           Preferences.WebUI = {
             Username = "admin";
@@ -403,9 +413,9 @@ in
                   if .name == "cookie" then .value = $cookie
                   elif .name == "freeleech" then .value = false
                   elif .name == "torrentBaseSettings.appMinimumSeeders" then .value = 1
-                  elif .name == "torrentBaseSettings.seedRatio" then .value = 2.0
-                  elif .name == "torrentBaseSettings.seedTime" then .value = 10080
-                  elif .name == "torrentBaseSettings.packSeedTime" then .value = 20160
+                  elif .name == "torrentBaseSettings.seedRatio" then .value = 99999
+                  elif .name == "torrentBaseSettings.seedTime" then .value = 525600
+                  elif .name == "torrentBaseSettings.packSeedTime" then .value = 525600
                   elif .name == "torrentBaseSettings.preferMagnetUrl" then .value = false
                   else .
                   end
