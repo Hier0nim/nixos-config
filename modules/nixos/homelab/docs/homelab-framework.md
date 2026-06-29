@@ -87,12 +87,14 @@ stack with minimal configuration.
 
 ### Media Stack (`profiles.media.enable`)
 
-Enables: sonarr, sonarr-anime, radarr, prowlarr, jellyfin, seerr (jellyseerr),
-recyclarr, qbittorrent
+Enables: sonarr, sonarr-anime, radarr, prowlarr, jellyfin, audiobookshelf,
+seerr (jellyseerr), recyclarr, qbittorrent
 
-This is the full media automation stack. Sonarr and Radarr manage TV and
-movies. Prowlarr manages indexers. qBittorrent handles downloads. Jellyfin
-is the media server. Seerr handles user requests.
+This is the full media stack. Sonarr and Radarr manage TV and movies. Prowlarr
+manages indexers and is also used for manual audiobook discovery. qBittorrent
+handles downloads. Jellyfin is the video media server. Audiobookshelf is the
+audiobook library/player. Seerr handles user requests for video content. See
+[audiobook-flow.md](audiobook-flow.md) for the curated audiobook workflow.
 
 ### Photos Stack (`profiles.photos.enable`)
 
@@ -205,6 +207,9 @@ nightly and are checked weekly.
     books/
   downloads/
     torrent/
+      audiobooks/
+    review/
+      audiobooks/
   photos/
     library/
     backups/
@@ -263,6 +268,7 @@ Jellyfin. The homelab framework integrates with nixflix through an adapter in
 `homelab.apps` registrations.
 
 Services managed by nixflix:
+
 - sonarr, sonarr-anime (TV)
 - radarr (movies)
 - prowlarr (indexers)
@@ -271,7 +277,13 @@ Services managed by nixflix:
 - recyclarr (quality profiles)
 - qbittorrent (downloads)
 
+Audiobooks are intentionally handled as a curated lane instead of Readarr-style
+automation. Prowlarr can search authorized audiobook indexers and qBittorrent
+downloads into the `audiobooks` category, but final import into Audiobookshelf
+is a reviewed `audiobook-import` step. See [audiobook-flow.md](audiobook-flow.md).
+
 The nixflix adapter automatically:
+
 - Creates app registrations for each enabled service
 - Sets up storage access based on service needs
 - Configures VPN for torrent and indexer services

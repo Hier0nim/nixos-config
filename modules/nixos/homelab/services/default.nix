@@ -2,6 +2,7 @@
 {
   imports = lib.flatten [
     ./nixflix.nix
+    ./audiobookshelf.nix
     ./tdarr.nix
     ./immich.nix
     ./copyparty.nix

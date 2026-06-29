@@ -487,14 +487,18 @@ in
         umaskSharedWriter = true;
       };
 
-      prowlarr = mkServiceOptions {
-        name = "prowlarr";
-        subdomain = "indexers";
-        port = 9696;
-        authGroup = "media-admin";
-        runsUnderNixflix = true;
-        umaskSharedWriter = true;
-      };
+      prowlarr =
+        mkServiceOptions {
+          name = "prowlarr";
+          subdomain = "indexers";
+          port = 9696;
+          authGroup = "media-admin";
+          runsUnderNixflix = true;
+          umaskSharedWriter = true;
+        }
+        // {
+          indexers.abtorrents.enable = mkEnableOption "ABtorrents declarative Prowlarr indexer";
+        };
 
       sonarr-anime = mkServiceOptions {
         name = "sonarr-anime";
@@ -526,6 +530,14 @@ in
             defaultType = "nvenc";
           };
         };
+
+      audiobookshelf = mkServiceOptions {
+        name = "audiobookshelf";
+        subdomain = "audiobooki";
+        port = 8000;
+        dataGroups = [ "media" ];
+        umaskSharedWriter = true;
+      };
 
       seerr = mkServiceOptions {
         name = "seerr";

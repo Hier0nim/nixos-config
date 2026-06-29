@@ -158,6 +158,9 @@ let
         mode = "2775";
         subdirs = [
           "torrent"
+          "torrent/audiobooks"
+          "review"
+          "review/audiobooks"
         ];
         consumers = storageConsumers "downloads";
       })

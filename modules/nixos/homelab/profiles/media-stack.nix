@@ -13,7 +13,9 @@ in
       "sonarr-anime".enable = true;
       radarr.enable = true;
       prowlarr.enable = true;
+      prowlarr.indexers.abtorrents.enable = true;
       jellyfin.enable = true;
+      audiobookshelf.enable = true;
       seerr.enable = true;
       recyclarr.enable = true;
       qbittorrent.enable = true;

@@ -42,7 +42,8 @@ let
     "sonarr_anime_api_key"
     "sonarr_anime_password"
     "jellyfin_pieczarkowo_password"
-  ];
+  ]
+  ++ lib.optional cfg.services.prowlarr.indexers.abtorrents.enable "abtorrents_cookie";
 
   arrServices = [
     "sonarr"
@@ -307,10 +308,15 @@ in
           "radarr" = "${data.downloads}/torrent/movies";
           "sonarr-anime" = "${data.downloads}/torrent/anime";
           "prowlarr" = "${data.downloads}/torrent/prowlarr";
+          "audiobooks" = "${data.downloads}/torrent/audiobooks";
         };
 
         reverseProxy.expose = false;
       };
+
+      # Prowlarr is used as a manual discovery/search UI for audiobooks.
+      # Manual grabs should land in the curated audiobook staging lane.
+      downloadarr.qbittorrent.categories.prowlarr = "audiobooks";
     };
 
     homelab.services =
@@ -364,6 +370,76 @@ in
               --prefix=${lib.escapeShellArg cfg.state.nixflix} \
               --prefix=${lib.escapeShellArg data.media} \
               --prefix=${lib.escapeShellArg data.downloads}
+          '';
+        };
+
+        prowlarr-indexer-abtorrents = lib.mkIf cfg.services.prowlarr.indexers.abtorrents.enable {
+          description = "Configure ABtorrents Prowlarr indexer via API";
+          after = [ "prowlarr-indexers.service" ];
+          requires = [ "prowlarr-indexers.service" ];
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          path = [
+            pkgs.curl
+            pkgs.jq
+          ];
+          script = ''
+            set -euo pipefail
+
+            BASE_URL="http://${config.nixflix.prowlarr.connectionAddress}:${toString config.nixflix.prowlarr.config.hostConfig.port}${config.nixflix.prowlarr.config.hostConfig.urlBase}/api/${config.nixflix.prowlarr.config.apiVersion}"
+            API_KEY="$(cat ${config.sops.secrets.prowlarr_api_key.path})"
+            COOKIE="$(cat ${config.sops.secrets.abtorrents_cookie.path})"
+
+            echo "Configuring ABtorrents indexer..."
+            SCHEMAS=$(curl -sS -H "X-Api-Key: $API_KEY" "$BASE_URL/indexer/schema")
+            INDEXERS=$(curl -sS -H "X-Api-Key: $API_KEY" "$BASE_URL/indexer")
+
+            PAYLOAD=$(jq --arg cookie "$COOKIE" '
+              .[] | select(.name == "ABtorrents")
+              | .fields[] |= (
+                  if .name == "cookie" then .value = $cookie
+                  elif .name == "freeleech" then .value = false
+                  elif .name == "torrentBaseSettings.appMinimumSeeders" then .value = 1
+                  elif .name == "torrentBaseSettings.seedRatio" then .value = 2.0
+                  elif .name == "torrentBaseSettings.seedTime" then .value = 10080
+                  elif .name == "torrentBaseSettings.packSeedTime" then .value = 20160
+                  elif .name == "torrentBaseSettings.preferMagnetUrl" then .value = false
+                  else .
+                  end
+                )
+              | . + {appProfileId: 1, tags: []}
+            ' <<<"$SCHEMAS")
+
+            EXISTING_ID=$(jq -r '.[] | select(.name == "ABtorrents") | .id' <<<"$INDEXERS")
+            RESPONSE=$(mktemp)
+
+            if [ -n "$EXISTING_ID" ]; then
+              echo "ABtorrents already exists, updating..."
+              METHOD=PUT
+              URL="$BASE_URL/indexer/$EXISTING_ID"
+            else
+              echo "ABtorrents does not exist, creating..."
+              METHOD=POST
+              URL="$BASE_URL/indexer"
+            fi
+
+            CODE=$(curl -sS -w '%{http_code}' -o "$RESPONSE" \
+              -H "X-Api-Key: $API_KEY" \
+              -H "Content-Type: application/json" \
+              -X "$METHOD" \
+              --data "$PAYLOAD" \
+              "$URL")
+
+            if [ "$CODE" -lt 200 ] || [ "$CODE" -ge 300 ]; then
+              echo "ABtorrents indexer API request failed with HTTP $CODE" >&2
+              jq 'if type == "array" then [.[] | {propertyName, errorMessage, severity, errorCode}] else . end' "$RESPONSE" >&2 || cat "$RESPONSE" >&2
+              exit 1
+            fi
+
+            echo "ABtorrents indexer configured"
           '';
         };
 

@@ -1,6 +1,7 @@
 {
   proxiedServices = [
     "actual"
+    "audiobookshelf"
     "cockpit"
     "copyparty"
     "enable-actual"
