@@ -81,7 +81,7 @@ in
         "/nas/shared" = {
           path = "${cfg.data.nas}/shared";
           access = {
-            rwd = [
+            rwmd = [
               "admin"
               "hieronim"
               "sarka"
@@ -92,7 +92,7 @@ in
         "/nas/hieronim" = {
           path = "${cfg.data.nas}/hieronim";
           access = {
-            rwd = [
+            rwmd = [
               "admin"
               "hieronim"
             ];
@@ -102,7 +102,7 @@ in
         "/nas/sarka" = {
           path = "${cfg.data.nas}/sarka";
           access = {
-            rwd = [
+            rwmd = [
               "admin"
               "sarka"
             ];
