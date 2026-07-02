@@ -7,10 +7,12 @@ import subprocess
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+TORRENT_DIR = os.environ["AUDIOBOOK_TORRENT_DIR"]
 REVIEW_DIR = os.environ["AUDIOBOOK_REVIEW_DIR"]
 LIBRARY_DIR = os.environ["AUDIOBOOK_LIBRARY_DIR"]
 STATE_DIR = os.environ["AUDIOBOOK_IMPORT_STATE_DIR"]
 IMPORT_CMD = os.environ["AUDIOBOOK_IMPORT_CMD"]
+REVIEW_CMD = os.environ["AUDIOBOOK_REVIEW_CMD"]
 HOST = os.environ.get("AUDIOBOOK_IMPORT_DASHBOARD_HOST", "127.0.0.1")
 PORT = int(os.environ.get("AUDIOBOOK_IMPORT_DASHBOARD_PORT", "8010"))
 AUDIO_EXTS = {".m4b", ".m4a", ".mp3", ".flac", ".ogg", ".opus", ".aac"}
@@ -32,9 +34,9 @@ def safe_child(root, name):
     root_real = os.path.realpath(root)
     path = os.path.realpath(os.path.join(root_real, name))
     if os.path.dirname(path) != root_real:
-        raise ValueError("path escapes review directory")
+        raise ValueError("path escapes root directory")
     if not os.path.isdir(path):
-        raise ValueError("review directory no longer exists")
+        raise ValueError("directory no longer exists")
     return path
 
 def safe_destination(value):
@@ -46,13 +48,13 @@ def safe_destination(value):
         raise ValueError("destination must be a safe relative path")
     return value
 
-def scan_pending():
+def scan_dir(root):
     rows = []
-    if not os.path.isdir(REVIEW_DIR):
+    if not os.path.isdir(root):
         return rows
-    for name in sorted(os.listdir(REVIEW_DIR), key=str.lower):
+    for name in sorted(os.listdir(root), key=str.lower):
         try:
-            path = safe_child(REVIEW_DIR, name)
+            path = safe_child(root, name)
         except Exception:
             continue
         total = 0
@@ -75,6 +77,12 @@ def scan_pending():
         rows.append({"name": name, "size": human_size(total), "audio_count": audio_count, "updated": newest})
     return rows
 
+def scan_pending():
+    return scan_dir(REVIEW_DIR)
+
+def scan_torrents():
+    return scan_dir(TORRENT_DIR)
+
 def read_log(name, limit=15):
     path = os.path.join(STATE_DIR, name)
     if not os.path.exists(path):
@@ -86,19 +94,20 @@ def read_log(name, limit=15):
         return [f"Could not read {name}: {exc}"]
     return [line.rstrip("\n") for line in reversed(lines)]
 
-def run_import(args):
+def run_command(args):
     os.makedirs(STATE_DIR, exist_ok=True)
     lock_path = os.path.join(STATE_DIR, "dashboard.lock")
     with open(lock_path, "w") as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            return 409, "Another import is already running."
+            return 409, "Another dashboard action is already running."
         completed = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=None)
         return completed.returncode, completed.stdout
 
 def render_page(message=None, code=200):
     pending = scan_pending()
+    torrents = scan_torrents()
     imported = read_log("imports.log")
     reviewed = read_log("reviews.log")
     now = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
@@ -106,6 +115,23 @@ def render_page(message=None, code=200):
     if message is not None:
         cls = "ok" if code == 0 else "err"
         msg_html = f"<section class='{cls}'><h2>Last action</h2><pre>{esc(message)}</pre></section>"
+    torrent_rows = []
+    for item in torrents:
+        updated = datetime.datetime.fromtimestamp(item["updated"]).strftime("%Y-%m-%d %H:%M") if item["updated"] else "unknown"
+        torrent_rows.append(f"""
+          <tr>
+            <td><strong>{esc(item["name"])}</strong><br><small>{esc(item["audio_count"])} audio file(s), {esc(item["size"])}, updated {esc(updated)}</small></td>
+            <td>
+              <form method="post" action="/review">
+                <input type="hidden" name="name" value="{esc(item["name"])}">
+                <label>Review name <input name="destination" placeholder="Blank keeps torrent folder name"></label>
+                <button name="mode" value="dry-run">Dry run copy</button>
+                <button name="mode" value="import">Copy to review</button>
+              </form>
+            </td>
+          </tr>
+        """)
+    torrents_html = "\n".join(torrent_rows) if torrent_rows else "<tr><td colspan='2'>No completed audiobook torrent folders found.</td></tr>"
     rows = []
     for item in pending:
         updated = datetime.datetime.fromtimestamp(item["updated"]).strftime("%Y-%m-%d %H:%M") if item["updated"] else "unknown"
@@ -140,8 +166,11 @@ def render_page(message=None, code=200):
   small {{ color: #9ca3af; }} form {{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }}
 </style></head><body>
 <h1>Audiobook imports</h1>
-<p>Review staging: <code>{esc(REVIEW_DIR)}</code><br>Library: <code>{esc(LIBRARY_DIR)}</code><br>Updated: {esc(now)}</p>
+<p>Torrent downloads: <code>{esc(TORRENT_DIR)}</code><br>Review staging: <code>{esc(REVIEW_DIR)}</code><br>Library: <code>{esc(LIBRARY_DIR)}</code><br>Updated: {esc(now)}</p>
 {msg_html}
+<section><h2>Torrent downloads</h2>
+<p>Copy completed qBittorrent audiobook folders into review staging while leaving the original torrent data in place for seeding.</p>
+<table><thead><tr><th>Folder</th><th>Action</th></tr></thead><tbody>{torrents_html}</tbody></table></section>
 <section><h2>Pending review folders</h2>
 <form method="post" action="/import-all" style="margin-bottom: 1rem">
   <label><input type="checkbox" name="auto" checked> auto tags</label>
@@ -192,6 +221,16 @@ class Handler(BaseHTTPRequestHandler):
                 args.append(source)
                 if destination:
                     args.append(destination)
+            elif self.path == "/review":
+                name = data.get("name", [""])[0]
+                source = safe_child(TORRENT_DIR, name)
+                destination = safe_destination(data.get("destination", [""])[0])
+                args = [REVIEW_CMD]
+                if dry_run:
+                    args.append("--dry-run")
+                args.append(source)
+                if destination:
+                    args.append(destination)
             elif self.path == "/import-all":
                 args = [IMPORT_CMD, "--all"]
                 if dry_run:
@@ -201,7 +240,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_error(404)
                 return
-            code, output = run_import(args)
+            code, output = run_command(args)
             self.respond(render_page(output, code))
         except Exception as exc:
             self.respond(render_page(str(exc), 1), status=400)

@@ -393,15 +393,20 @@ let
       }
       ''
                 set -euo pipefail
+                export AUDIOBOOK_TORRENT_DIR="$TMPDIR/torrent"
                 export AUDIOBOOK_REVIEW_DIR="$TMPDIR/review"
                 export AUDIOBOOK_LIBRARY_DIR="$TMPDIR/library"
                 export AUDIOBOOK_IMPORT_STATE_DIR="$TMPDIR/state"
+        printf '%s\n' '#!/bin/sh' 'echo "review command: $@"' > "$TMPDIR/review-cmd"
+                chmod +x "$TMPDIR/review-cmd"
                 export AUDIOBOOK_IMPORT_CMD=/bin/false
+                export AUDIOBOOK_REVIEW_CMD="$TMPDIR/review-cmd"
                 export AUDIOBOOK_IMPORT_DASHBOARD_HOST=127.0.0.1
                 export AUDIOBOOK_IMPORT_DASHBOARD_PORT=18081
 
-                mkdir -p "$AUDIOBOOK_REVIEW_DIR/Book One" "$AUDIOBOOK_LIBRARY_DIR" "$AUDIOBOOK_IMPORT_STATE_DIR"
+                mkdir -p "$AUDIOBOOK_TORRENT_DIR/Torrent Book" "$AUDIOBOOK_REVIEW_DIR/Book One" "$AUDIOBOOK_LIBRARY_DIR" "$AUDIOBOOK_IMPORT_STATE_DIR"
                 printf audio > "$AUDIOBOOK_REVIEW_DIR/Book One/chapter.m4b"
+                printf audio > "$AUDIOBOOK_TORRENT_DIR/Torrent Book/chapter.m4b"
                 printf '2026-01-01T00:00:00Z\t/src\t/dest\n' > "$AUDIOBOOK_IMPORT_STATE_DIR/imports.log"
 
                 python -m py_compile ${audiobookImportDashboard}
@@ -424,25 +429,27 @@ let
 
                 python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:18081/', timeout=2).read().decode())" > "$TMPDIR/page.html"
                 grep -q 'Book One' "$TMPDIR/page.html"
+                grep -q 'Torrent Book' "$TMPDIR/page.html"
                 grep -q 'Recent imports' "$TMPDIR/page.html"
 
-                cat > "$TMPDIR/csrf_test.py" <<'PY'
-        import urllib.error
-        import urllib.request
-
-        req = urllib.request.Request(
-            'http://127.0.0.1:18081/import-all',
-            data=b'mode=dry-run',
-            headers={'Origin': 'http://evil.example'},
-            method='POST',
-        )
-        try:
-            urllib.request.urlopen(req, timeout=2)
-        except urllib.error.HTTPError as exc:
-            assert exc.code == 403, exc.code
-        else:
-            raise SystemExit('cross-origin POST was not rejected')
-        PY
+        python -c "import urllib.parse, urllib.request; data = urllib.parse.urlencode({'name': 'Torrent Book', 'mode': 'dry-run'}).encode(); print(urllib.request.urlopen('http://127.0.0.1:18081/review', data=data, timeout=2).read().decode())" > "$TMPDIR/review-result.html"
+                grep -q 'review command:' "$TMPDIR/review-result.html"
+        printf '%s\n' \
+          'import urllib.error' \
+          'import urllib.request' \
+          'req = urllib.request.Request(' \
+          '    "http://127.0.0.1:18081/import-all",' \
+          '    data=b"mode=dry-run",' \
+          '    headers={"Origin": "http://evil.example"},' \
+          '    method="POST",' \
+          ')' \
+          'try:' \
+          '    urllib.request.urlopen(req, timeout=2)' \
+          'except urllib.error.HTTPError as exc:' \
+          '    assert exc.code == 403, exc.code' \
+          'else:' \
+          '    raise SystemExit("cross-origin POST was not rejected")' \
+          > "$TMPDIR/csrf_test.py"
                 python "$TMPDIR/csrf_test.py"
 
                 touch "$out"
@@ -514,16 +521,19 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
       unitConfig.RequiresMountsFor = [
+        torrentDir
         reviewDir
         libraryDir
         importStateDir
       ];
 
       environment = {
+        AUDIOBOOK_TORRENT_DIR = torrentDir;
         AUDIOBOOK_REVIEW_DIR = reviewDir;
         AUDIOBOOK_LIBRARY_DIR = libraryDir;
         AUDIOBOOK_IMPORT_STATE_DIR = importStateDir;
         AUDIOBOOK_IMPORT_CMD = "${audiobookImport}/bin/audiobook-import";
+        AUDIOBOOK_REVIEW_CMD = "${audiobookReview}/bin/audiobook-review";
         AUDIOBOOK_IMPORT_DASHBOARD_HOST = audiobookImportDashboardService.upstream.host;
         AUDIOBOOK_IMPORT_DASHBOARD_PORT = toString audiobookImportDashboardService.upstream.port;
       };
@@ -540,6 +550,7 @@ in
         ProtectHome = true;
         ProtectSystem = "strict";
         ReadWritePaths = [
+          torrentDir
           reviewDir
           libraryDir
           importStateDir
