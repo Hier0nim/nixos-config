@@ -2,6 +2,7 @@
   proxiedServices = [
     "actual"
     "audiobookshelf"
+    "audiobook-imports"
     "beszel"
     "copyparty"
     "enable-actual"

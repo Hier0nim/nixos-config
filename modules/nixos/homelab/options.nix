@@ -545,6 +545,15 @@ in
         umaskSharedWriter = true;
       };
 
+      "audiobook-imports" = mkServiceOptions {
+        name = "audiobook-imports";
+        subdomain = "audiobook-imports";
+        port = 8010;
+        authGroup = "media-admin";
+        dataGroups = [ "media" ];
+        exposeEnable = true;
+      };
+
       seerr = mkServiceOptions {
         name = "seerr";
         subdomain = "chciejnik";
