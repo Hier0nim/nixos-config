@@ -93,10 +93,6 @@
       sonarr-anime.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;
       tdarr.enable = true;
-      cockpit = {
-        expose.enable = true;
-        auth.stripAuthorizationHeader = true;
-      };
       jellyfin.hardwareAcceleration = {
         enable = true;
         type = "nvenc";
@@ -116,6 +112,8 @@
 
     backup.enable = true;
   };
+
+  services.beszel.agent.enable = true;
 
   custom.wifi.networks = {
     pieczarkowo = {

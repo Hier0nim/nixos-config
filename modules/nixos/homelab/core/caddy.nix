@@ -54,7 +54,7 @@ let
   authAttrs = lib.map (name: mkAuth name groups.${name}) authNames;
   authSecrets = lib.foldl' (acc: item: acc // item.secrets) { } authAttrs;
   authTemplates = lib.foldl' (acc: item: acc // item.template) { } authAttrs;
-  caddyQuote = value: "\"${lib.escape [ "\\" "\"" ] value}\"";
+  caddyQuote = _value: ""; # kept for compatibility
   appendCaddyConfig =
     first: second:
     lib.concatStringsSep "\n" (
@@ -154,13 +154,24 @@ let
       redirectConfig = optionalString (svc.expose.pathPrefix != null && svc.expose.redirectToPrefix) ''
         redir / ${svc.expose.pathPrefix}/
       '';
+      # IP allowlist: if allowedCIDRs is set, wrap in @allowed matcher
+      cidrs = svc.expose.allowedCIDRs;
+      ipAllowConfig = optionalString (cidrs != [ ]) ''
+        @allowed remote_ip ${lib.concatStringsSep " " cidrs}
+        handle @allowed {
+          ${baseHandle}
+        }
+
+        respond 404
+      '';
+      finalHandle = if cidrs != [ ] then ipAllowConfig else baseHandle;
     in
     {
       "${fqdn}".extraConfig = ''
         ${tlsConfig}
         ${redirectConfig}
         ${apiBypassConfig}
-        ${baseHandle}
+        ${finalHandle}
       '';
     };
 

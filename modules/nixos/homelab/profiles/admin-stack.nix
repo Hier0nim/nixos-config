@@ -8,6 +8,9 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.profiles.admin.enable) {
-    homelab.services.cockpit.enable = true;
+    homelab.services = {
+      beszel.enable = true;
+      ttyd.enable = true;
+    };
   };
 }

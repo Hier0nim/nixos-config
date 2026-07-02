@@ -3,10 +3,11 @@
   imports = lib.flatten [
     ./nixflix.nix
     ./audiobookshelf.nix
-    ./tdarr.nix
-    ./immich.nix
+    ./beszel.nix
     ./copyparty.nix
-    ./cockpit.nix
+    ./tdarr.nix
+    ./ttyd.nix
+    ./immich.nix
     ./actual.nix
     ./enable-actual.nix
     ./backup.nix

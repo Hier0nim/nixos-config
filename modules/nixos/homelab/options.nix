@@ -128,6 +128,12 @@ let
           default = "";
           description = "Extra config appended inside reverse_proxy for ${name}.";
         };
+
+        allowedCIDRs = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "List of allowed CIDR ranges for ${name}. If empty, no IP restriction is applied.";
+        };
       };
 
       auth = {
@@ -609,12 +615,18 @@ in
         dataGroups = [ "nas" ];
       };
 
-      cockpit = mkServiceOptions {
-        name = "cockpit";
-        subdomain = "admin";
-        port = 9090;
+      beszel = mkServiceOptions {
+        name = "beszel";
+        subdomain = "monitor";
+        port = 8090;
         authGroup = "infra-admin";
-        exposeEnable = true;
+      };
+
+      ttyd = mkServiceOptions {
+        name = "ttyd";
+        subdomain = "shell";
+        port = 7681;
+        authGroup = "infra-admin";
       };
 
       actual = mkServiceOptions {

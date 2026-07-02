@@ -2,7 +2,7 @@
   proxiedServices = [
     "actual"
     "audiobookshelf"
-    "cockpit"
+    "beszel"
     "copyparty"
     "enable-actual"
     "immich"
@@ -14,6 +14,7 @@
     "sonarr"
     "sonarr-anime"
     "tdarr"
+    "ttyd"
   ];
 
   nixflixStateServices = [
