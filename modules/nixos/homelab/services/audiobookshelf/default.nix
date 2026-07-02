@@ -120,8 +120,6 @@ let
         chgrp -R media "$dest"
         find "$dest" -type d -exec chmod 2775 {} +
         find "$dest" -type f -exec chmod 0664 {} +
-      else
-        echo "Not running as root; relying on existing group-writable media permissions." >&2
       fi
 
       printf '%s\t%s\t%s\n' "$(date --iso-8601=seconds)" "$source_real" "$dest" >> "$log_dir/reviews.log"
@@ -294,8 +292,6 @@ let
           chgrp -R media "$dest"
           find "$dest" -type d -exec chmod 2775 {} +
           find "$dest" -type f -exec chmod 0664 {} +
-        else
-          echo "  Not running as root; relying on existing group-writable media permissions." >&2
         fi
 
         printf '%s\t%s\t%s\n' "$(date --iso-8601=seconds)" "$source_real" "$dest" >> "$log_dir/imports.log"
@@ -392,67 +388,48 @@ let
         nativeBuildInputs = [ pkgs.python3 ];
       }
       ''
-                set -euo pipefail
-                export AUDIOBOOK_TORRENT_DIR="$TMPDIR/torrent"
-                export AUDIOBOOK_REVIEW_DIR="$TMPDIR/review"
-                export AUDIOBOOK_LIBRARY_DIR="$TMPDIR/library"
-                export AUDIOBOOK_IMPORT_STATE_DIR="$TMPDIR/state"
-        printf '%s\n' '#!/bin/sh' 'echo "review command: $@"' > "$TMPDIR/review-cmd"
-                chmod +x "$TMPDIR/review-cmd"
-                export AUDIOBOOK_IMPORT_CMD=/bin/false
-                export AUDIOBOOK_REVIEW_CMD="$TMPDIR/review-cmd"
-                export AUDIOBOOK_IMPORT_DASHBOARD_HOST=127.0.0.1
-                export AUDIOBOOK_IMPORT_DASHBOARD_PORT=18081
+        set -euo pipefail
 
-                mkdir -p "$AUDIOBOOK_TORRENT_DIR/Torrent Book" "$AUDIOBOOK_REVIEW_DIR/Book One" "$AUDIOBOOK_LIBRARY_DIR" "$AUDIOBOOK_IMPORT_STATE_DIR"
-                printf audio > "$AUDIOBOOK_REVIEW_DIR/Book One/chapter.m4b"
-                printf audio > "$AUDIOBOOK_TORRENT_DIR/Torrent Book/chapter.m4b"
-                printf '2026-01-01T00:00:00Z\t/src\t/dest\n' > "$AUDIOBOOK_IMPORT_STATE_DIR/imports.log"
+        # Syntax check
+        python -m py_compile ${audiobookImportDashboard}
 
-                python -m py_compile ${audiobookImportDashboard}
-                ${audiobookImportDashboard} > "$TMPDIR/server.log" 2>&1 &
-                server=$!
-                trap 'kill "$server" 2>/dev/null || true' EXIT
+        # Set up test data
+        export AUDIOBOOK_TORRENT_DIR="$TMPDIR/torrent"
+        export AUDIOBOOK_REVIEW_DIR="$TMPDIR/review"
+        export AUDIOBOOK_LIBRARY_DIR="$TMPDIR/library"
+        export AUDIOBOOK_IMPORT_STATE_DIR="$TMPDIR/state"
+        export AUDIOBOOK_IMPORT_CMD=/bin/false
+        export AUDIOBOOK_REVIEW_CMD=/bin/true
+        export AUDIOBOOK_IMPORT_DASHBOARD_HOST=127.0.0.1
+        export AUDIOBOOK_IMPORT_DASHBOARD_PORT=18081
 
-                ready=0
-                for _ in $(seq 1 50); do
-                  if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18081/', timeout=1).read()"; then
-                    ready=1
-                    break
-                  fi
-                  sleep 0.1
-                done
-                if [ "$ready" -ne 1 ]; then
-                  cat "$TMPDIR/server.log" >&2
-                  exit 1
-                fi
+        mkdir -p "$AUDIOBOOK_TORRENT_DIR/Torrent Book"
+        mkdir -p "$AUDIOBOOK_TORRENT_DIR/Handled Torrent"
+        mkdir -p "$AUDIOBOOK_TORRENT_DIR/Renamed Torrent"
+        mkdir -p "$AUDIOBOOK_REVIEW_DIR/Book One"
+        mkdir -p "$AUDIOBOOK_REVIEW_DIR/Handled Torrent"
+        mkdir -p "$AUDIOBOOK_REVIEW_DIR/Old Name - Renamed Book"
+        mkdir -p "$AUDIOBOOK_LIBRARY_DIR/Author/Finished Book"
+        mkdir -p "$AUDIOBOOK_LIBRARY_DIR/Author/Renamed Book"
+        mkdir -p "$AUDIOBOOK_IMPORT_STATE_DIR"
+        printf audio > "$AUDIOBOOK_REVIEW_DIR/Book One/chapter.m4b"
+        printf audio > "$AUDIOBOOK_REVIEW_DIR/Handled Torrent/chapter.m4b"
+        printf audio > "$AUDIOBOOK_REVIEW_DIR/Old Name - Renamed Book/chapter.m4b"
+        printf audio > "$AUDIOBOOK_TORRENT_DIR/Torrent Book/chapter.m4b"
+        printf audio > "$AUDIOBOOK_TORRENT_DIR/Handled Torrent/chapter.m4b"
+        printf audio > "$AUDIOBOOK_TORRENT_DIR/Renamed Torrent/chapter.m4b"
+        # Handled Torrent: exact path match (import dest still exists)
+        printf '2026-01-01T00:00:00Z\t%s\t%s\n' "$AUDIOBOOK_TORRENT_DIR/Handled Torrent" "$AUDIOBOOK_REVIEW_DIR/Handled Torrent" > "$AUDIOBOOK_IMPORT_STATE_DIR/reviews.log"
+        printf '2026-01-01T00:00:01Z\t%s\t%s\n' "$AUDIOBOOK_REVIEW_DIR/Handled Torrent" "$AUDIOBOOK_LIBRARY_DIR/Author/Finished Book" >> "$AUDIOBOOK_IMPORT_STATE_DIR/imports.log"
+        # Renamed Torrent: import dest no longer exists (old path), but library has the renamed folder
+        printf '2026-01-01T00:00:02Z\t%s\t%s\n' "$AUDIOBOOK_TORRENT_DIR/Renamed Torrent" "$AUDIOBOOK_REVIEW_DIR/Old Name - Renamed Book" >> "$AUDIOBOOK_IMPORT_STATE_DIR/reviews.log"
+        printf '2026-01-01T00:00:03Z\t%s\t%s\n' "$AUDIOBOOK_REVIEW_DIR/Old Name - Renamed Book" "$AUDIOBOOK_LIBRARY_DIR/Author/Old Name - Renamed Book" >> "$AUDIOBOOK_IMPORT_STATE_DIR/imports.log"
 
-                python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:18081/', timeout=2).read().decode())" > "$TMPDIR/page.html"
-                grep -q 'Book One' "$TMPDIR/page.html"
-                grep -q 'Torrent Book' "$TMPDIR/page.html"
-                grep -q 'Recent imports' "$TMPDIR/page.html"
+        # Strip shebang, import as module (no networking needed)
+        sed '1d' ${audiobookImportDashboard} > "$TMPDIR/dashboard_mod.py"
+        python ${./test_dashboard.py} "$TMPDIR/dashboard_mod.py"
 
-        python -c "import urllib.parse, urllib.request; data = urllib.parse.urlencode({'name': 'Torrent Book', 'mode': 'dry-run'}).encode(); print(urllib.request.urlopen('http://127.0.0.1:18081/review', data=data, timeout=2).read().decode())" > "$TMPDIR/review-result.html"
-                grep -q 'review command:' "$TMPDIR/review-result.html"
-        printf '%s\n' \
-          'import urllib.error' \
-          'import urllib.request' \
-          'req = urllib.request.Request(' \
-          '    "http://127.0.0.1:18081/import-all",' \
-          '    data=b"mode=dry-run",' \
-          '    headers={"Origin": "http://evil.example"},' \
-          '    method="POST",' \
-          ')' \
-          'try:' \
-          '    urllib.request.urlopen(req, timeout=2)' \
-          'except urllib.error.HTTPError as exc:' \
-          '    assert exc.code == 403, exc.code' \
-          'else:' \
-          '    raise SystemExit("cross-origin POST was not rejected")' \
-          > "$TMPDIR/csrf_test.py"
-                python "$TMPDIR/csrf_test.py"
-
-                touch "$out"
+        touch "$out"
       '';
 in
 {
@@ -513,7 +490,6 @@ in
       audiobookReview
       audiobookImport
     ];
-
     system.extraDependencies = [ audiobookImportDashboardTest ];
 
     systemd.services."audiobook-import-dashboard" = lib.mkIf audiobookImportDashboardService.enable {
