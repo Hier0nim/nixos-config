@@ -9,20 +9,4 @@ _: {
       projectFile = "src/Recyclarr.Cli/Recyclarr.Cli.csproj";
     });
   };
-
-  pythonDistutils = final: prev: {
-    pythonPackagesExtensions = (prev.pythonPackagesExtensions or [ ]) ++ [
-      (_pythonFinal: pythonPrev: {
-        distutils = pythonPrev.distutils.overrideAttrs (old: {
-          # Disable tests that fail with "RuntimeError: can't start new thread" in
-          # constrained build environments (e.g. i686 cross-compilation under QEMU).
-          # These are thread-spawning concurrency tests, not actual code bugs.
-          disabledTests = (old.disabledTests or [ ]) ++ [
-            "test_concurrent_safe"
-            "TestParallelBuildExt"
-          ];
-        });
-      })
-    ];
-  };
 }

@@ -1,5 +1,4 @@
 {
-  stablePkgs,
   pkgs,
   inputs,
   ...
@@ -390,7 +389,6 @@ in
       ];
     })
     prismlauncher
-    stablePkgs.lutris
     (import inputs.creamlinux-installer { inherit pkgs; })
   ];
 
