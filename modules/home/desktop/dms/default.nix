@@ -45,6 +45,7 @@ in
 
   gtk = {
     enable = true;
+    gtk4.theme = config.gtk.theme; # Silence stateVersion < 26.05 warning
     theme = {
       name = "adw-gtk3";
       package = pkgs.adw-gtk3;

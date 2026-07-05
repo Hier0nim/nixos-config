@@ -15,7 +15,7 @@ _: {
             hash = "sha256-PgLSZDBEWUHpfTRfFyklmiiLBE1i1aGCtz4eRA3POao=";
           })
           {
-            inherit (final) system;
+            inherit (final.stdenv.hostPlatform) system;
             config.allowUnfree = true;
           };
     in
