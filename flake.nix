@@ -189,7 +189,7 @@
 
     pi-config.url = "git+ssh://git@github.com/Hier0nim/dot_pi.git";
 
-    open-design.url = "github:nexu-io/open-design";
+    open-design.url = "github:nexu-io/open-design/d64695937efd2c4f8ff8f07c11e5a7030e32c39a";
 
     creamlinux-installer = {
       url = "github:Novattz/creamlinux-installer";
