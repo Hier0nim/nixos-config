@@ -56,4 +56,11 @@
     clean.extraArgs = "--keep-since 20d --keep 20";
     flake = config.custom.worktreePath;
   };
+
+  # Automatic periodic garbage collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
 }
