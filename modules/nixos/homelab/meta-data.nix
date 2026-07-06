@@ -11,6 +11,7 @@
     "prowlarr"
     "qbittorrent"
     "radarr"
+    "remote-pi-relay"
     "seerr"
     "sonarr"
     "sonarr-anime"

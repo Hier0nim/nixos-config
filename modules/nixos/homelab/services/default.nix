@@ -6,6 +6,7 @@
     ./beszel.nix
     ./copyparty.nix
     ./tdarr.nix
+    ./remote-pi-relay.nix
     ./ttyd.nix
     ./immich.nix
     ./actual.nix

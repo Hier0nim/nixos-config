@@ -631,6 +631,21 @@ in
         authGroup = "infra-admin";
       };
 
+      "remote-pi-relay" =
+        mkServiceOptions {
+          name = "remote-pi-relay";
+          subdomain = "relay-rp";
+          port = 3001;
+          authGroup = null;
+        }
+        // {
+          image = mkOption {
+            type = types.str;
+            default = "jacobmoura7/remote-pi-relay:v0.2.2";
+            description = "OCI image used for the Remote Pi relay container.";
+          };
+        };
+
       ttyd = mkServiceOptions {
         name = "ttyd";
         subdomain = "shell";
