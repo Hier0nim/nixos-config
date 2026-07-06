@@ -1,12 +1,12 @@
-{ config, lib, ... }:
+{ config, pkgs, ... }:
 {
   custom = {
     username = "hieronim";
     fullName = "Hier0nim";
     email = "hieronimdaniel@proton.me";
-    repoPath = lib.custom.relativeToRoot ".";
+    repoPath = ../..;
     worktreePath = "/home/${config.custom.username}/Projects/nixos-config";
-    wallpaper = lib.custom.relativeToRoot "assets/wallpapers/koi.png";
+    wallpaper = ../../assets/wallpapers/koi.png;
   };
 
   home = {
@@ -17,7 +17,7 @@
       EDITOR = "nvim";
       TERM = "ghostty";
       BROWSER = "firefox";
-      SHELL = "nu";
+      SHELL = "${pkgs.nushell}/bin/nu";
       FLAKE = config.custom.worktreePath;
       USERNAME = config.custom.username;
     };

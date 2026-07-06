@@ -4,49 +4,79 @@
     mkdir -p -m 700 "${config.home.homeDirectory}/.ssh"
   '';
 
-  sops.secrets = {
-    ssh_github_personal = {
-      sopsFile = config.custom.repoPath + "/secrets/common/ssh/github-personal.yaml";
-      key = "key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519_github_personal";
-      mode = "0600";
+  sops = {
+    secrets = {
+      ssh_github_personal = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/github-personal.yaml";
+        key = "key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519_github_personal";
+        mode = "0600";
+      };
+      ssh_hetzner_pieczarkownia = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-pieczarkownia.yaml";
+        key = "key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_pieczarkownia";
+        mode = "0600";
+      };
+      ssh_server_legion = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/server-legion.yaml";
+        key = "key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519_server_legion";
+        mode = "0600";
+      };
+      ssh_server_legion_host = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/server-legion.yaml";
+        key = "host";
+      };
+      ssh_hetzner_punktia = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
+        key = "key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_punktia";
+        mode = "0600";
+      };
+      ssh_hetzner_punktia_host = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
+        key = "host";
+      };
     };
-    ssh_hetzner_pieczarkownia = {
-      sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-pieczarkownia.yaml";
-      key = "key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_pieczarkownia";
-      mode = "0600";
-    };
-    ssh_server_legion = {
-      sopsFile = config.custom.repoPath + "/secrets/common/ssh/server-legion.yaml";
-      key = "key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519_server_legion";
-      mode = "0600";
-    };
-    ssh_hetzner_punktia = {
-      sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
-      key = "key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519_hetzner_punktia";
-      mode = "0600";
-    };
-    ssh_hetzner_punktia_host = {
-      sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-punktia.yaml";
-      key = "host";
-    };
-  };
 
-  sops.templates."ssh-punktia-prod" = {
-    content = ''
-      Host punktia-prod
-        HostName ${config.sops.placeholder."ssh_hetzner_punktia_host"}
-        User root
-        IdentityFile ~/.ssh/id_ed25519_hetzner_punktia
-        IdentitiesOnly yes
-        ServerAliveInterval 60
-        ServerAliveCountMax 3
-    '';
-    path = "${config.home.homeDirectory}/.ssh/config.d/punktia-prod.conf";
-    mode = "0600";
+    templates = {
+      "ssh-punktia-prod" = {
+        content = ''
+          Host punktia-prod
+            HostName ${config.sops.placeholder."ssh_hetzner_punktia_host"}
+            User root
+            IdentityFile ~/.ssh/id_ed25519_hetzner_punktia
+            IdentitiesOnly yes
+            ServerAliveInterval 60
+            ServerAliveCountMax 3
+        '';
+        path = "${config.home.homeDirectory}/.ssh/config.d/punktia-prod.conf";
+        mode = "0600";
+      };
+
+      "ssh-homelab" = {
+        content = ''
+          Host homelab
+            HostName ${config.sops.placeholder."ssh_server_legion_host"}
+            User ${config.custom.username}
+            IdentityFile ~/.ssh/id_ed25519_server_legion
+            IdentitiesOnly yes
+
+          Host legion-workstation workstation-dev
+            HostName 10.233.10.2
+            Port 22
+            User ${config.custom.username}
+            IdentityFile ~/.ssh/id_ed25519_server_legion
+            IdentitiesOnly yes
+            ProxyJump homelab
+            HostKeyAlias server-legion-workstation
+            ForwardAgent yes
+        '';
+        path = "${config.home.homeDirectory}/.ssh/config.d/homelab.conf";
+        mode = "0600";
+      };
+    };
   };
 
   programs.ssh = {
@@ -78,11 +108,6 @@
           HostName <your-server-ip>
           User root
           IdentityFile ~/.ssh/id_ed25519_hetzner_pieczarkownia
-
-        Host homelab
-          HostName 192.168.8.2
-          User ${config.custom.username}
-          IdentityFile ~/.ssh/id_ed25519_server_legion
 
         Host router
           HostName 192.168.8.1

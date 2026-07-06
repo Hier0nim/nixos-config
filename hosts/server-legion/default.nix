@@ -86,6 +86,16 @@
       admin.enable = true;
     };
 
+    workstation = {
+      enable = true;
+      ssh = {
+        enable = true;
+        hostPort = 2222;
+        # Keep closed on the public firewall; use SSH ProxyJump through server-legion.
+        openFirewall = false;
+      };
+    };
+
     services = {
       actual.enable = true;
       "enable-actual".enable = true;

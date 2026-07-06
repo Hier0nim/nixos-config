@@ -472,6 +472,133 @@ in
       description = "Declarative app registry used to generate homelab users, groups, storage, and state guardrails.";
     };
 
+    workstation = {
+      enable = mkEnableOption "isolated remote workstation container";
+
+      user = mkOption {
+        type = types.str;
+        default = "hieronim";
+        description = "User created inside the workstation container.";
+      };
+
+      ssh = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Enable SSH access to the workstation container.";
+        };
+
+        hostPort = mkOption {
+          type = types.port;
+          default = 2222;
+          description = "Host port forwarded to the workstation container SSH server.";
+        };
+
+        openFirewall = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Open the forwarded workstation SSH port on the host firewall. Leave false when using SSH ProxyJump via the host.";
+        };
+      };
+
+      network = {
+        hostAddress = mkOption {
+          type = types.str;
+          default = "10.233.10.1";
+          description = "Host-side address for the workstation container private network.";
+        };
+
+        localAddress = mkOption {
+          type = types.str;
+          default = "10.233.10.2";
+          description = "Container-side address for the workstation private network.";
+        };
+
+        externalInterface = mkOption {
+          type = types.str;
+          default = "wlp7s0";
+          description = "Host network interface used for NAT from the workstation container to the internet.";
+        };
+
+        nameservers = mkOption {
+          type = types.listOf types.str;
+          default = [
+            "1.1.1.1"
+            "9.9.9.9"
+          ];
+          description = "DNS resolvers configured inside the workstation container.";
+        };
+      };
+
+      resources = {
+        memoryMax = mkOption {
+          type = types.str;
+          default = "8G";
+          description = "MemoryMax applied to the workstation container service.";
+        };
+
+        cpuQuota = mkOption {
+          type = types.str;
+          default = "400%";
+          description = "CPUQuota applied to the workstation container service.";
+        };
+      };
+
+      apps = mkOption {
+        type = types.attrsOf (
+          types.submodule (
+            { name, ... }:
+            {
+              options = {
+                enable = mkOption {
+                  type = types.bool;
+                  default = false;
+                  description = "Expose this workstation localhost app through host Caddy.";
+                };
+
+                subdomain = mkOption {
+                  type = types.str;
+                  default = name;
+                  description = "Subdomain used for this workstation app.";
+                };
+
+                port = mkOption {
+                  type = types.port;
+                  description = "Port where the app listens on 127.0.0.1 inside the workstation container.";
+                };
+
+                exposedPort = mkOption {
+                  type = types.port;
+                  default = 0;
+                  description = "Container private-network port used by the internal TCP proxy. 0 means use port.";
+                };
+
+                authGroup = mkOption {
+                  type = types.nullOr types.str;
+                  default = "infra-admin";
+                  description = "Caddy auth group required for this workstation app.";
+                };
+
+                allowedCIDRs = mkOption {
+                  type = types.listOf types.str;
+                  default = [ ];
+                  description = "CIDR allowlist applied at Caddy for this workstation app.";
+                };
+
+                reverseProxyExtraConfig = mkOption {
+                  type = types.lines;
+                  default = "";
+                  description = "Extra Caddy reverse_proxy config for this workstation app.";
+                };
+              };
+            }
+          )
+        );
+        default = { };
+        description = "Declarative registry of localhost apps exposed from the workstation container.";
+      };
+    };
+
     services = {
       sonarr = mkServiceOptions {
         name = "sonarr";

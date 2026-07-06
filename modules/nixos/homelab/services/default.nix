@@ -12,5 +12,6 @@
     ./actual.nix
     ./enable-actual.nix
     ./backup.nix
+    ./workstation.nix
   ];
 }
