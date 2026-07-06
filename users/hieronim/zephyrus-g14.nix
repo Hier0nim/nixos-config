@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 {
   imports = [
     ./home-common.nix
@@ -8,6 +13,7 @@
     (lib.custom.relativeToRoot "modules/home/profiles/gaming.nix")
     (lib.custom.relativeToRoot "modules/home/profiles/remote-admin.nix")
     (lib.custom.relativeToRoot "modules/home/common/services/copyparty-drive.nix")
+    inputs.nix-index-database.homeModules.default
   ];
 
   custom = {
@@ -18,6 +24,8 @@
     };
   };
 
+  programs.nix-index-database.comma.enable = true;
+
   home.packages = with pkgs; [
     teams-for-linux
     proton-pass
@@ -25,7 +33,6 @@
     qbittorrent
     proton-vpn
     protonmail-desktop
-    comma
     libreoffice-fresh
     jellyfin-desktop
     via

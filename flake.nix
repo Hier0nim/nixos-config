@@ -195,5 +195,11 @@
       url = "github:Novattz/creamlinux-installer/a1be636a8c00bc1c077cd37fa6a83f5cc8e5e17f";
       flake = false;
     };
+
+    # Pre-built nix-index databases for comma
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }

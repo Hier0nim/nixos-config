@@ -638,6 +638,26 @@
         "url": "https://flakehub.com/f/DeterminateSystems/nix-src/%2A"
       }
     },
+    "nix-index-database": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783233851,
+        "narHash": "sha256-jzisD+3wWZPC4QvAsKtYguiGsmlH2SN3Mjx5LWd68Ok=",
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "rev": "fab14c7b63499d57cb6673d5690168c3ec42b99a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "type": "github"
+      }
+    },
     "nix-pi-agent": {
       "inputs": {
         "flake-utils": "flake-utils_4",
@@ -1107,6 +1127,7 @@
         "home-manager-stable": "home-manager-stable",
         "niri": "niri",
         "niri-float-sticky": "niri-float-sticky",
+        "nix-index-database": "nix-index-database",
         "nixCats": "nixCats",
         "nixflix": "nixflix",
         "nixos-hardware": "nixos-hardware",

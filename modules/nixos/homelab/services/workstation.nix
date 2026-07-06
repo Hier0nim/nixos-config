@@ -152,6 +152,14 @@ in
           };
 
           nix = {
+            # Add flake inputs as registry entries
+            registry = lib.mapAttrs (_: value: { flake = value; }) (
+              lib.filterAttrs (_: value: value ? _type && value._type == "flake") inputs
+            );
+
+            # Add registry to legacy NIX_PATH for comma/nix-shell
+            nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
+
             settings = {
               experimental-features = [
                 "nix-command"
