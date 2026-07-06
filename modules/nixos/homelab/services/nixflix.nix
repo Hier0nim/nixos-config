@@ -157,7 +157,7 @@ in
 
         system.pluginRepositories."Intro Skipper" = {
           url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-04zM8nfxcnpK5dITdiDjPmySv6YlXEsc7Nef5fr7cuU=";
+          hash = "sha256-bZePZYEi0u9ER5e4Q1Qb89jRpyu9hMvEPPZG7iNley4=";
         };
         system.pluginRepositories."Jellyfin Stable".hash =
           lib.mkForce "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
