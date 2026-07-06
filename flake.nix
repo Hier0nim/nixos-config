@@ -192,7 +192,7 @@
     open-design.url = "github:nexu-io/open-design/d64695937efd2c4f8ff8f07c11e5a7030e32c39a";
 
     creamlinux-installer = {
-      url = "github:Novattz/creamlinux-installer";
+      url = "github:Novattz/creamlinux-installer/a1be636a8c00bc1c077cd37fa6a83f5cc8e5e17f";
       flake = false;
     };
   };

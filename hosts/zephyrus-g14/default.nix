@@ -47,7 +47,7 @@
       enable = true;
       asusdConfigPath = ./asusd.ron;
     };
-    services.localLlama.enable = true;
+    services.localLlama.enable = false;
     programs.winboat.enable = false;
   };
 
