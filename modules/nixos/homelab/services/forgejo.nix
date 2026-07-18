@@ -30,6 +30,7 @@ in
           DOMAIN = "${forgejoCfg.expose.subdomain}.${cfg.domain}";
           ROOT_URL = "https://${forgejoCfg.expose.subdomain}.${cfg.domain}/";
           SSH_PORT = 22;
+          SSH_USER = "forgejo";
           DISABLE_SSH = false;
         };
         session.COOKIE_SECURE = true;

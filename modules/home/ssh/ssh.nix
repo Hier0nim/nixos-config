@@ -108,7 +108,7 @@
         IdentitiesOnly = "yes";
       };
       "git.pieczarkowo.me" = {
-        User = "git";
+        User = "forgejo";
         IdentityFile = "~/.ssh/id_ed25519_forgejo";
         IdentitiesOnly = "yes";
       };
