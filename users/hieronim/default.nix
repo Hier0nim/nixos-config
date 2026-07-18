@@ -4,6 +4,7 @@
   config,
   lib,
   self,
+  customLib,
   ...
 }:
 let
@@ -62,7 +63,12 @@ in
 // lib.optionalAttrs (inputs ? "home-manager") {
   home-manager = {
     extraSpecialArgs = {
-      inherit pkgs inputs self;
+      inherit
+        customLib
+        pkgs
+        inputs
+        self
+        ;
       inherit (config.networking) hostName;
     };
     users.${username}.imports = [
@@ -70,13 +76,16 @@ in
         {
           config,
           hostName,
+          customLib,
+          lib,
           ...
         }:
-        import (lib.custom.relativeToRoot "users/hieronim/${hostName}.nix") {
+        import (customLib.relativeToRoot "users/hieronim/${hostName}.nix") {
           inherit
             pkgs
             inputs
             config
+            customLib
             lib
             hostName
             ;

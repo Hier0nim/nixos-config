@@ -1,17 +1,12 @@
 {
   config,
-  lib,
   inputs,
-  pkgs,
+  customLib,
   ...
 }:
 let
-  stablePkgs = import inputs.nixpkgs-stable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    inherit (config.nixpkgs) config overlays;
-  };
   sharedModules = [
-    (lib.custom.relativeToRoot "modules/home")
+    (customLib.relativeToRoot "modules/home")
     inputs.sops-nix.homeManagerModules.sops
     inputs.open-design.homeManagerModules.default
     {
@@ -44,7 +39,7 @@ in
 
     # Provide flake inputs to Home Manager modules.
     extraSpecialArgs = {
-      inherit inputs stablePkgs;
+      inherit customLib inputs;
       systemConfig = config;
     };
   };

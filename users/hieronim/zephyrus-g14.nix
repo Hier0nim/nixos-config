@@ -1,5 +1,5 @@
 {
-  lib,
+  customLib,
   pkgs,
   inputs,
   ...
@@ -8,11 +8,11 @@
   imports = [
     ./home-common.nix
 
-    (lib.custom.relativeToRoot "modules/home/profiles/desktop.nix")
-    (lib.custom.relativeToRoot "modules/home/profiles/dev.nix")
-    (lib.custom.relativeToRoot "modules/home/profiles/gaming.nix")
-    (lib.custom.relativeToRoot "modules/home/profiles/remote-admin.nix")
-    (lib.custom.relativeToRoot "modules/home/common/services/copyparty-drive.nix")
+    (customLib.relativeToRoot "modules/home/profiles/desktop.nix")
+    (customLib.relativeToRoot "modules/home/profiles/dev.nix")
+    (customLib.relativeToRoot "modules/home/profiles/gaming.nix")
+    (customLib.relativeToRoot "modules/home/profiles/remote-admin.nix")
+    (customLib.relativeToRoot "modules/home/common/services/copyparty-drive.nix")
     inputs.nix-index-database.homeModules.default
   ];
 

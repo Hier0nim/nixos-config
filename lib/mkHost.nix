@@ -6,19 +6,17 @@
   system,
   modules,
   specialArgs ? { },
+  customLib,
 }:
-let
-  hostLib = nixpkgs.lib.extend (self: _super: { custom = import ./. { lib = self; }; });
-in
 nixpkgs.lib.nixosSystem {
   inherit system modules;
   specialArgs = {
     inherit
+      customLib
       inputs
       outputs
       self
       ;
-    lib = hostLib;
   }
   // specialArgs;
 }

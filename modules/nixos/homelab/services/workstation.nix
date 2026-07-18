@@ -4,6 +4,7 @@
   lib,
   pkgs,
   self,
+  customLib,
   ...
 }:
 let
@@ -14,8 +15,8 @@ let
 
   appExposedPort = app: if app.exposedPort == 0 then app.port else app.exposedPort;
 
-  homeProfile = lib.custom.relativeToRoot "users/hieronim/workstation.nix";
-  homeModules = lib.custom.relativeToRoot "modules/home";
+  homeProfile = customLib.relativeToRoot "users/hieronim/workstation.nix";
+  homeModules = customLib.relativeToRoot "modules/home";
 
   mkAppProxyService =
     name: app:

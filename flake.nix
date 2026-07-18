@@ -14,11 +14,9 @@
         "x86_64-linux"
       ];
 
-      # ========== Extend lib with lib.custom ==========
-      # NOTE: This approach allows lib.custom to propagate into hm
-      # see: https://github.com/nix-community/home-manager/pull/3454
-      baseLib = nixpkgs.lib;
-      lib = baseLib.extend (self: super: { custom = import ./lib { lib = self; }; });
+      customLib = import ./lib {
+        inherit (nixpkgs) lib;
+      };
 
     in
     {
@@ -27,10 +25,15 @@
         let
           hosts = import ./hosts { inherit inputs; };
         in
-        lib.mapAttrs (
+        nixpkgs.lib.mapAttrs (
           _name: host:
-          lib.custom.mkHost {
-            inherit inputs outputs self;
+          customLib.mkHost {
+            inherit
+              customLib
+              inputs
+              outputs
+              self
+              ;
             inherit (host) nixpkgs system modules;
             specialArgs = host.specialArgs or { };
           }
@@ -38,19 +41,13 @@
 
       # ========= Formatting =========
       # Nix formatter available through 'nix fmt' https://github.com/NixOS/nixfmt
-      formatter = forAllSystems (
-        system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-        in
-        pkgs.nixfmt
-      );
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       # Pre-commit checks + host build checks
       checks = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs { inherit system; };
+          pkgs = nixpkgs.legacyPackages.${system};
         in
         import ./checks.nix {
           inherit inputs system pkgs;

@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  customLib,
+  lib,
+  ...
+}:
 let
   inherit (lib) types;
 in
@@ -24,7 +29,7 @@ in
 
     repoPath = lib.mkOption {
       type = types.path;
-      default = lib.custom.relativeToRoot ".";
+      default = customLib.relativeToRoot ".";
       description = "Path to the flake repository.";
     };
 
