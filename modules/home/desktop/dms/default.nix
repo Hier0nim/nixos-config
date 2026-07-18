@@ -17,27 +17,35 @@ in
     inputs.dms.homeModules.dank-material-shell
     inputs.dms.homeModules.niri
     inputs.danksearch.homeModules.dsearch
+    inputs.dankcalendar.homeModules.dank-calendar
     ./niri.nix
   ];
 
-  programs.dank-material-shell = {
-    enable = true;
-    enableSystemMonitoring = true;
-    enableVPN = true;
-    enableClipboardPaste = true;
-    niri = {
-      enableSpawn = true;
-      enableKeybinds = false;
+  programs = {
+    dank-material-shell = {
+      enable = true;
+      enableSystemMonitoring = true;
+      enableVPN = true;
+      enableClipboardPaste = true;
+      niri = {
+        enableSpawn = true;
+        enableKeybinds = false;
+      };
     };
-  };
 
-  programs.dsearch = {
-    enable = true;
-    package =
-      inputs.danksearch.packages.${pkgs.stdenv.hostPlatform.system}.dsearch.overrideAttrs
-        (old: {
-          vendorHash = "sha256-Gq3tVwe39m5KGfkI3DEnQEQEGs/cLDCiwx6XFM61f6c=";
-        });
+    dsearch = {
+      enable = true;
+      package =
+        inputs.danksearch.packages.${pkgs.stdenv.hostPlatform.system}.dsearch.overrideAttrs
+          (old: {
+            vendorHash = "sha256-Gq3tVwe39m5KGfkI3DEnQEQEGs/cLDCiwx6XFM61f6c=";
+          });
+    };
+
+    dank-calendar = {
+      enable = true;
+      systemd.enable = true;
+    };
   };
 
   dconf.enable = true;

@@ -1,5 +1,5 @@
 {
-  programs.vesktop = {
+  programs.equibop = {
     enable = true;
 
     settings = {
@@ -12,7 +12,7 @@
       minimizeToTray = true;
     };
 
-    vencord.settings = {
+    equicord.settings = {
       autoUpdate = false;
       autoUpdateNotification = false;
       notifyAboutUpdates = false;

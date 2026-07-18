@@ -30,3 +30,4 @@ set modeindicatormodes {"ignore": "false"}
 set yankto both
 
 " blacklistadd localhost
+blacklistadd https://console.hetzner.com

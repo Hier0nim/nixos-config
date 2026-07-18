@@ -67,7 +67,7 @@
 
             "x-scheme-handler/mailto" = [ "protonmail.desktop" ];
             "x-scheme-handler/spotify" = [ "spotify.desktop" ];
-            "x-scheme-handler/discord" = [ "vesktop.desktop" ];
+            "x-scheme-handler/discord" = [ "equibop.desktop" ];
           };
       in
       {

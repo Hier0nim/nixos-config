@@ -7,7 +7,7 @@
     ./git.nix
     ./lazygit.nix
     ./obs-studio.nix
-    ./vesktop.nix
+    ./equibop.nix
     ./ghostty.nix
     ./nvim.nix
     ./spicetify.nix
