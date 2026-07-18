@@ -12,6 +12,12 @@
         path = "${config.home.homeDirectory}/.ssh/id_ed25519_github_personal";
         mode = "0600";
       };
+      ssh_forgejo = {
+        sopsFile = config.custom.repoPath + "/secrets/common/ssh/forgejo.yaml";
+        key = "key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519_forgejo";
+        mode = "0600";
+      };
       ssh_hetzner_pieczarkownia = {
         sopsFile = config.custom.repoPath + "/secrets/common/ssh/hetzner-pieczarkownia.yaml";
         key = "key";
@@ -99,6 +105,11 @@
         HostName = "github.com";
         User = "git";
         IdentityFile = "~/.ssh/id_ed25519_github_personal";
+        IdentitiesOnly = "yes";
+      };
+      "git.pieczarkowo.me" = {
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519_forgejo";
         IdentitiesOnly = "yes";
       };
       pieczarkownia = {
