@@ -49,18 +49,9 @@
   # We need git for flakes
   environment.systemPackages = [ pkgs.git ];
 
-  # Provide better build output and will also handle garbage collection
   programs.nh = {
     enable = true;
-    clean.enable = true;
     clean.extraArgs = "--keep-since 20d --keep 20";
     flake = config.custom.worktreePath;
-  };
-
-  # Automatic periodic garbage collection
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 14d";
   };
 }

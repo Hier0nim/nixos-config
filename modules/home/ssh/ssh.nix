@@ -87,34 +87,32 @@
       "~/.ssh/config.d/*.conf"
     ];
 
-    matchBlocks."*" = {
-      addKeysToAgent = "yes";
-      serverAliveInterval = 3600;
-      controlMaster = "auto";
-      controlPath = "~/.ssh/ctrl-%r@%h:%p";
-      controlPersist = "15m";
+    settings = {
+      "*" = {
+        AddKeysToAgent = "yes";
+        ServerAliveInterval = 3600;
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/ctrl-%r@%h:%p";
+        ControlPersist = "15m";
+      };
+      "github.com github-personal" = {
+        HostName = "github.com";
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519_github_personal";
+        IdentitiesOnly = "yes";
+      };
+      pieczarkownia = {
+        HostName = "<your-server-ip>";
+        User = "root";
+        IdentityFile = "~/.ssh/id_ed25519_hetzner_pieczarkownia";
+      };
+      router = {
+        HostName = "192.168.8.1";
+        User = "root";
+        IdentityFile = "none";
+        PreferredAuthentications = "password";
+      };
     };
-
-    extraConfig =
-      # sshconfig
-      ''
-        Host github.com github-personal
-          HostName github.com
-          User git
-          IdentityFile ~/.ssh/id_ed25519_github_personal
-          IdentitiesOnly yes
-
-        Host pieczarkownia
-          HostName <your-server-ip>
-          User root
-          IdentityFile ~/.ssh/id_ed25519_hetzner_pieczarkownia
-
-        Host router
-          HostName 192.168.8.1
-          User root
-          IdentityFile none
-          PreferredAuthentications password
-      '';
   };
 
   services.ssh-agent = {
