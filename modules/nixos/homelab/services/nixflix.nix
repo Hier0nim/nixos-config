@@ -278,7 +278,7 @@ in
 
       seerr = {
         inherit (cfg.services.seerr) enable;
-        package = lib.mkForce pkgs.jellyseerr;
+        package = lib.mkForce pkgs.seerr;
         apiKey = secretRef "seerr_api_key";
         jellyfin.adminUsername = "admin";
         jellyfin.adminPassword = secretRef "jellyfin_admin_password";
