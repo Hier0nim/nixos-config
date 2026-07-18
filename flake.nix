@@ -157,6 +157,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    dankcalendar = {
+      url = "github:AvengeMedia/dankcalendar";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -192,7 +197,7 @@
     open-design.url = "github:nexu-io/open-design/d64695937efd2c4f8ff8f07c11e5a7030e32c39a";
 
     creamlinux-installer = {
-      url = "github:Novattz/creamlinux-installer/a1be636a8c00bc1c077cd37fa6a83f5cc8e5e17f";
+      url = "github:Novattz/creamlinux-installer/7c16b63b41f984a1f480fa14ce78da4cc4869a66";
       flake = false;
     };
 
