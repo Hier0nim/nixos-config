@@ -9,8 +9,7 @@ let
   inherit (cfg) data;
   inherit (config.networking) hostName;
   inherit (cfg.media.vpn) wgConfSecretName;
-  homelabMeta = import ../meta-data.nix;
-  inherit (homelabMeta) nixflixStateServices;
+  nixflixStateServices = lib.attrNames (lib.filterAttrs (_: svc: svc.runsUnderNixflix) cfg.services);
   jellyfinHwAccel = cfg.services.jellyfin.hardwareAcceleration;
 
   mediaSecretsFile = "${config.custom.repoPath}/secrets/${hostName}/media.yaml";

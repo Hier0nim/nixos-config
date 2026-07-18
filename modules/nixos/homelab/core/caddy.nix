@@ -6,9 +6,9 @@
 let
   cfg = config.homelab;
   inherit (config.networking) hostName;
-  inherit (lib) mkIf optionalAttrs optionalString;
+  inherit (lib) mkIf optionalString;
   inherit (config.custom) repoPath;
-  homelabMeta = import ../meta-data.nix;
+  proxiedServices = lib.filterAttrs (_: svc: svc.enable && svc.expose.enable) cfg.services;
 
   caddySecretsFile = "${repoPath}/secrets/${hostName}/caddy.yaml";
 
@@ -63,7 +63,6 @@ let
         second
       ]
     );
-  inherit (homelabMeta) proxiedServices;
 
   mkReverseProxy =
     upstream: extraConfig:
@@ -191,15 +190,12 @@ in
     ];
 
     services.caddy.virtualHosts = lib.foldl' (
-      acc: name:
-      let
-        svc = cfg.services.${name};
-        baseVhost = optionalAttrs (svc.enable && svc.expose.enable) (mkVhost {
-          inherit svc;
-          subdomain = svc.expose.subdomain;
-        });
-      in
-      acc // baseVhost
-    ) { } proxiedServices;
+      acc: svc:
+      acc
+      // mkVhost {
+        inherit svc;
+        subdomain = svc.expose.subdomain;
+      }
+    ) { } (lib.attrValues proxiedServices);
   };
 }
