@@ -11,6 +11,7 @@
     ./immich.nix
     ./actual.nix
     ./enable-actual.nix
+    ./forgejo.nix
     ./backup.nix
     ./workstation.nix
   ];

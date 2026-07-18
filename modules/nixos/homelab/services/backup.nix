@@ -24,8 +24,12 @@ let
   serviceBackupExcludes = lib.concatLists (
     map (name: cfg.services.${name}.backup.exclude) (builtins.attrNames serviceBackups)
   );
+  serviceBackupPrepareServices = lib.concatLists (
+    map (name: cfg.services.${name}.backup.prepareServices) (builtins.attrNames serviceBackups)
+  );
   backupPaths = lib.unique serviceBackupPaths;
   backupExcludes = lib.unique serviceBackupExcludes;
+  backupPrepareServices = lib.unique serviceBackupPrepareServices;
 
   inherit (pkgs) restic coreutils util-linux;
   resticBin = "${restic}/bin/restic";
@@ -110,9 +114,7 @@ let
     ${resticBase} init --repository-version 2
   '';
 
-  backupPrepareCommand = ''
-    ${preflightScript}
-  '';
+  backupPrepareCommand = "${preflightScript}";
 in
 {
   config = lib.mkIf (cfg.enable && backupCfg.enable) {
@@ -206,6 +208,8 @@ in
       ];
       services = {
         "restic-backups-homelab" = {
+          requires = lib.mkAfter backupPrepareServices;
+          after = lib.mkAfter backupPrepareServices;
           unitConfig.RequiresMountsFor = [ mountPoint ];
           serviceConfig = {
             Nice = 10;

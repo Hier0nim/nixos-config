@@ -207,6 +207,12 @@ let
           default = [ ];
           description = "Service-specific exclude patterns for ${name} backups.";
         };
+
+        prepareServices = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Systemd services that must complete before ${name} data is backed up.";
+        };
       };
     };
 in
@@ -800,6 +806,12 @@ in
             description = "OCI image used for the Enable Actual container.";
           };
         };
+      forgejo = mkServiceOptions {
+        name = "forgejo";
+        subdomain = "git";
+        port = 3000;
+      };
+
     };
 
     media.vpn.wgConfSecretName = mkOption {

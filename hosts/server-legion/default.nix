@@ -100,6 +100,7 @@
       actual.enable = true;
       "enable-actual".enable = true;
       "remote-pi-relay".enable = true;
+      forgejo.enable = true;
       sonarr.auth.bypassForApi = true;
       sonarr-anime.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;

@@ -6,6 +6,7 @@
     "beszel"
     "copyparty"
     "enable-actual"
+    "forgejo"
     "immich"
     "jellyfin"
     "prowlarr"
