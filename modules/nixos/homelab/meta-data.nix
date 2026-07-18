@@ -9,6 +9,7 @@
     "forgejo"
     "immich"
     "jellyfin"
+    "maintainerr"
     "prowlarr"
     "qbittorrent"
     "radarr"
@@ -26,6 +27,7 @@
     "radarr"
     "recyclarr"
     "seerr"
+    "maintainerr"
     "sonarr"
     "sonarr-anime"
   ];

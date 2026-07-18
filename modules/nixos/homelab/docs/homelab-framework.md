@@ -88,7 +88,7 @@ stack with minimal configuration.
 ### Media Stack (`profiles.media.enable`)
 
 Enables: sonarr, sonarr-anime, radarr, prowlarr, jellyfin, audiobookshelf,
-seerr (jellyseerr), recyclarr, qbittorrent
+seerr (jellyseerr), recyclarr, qbittorrent, maintainerr
 
 This is the full media stack. Sonarr and Radarr manage TV and movies. Prowlarr
 manages indexers and is also used for manual audiobook discovery. qBittorrent

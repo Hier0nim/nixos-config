@@ -157,10 +157,13 @@ in
 
         system.pluginRepositories."Intro Skipper" = {
           url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-bZePZYEi0u9ER5e4Q1Qb89jRpyu9hMvEPPZG7iNley4=";
+          hash = "sha256-buAdSj5BADzq3AtUIFuBl1VhSkmy//RFUdBfpb6OAnI=";
         };
-        system.pluginRepositories."Jellyfin Stable".hash =
-          lib.mkForce "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
+
+        system.pluginRepositories."Jellyfin Stable Plugin Repo" = lib.mkForce {
+          url = "https://repo.jellyfin.org/files/plugin/manifest.json";
+          hash = "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
+        };
 
         users.admin = {
           policy.isAdministrator = true;
@@ -289,6 +292,12 @@ in
         inherit (cfg.services.recyclarr) enable;
       };
 
+      maintainerr = {
+        inherit (cfg.services.maintainerr) enable group;
+        reverseProxy.expose = false;
+        settings.forceJellyfinToIgnoreEmptyMediaFolders = false;
+      };
+
       torrentClients.qbittorrent = {
         enable = true;
         vpn.enable = true;
@@ -342,6 +351,10 @@ in
             pathPrefix = null;
             redirectToPrefix = false;
           };
+        };
+
+        maintainerr = {
+          upstream.host = lib.mkDefault config.nixflix.maintainerr.connectionAddress;
         };
       };
 

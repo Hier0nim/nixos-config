@@ -114,7 +114,7 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     nixflix = {
-      url = "github:kiriwalawren/nixflix/17738063b822d002194dc3c213f119600d2d6fb8";
+      url = "github:kiriwalawren/nixflix/2aa1d080f760584d1205575f730525349f5c38cb";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     copyparty = {

@@ -19,6 +19,7 @@ in
       seerr.enable = true;
       recyclarr.enable = true;
       qbittorrent.enable = true;
+      maintainerr.enable = true;
     };
   };
 }

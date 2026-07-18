@@ -694,6 +694,16 @@ in
         runsUnderNixflix = true;
       };
 
+      maintainerr = mkServiceOptions {
+        name = "maintainerr";
+        subdomain = "maintainerr";
+        port = 6246;
+        authGroup = "media-admin";
+        dataGroups = [ "media" ];
+        runsUnderNixflix = true;
+        umaskSharedWriter = true;
+      };
+
       tdarr =
         mkServiceOptions {
           name = "tdarr";
