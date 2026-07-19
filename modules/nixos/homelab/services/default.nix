@@ -12,6 +12,7 @@
     ./actual.nix
     ./enable-actual.nix
     ./forgejo.nix
+    ./forgejo-actions-runner.nix
     ./backup.nix
     ./workstation.nix
   ];

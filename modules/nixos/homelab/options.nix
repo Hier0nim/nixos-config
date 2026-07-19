@@ -806,7 +806,7 @@ in
         mkServiceOptions {
           name = "enable-actual";
           subdomain = "actual-sync";
-          port = 3000;
+          port = 3002;
           authGroup = "infra-admin";
         }
         // {
@@ -816,11 +816,15 @@ in
             description = "OCI image used for the Enable Actual container.";
           };
         };
-      forgejo = mkServiceOptions {
-        name = "forgejo";
-        subdomain = "git";
-        port = 3000;
-      };
+      forgejo =
+        mkServiceOptions {
+          name = "forgejo";
+          subdomain = "git";
+          port = 3000;
+        }
+        // {
+          actions.runner.enable = mkEnableOption "Forgejo Actions runner";
+        };
 
     };
 

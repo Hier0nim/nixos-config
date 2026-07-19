@@ -7,6 +7,7 @@
 {
   imports = [
     inputs.nixos-hardware.nixosModules.lenovo-legion-y530-15ich
+    inputs.microvm.nixosModules.host
 
     ./disko.nix
     ./hardware-configuration.nix
@@ -101,6 +102,7 @@
       "enable-actual".enable = true;
       "remote-pi-relay".enable = true;
       forgejo.enable = true;
+      forgejo.actions.runner.enable = true;
       sonarr.auth.bypassForApi = true;
       sonarr-anime.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;

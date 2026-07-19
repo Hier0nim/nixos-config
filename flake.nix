@@ -125,6 +125,10 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
     # Secrets management.
     sops-nix = {
       url = "github:mic92/sops-nix";
