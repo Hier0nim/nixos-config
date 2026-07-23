@@ -68,6 +68,8 @@
     nvme-cli
     usbutils
     pciutils
+    # Advertise the terminal definition received from local Ghostty sessions over SSH.
+    ghostty.terminfo
   ];
 
   homelab = {
@@ -102,7 +104,37 @@
       "enable-actual".enable = true;
       "remote-pi-relay".enable = true;
       forgejo.enable = true;
-      forgejo.actions.runner.enable = true;
+      forgejo.actions.runners.global = {
+        vmName = "forgejo-runner";
+        tapName = "tap-fj-runner";
+        subnet = "10.203.0.0/30";
+        hostAddress = "10.203.0.1";
+        guestAddress = "10.203.0.2";
+        macAddress = "02:00:00:30:00:02";
+        egress.enable = true;
+        resources = {
+          memoryMiB = 9216;
+          nixCacheMiB = 65536;
+          qgroupReservePercent = 15;
+          qgroupReserveMinMiB = 512;
+          qgroupReserveFloorPercent = 25;
+          qgroupLimitBudgetMiB = 98304;
+          # Existing ext4 image; resize only through an explicit offline maintenance migration.
+          dockerMiB = 8192;
+        };
+        runner = {
+          name = "server-legion-forgejo-ci";
+          tokenSecret = "forgejo_runner_token";
+          tokenSopsFile = "secrets/server-legion/forgejo-runner.yaml";
+          labels = [
+            "forgejo-ci:docker://forgejo-runner-nix:${pkgs.nix.version}"
+            "ubuntu-latest:docker://forgejo-runner-nix:${pkgs.nix.version}"
+            "nix:docker://forgejo-runner-nix:${pkgs.nix.version}"
+          ];
+          imageNames = [ "nix" ];
+          capacity = 1;
+        };
+      };
       sonarr.auth.bypassForApi = true;
       sonarr-anime.auth.bypassForApi = true;
       radarr.auth.bypassForApi = true;

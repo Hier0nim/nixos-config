@@ -812,19 +812,18 @@ in
         // {
           image = mkOption {
             type = types.str;
-            default = "2manyvcos/enable-actual";
-            description = "OCI image used for the Enable Actual container.";
+            # Keep the version tag aligned with services.actual.package.version.
+            # Docker tags are mutable; the digest makes this exact image immutable. Update both
+            # deliberately after verifying compatibility when Actual Budget is upgraded.
+            default = "2manyvcos/enable-actual:actual26.7.0@sha256:bd371e75daf4d71f9622e931e74d99eb478795659440de2f06260df447e79582";
+            description = "OCI image used for Enable Actual, pinned to Actual Budget 26.7.0 and its manifest digest.";
           };
         };
-      forgejo =
-        mkServiceOptions {
-          name = "forgejo";
-          subdomain = "git";
-          port = 3000;
-        }
-        // {
-          actions.runner.enable = mkEnableOption "Forgejo Actions runner";
-        };
+      forgejo = mkServiceOptions {
+        name = "forgejo";
+        subdomain = "git";
+        port = 3000;
+      };
 
     };
 

@@ -38,6 +38,12 @@ in
           DISABLE_REGISTRATION = true;
           REQUIRE_SIGNIN_VIEW = true;
         };
+        "cron.cleanup_offline_runners" = {
+          ENABLED = true;
+          SCHEDULE = "@midnight";
+          GLOBAL_SCOPE_ONLY = true;
+          OLDER_THAN = "24h";
+        };
         repository.DEFAULT_PRIVATE = "private";
       };
     };
