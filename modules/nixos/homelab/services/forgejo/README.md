@@ -45,14 +45,14 @@ Stop and runtime-mask the VM before deploying the cache change. The migration is
 
 ```console
 cd /home/hieronim/Projects/nixos-config
-TERM=dumb sudo systemctl mask --runtime --now microvm@forgejo-runner.service
-TERM=dumb nh os switch .#server-legion
-TERM=dumb sudo systemctl is-enabled microvm@forgejo-runner.service
-TERM=dumb sudo systemctl is-active microvm@forgejo-runner.service
-TERM=dumb sudo systemctl start forgejo-runner-nix-cache-migrate-global.service
-TERM=dumb sudo journalctl -u forgejo-runner-nix-cache-migrate-global.service --since today --no-pager
-TERM=dumb sudo stat -c '%n %s bytes' /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
-TERM=dumb sudo blkid /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
+sudo systemctl mask --runtime --now microvm@forgejo-runner.service
+nh os switch .#server-legion
+sudo systemctl is-enabled microvm@forgejo-runner.service
+sudo systemctl is-active microvm@forgejo-runner.service
+sudo systemctl start forgejo-runner-nix-cache-migrate-global.service
+sudo journalctl -u forgejo-runner-nix-cache-migrate-global.service --since today --no-pager
+sudo stat -c '%n %s bytes' /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
+sudo blkid /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
 ```
 
 The migration service refuses to run unless the VM remains `masked`/`masked-runtime` and `inactive`, the cache is unmounted and unattached, and the old image is smaller than the declared size. It temporarily retires the old image, creates and validates a fresh 64 GiB ext4 image, then removes the retired cache only after validation succeeds. A failed migration leaves the interlock armed and never changes `var.raw`.
@@ -60,16 +60,16 @@ The migration service refuses to run unless the VM remains `masked`/`masked-runt
 For a cache reset after a future seed epoch change, when the image already has the declared size, use the separate owner-only reset service instead:
 
 ```console
-TERM=dumb sudo systemctl start forgejo-runner-nix-cache-reset-global.service
-TERM=dumb sudo journalctl -u forgejo-runner-nix-cache-reset-global.service --since today --no-pager
+sudo systemctl start forgejo-runner-nix-cache-reset-global.service
+sudo journalctl -u forgejo-runner-nix-cache-reset-global.service --since today --no-pager
 ```
 
 After either successful operation, boot the VM:
 
 ```console
-TERM=dumb sudo systemctl unmask --runtime microvm@forgejo-runner.service
-TERM=dumb sudo systemctl start microvm@forgejo-runner.service
-TERM=dumb sudo journalctl -u microvm@forgejo-runner.service --since today --no-pager
+sudo systemctl unmask --runtime microvm@forgejo-runner.service
+sudo systemctl start microvm@forgejo-runner.service
+sudo journalctl -u microvm@forgejo-runner.service --since today --no-pager
 ```
 
 Run two Nix jobs on the same runner, reboot the VM, and run the jobs again. Confirm the second run reuses the persistent `/nix` volume, while workspace and Docker data remain disposable.
@@ -100,5 +100,5 @@ Pin every workflow `uses:` reference to an immutable commit SHA. Keep deployment
 The guest-root Docker observer records job and service-container lifecycle, network endpoints and aliases, selected `forgejo-nix` mount metadata, and Docker capability metadata. Jobs use Docker's standard default capability profile and retain each image's own `PATH` inside the isolated VM; they never receive Docker access or record environment values or container logs. During an active job, inspect it from the host with:
 
 ```console
-TERM=dumb sudo journalctl -fu microvm@forgejo-runner.service -o cat | grep --line-buffered 'Docker observer:'
+sudo journalctl -fu microvm@forgejo-runner.service -o cat | grep --line-buffered 'Docker observer:'
 ```
