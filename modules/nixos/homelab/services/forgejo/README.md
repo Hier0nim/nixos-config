@@ -4,7 +4,7 @@ This directory defines Forgejo and its isolated direct-QEMU Actions runner. The 
 
 ## Runner boundary
 
-Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach the public Internet only through the optional egress proxy: public HTTPS on port 443 is allowed; direct traffic, plain HTTP, private networks, other host services, and the Docker socket are not.
+Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach any public HTTP on port 80 and HTTPS on port 443 through the optional egress proxy; there is no domain allowlist. Direct traffic, other ports, private networks, other host services, and the Docker socket are not reachable.
 
 The deployed global runner is deliberately small and single-purpose:
 
