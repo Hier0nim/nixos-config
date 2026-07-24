@@ -4,13 +4,16 @@ This directory defines Forgejo and its isolated direct-QEMU Actions runner. The 
 
 ## Runner boundary
 
-Each enabled runner is a capacity-one MicroVM with no host shares, a dedicated TAP and `/30`, private Forgejo proxy, optional TCP/443 egress proxy, fail-closed host firewall rules, and four bounded raw ext4 filesystems:
+Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach the public Internet only through the optional egress proxy: public HTTPS on port 443 is allowed; direct traffic, plain HTTP, private networks, other host services, and the Docker socket are not.
 
-- runner state persists;
-- Docker data and the workspace are reset on cold startup;
-- the fixed-size `nix-cache.raw` persists local Nix paths.
+The deployed global runner is deliberately small and single-purpose:
 
-Images are digest-pinned or Nix-built, loaded from offline OCI archives, and verified before runner admission. Jobs cannot use privileged containers, arbitrary volumes, the Docker socket, or host paths. They use Docker's standard capability profile inside the isolated runner VM and retain `no-new-privileges`.
+- 4 vCPUs;
+- 9 GiB guest memory, with the QEMU service capped at 10 GiB including overhead;
+- one concurrent job;
+- four bounded ext4 volumes for runner state, Docker data, workspace, and the persistent Nix cache.
+
+Runner state and the Nix cache persist. Docker data and the workspace are disposable and reset on a cold start. Images are digest-pinned or Nix-built, loaded from offline OCI archives, and verified before the runner accepts jobs. Jobs cannot use privileged containers, arbitrary volumes, host paths, or Docker access. They retain Docker's standard capability profile and `no-new-privileges` inside the isolated VM.
 
 ## Persistent Nix reuse
 
@@ -32,6 +35,8 @@ The runner's `nixSeedEpoch` must match every selected image. A populated cache v
 
 Nix's native `min-free`/`max-free` behavior bounds local-store collection. The filesystem remains fixed-size and the cache is shared by jobs on that runner, so path names, cache hits, timing, and capacity are not repository-confidential. Forgejo's Actions cache backend is intentionally disabled; `actions/cache` is therefore unsupported on this runner and should not be used as a second cache layer.
 
+A project that pins a new Nixpkgs revision can request a derivation that is not yet available from a configured binary cache. Nix then builds it locally once; large SDK bootstrap builds can take a long time. Do not restart a running build to speed it up. Successful outputs stay in the persistent 64 GiB cache and are reused by later jobs.
+
 ## Owner migration and reset
 
 The declared cache is now 64 GiB, while an older installation may still have a 12 GiB `nix-cache.raw`. Deployment does not resize that file automatically. The storage service arms a migration interlock and the VM remains blocked until the owner performs the cache-only migration.
@@ -41,7 +46,7 @@ Stop and runtime-mask the VM before deploying the cache change. The migration is
 ```console
 cd /home/hieronim/Projects/nixos-config
 TERM=dumb sudo systemctl mask --runtime --now microvm@forgejo-runner.service
-TERM=dumb sudo nh os switch .#server-legion
+TERM=dumb nh os switch .#server-legion
 TERM=dumb sudo systemctl is-enabled microvm@forgejo-runner.service
 TERM=dumb sudo systemctl is-active microvm@forgejo-runner.service
 TERM=dumb sudo systemctl start forgejo-runner-nix-cache-migrate-global.service
