@@ -102,3 +102,11 @@ The guest-root Docker observer records job and service-container lifecycle, netw
 ```console
 sudo journalctl -fu microvm@forgejo-runner.service -o cat | grep --line-buffered 'Docker observer:'
 ```
+
+For repeated package-fetch failures, inspect the error-only Squid log:
+
+```console
+sudo cat /run/forgejo-runner-egress-global/egress-errors.log
+```
+
+It records only the timestamp, guest address, method, Squid result, and HTTP status for failed transactions—not destinations, URLs, paths, queries, headers, bodies, successful requests, or environment values. No entry means the Nix builder did not reach Squid; a `5xx` entry means it did and the next investigation is Squid DNS/upstream connectivity.
