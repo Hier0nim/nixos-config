@@ -4,7 +4,7 @@ This directory defines Forgejo and its isolated direct-QEMU Actions runner. The 
 
 ## Runner boundary
 
-Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach any public HTTPS destination through its egress proxy; there is no domain allowlist. The proxy accepts only the guest, only HTTPS `CONNECT` on port 443, and denies private/reserved destinations. Direct traffic, plain HTTP, other host services, and the Docker socket are not reachable.
+Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach the public Internet only through the optional egress proxy: public HTTPS on port 443 is allowed; direct traffic, plain HTTP, private networks, other host services, and the Docker socket are not.
 
 The deployed global runner is deliberately small and single-purpose:
 
@@ -29,7 +29,7 @@ The guest creates and verifies that volume after Docker starts. The cache image 
 --mount type=volume,src=forgejo-nix,dst=/nix
 ```
 
-One canonical `forgejo-runner-nix` image serves every runner label. It combines the Node 20 Bookworm base required by Forgejo JavaScript actions and FHS-native tools with only Nix, Git, CA certificates, and minimal POSIX utilities. It carries the normal `/nix/store` configuration, an explicit empty `build-users-group` for direct job Nix, proxy variables inherited by direct Nix builders, the cache.nixos substituter and key, 4/8 GiB `min-free`/`max-free` watermarks, a post-build hook that removes the unsandboxed builder's `/homeless-shelter` between derivations, and `sandbox = false` for local Docker jobs. Application services and toolchains—including PostgreSQL, Mailpit, Devenv, Chromium, Rust, and a second Node runtime—are deliberately not embedded. There is no guest Nix daemon, socket, remote setting, custom store URL, cache service, pressure timer, cache-path bind mount, or boot-store copy.
+One canonical `forgejo-runner-nix` image serves every runner label. It combines the Node 20 Bookworm base required by Forgejo JavaScript actions and FHS-native tools with only Nix, Git, CA certificates, and minimal POSIX utilities. It carries the normal `/nix/store` configuration, an explicit empty `build-users-group` for direct job Nix, the cache.nixos substituter and key, 4/8 GiB `min-free`/`max-free` watermarks, a post-build hook that removes the unsandboxed builder's `/homeless-shelter` between derivations, and `sandbox = false` for local Docker jobs. Application services and toolchains—including PostgreSQL, Mailpit, Devenv, Chromium, Rust, and a second Node runtime—are deliberately not embedded. There is no guest Nix daemon, socket, remote setting, custom store URL, cache service, pressure timer, cache-path bind mount, or boot-store copy.
 
 The runner's `nixSeedEpoch` must match every selected image. A populated cache volume with another epoch, or unexpected legacy contents without an epoch, fails startup. Increment the runner and image epoch only for a seed change that makes the existing `/nix` layout incompatible, then perform the owner reset below; removal of an unused seed utility is compatible and does not reset cached paths.
 
@@ -101,11 +101,4 @@ The guest-root Docker observer records job and service-container lifecycle, netw
 
 ```console
 sudo journalctl -fu microvm@forgejo-runner.service -o cat | grep --line-buffered 'Docker observer:'
-
-Squid logs only failed egress transactions, recording the timestamp, guest address, `CONNECT` target, and HTTP status—never headers, bodies, successful destinations, or environment values. For repeated package-fetch failures, inspect:
-
-```console
-sudo journalctl -u forgejo-runner-egress-global.service --since '30 minutes ago' --no-pager
-```
-
 ```
