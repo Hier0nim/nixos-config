@@ -196,6 +196,7 @@ in
     egressConfig="$(${pkgs.gnugrep}/bin/grep -Eo '/nix/store/[^ ]+\.conf' <<<"$runnerEgressExecStart" | ${pkgs.coreutils}/bin/head -n 1)"
     test -n "$egressConfig"
     ${pkgs.squid}/bin/squid -k parse -f "$egressConfig"
+    ${pkgs.gnugrep}/bin/grep -Fx 'acl runner_connections maxconn 256' "$egressConfig"
     ${pkgs.gnugrep}/bin/grep -Fx 'acl public_proxy_ports port 80 443' "$egressConfig"
     ${pkgs.gnugrep}/bin/grep -Fx 'acl SSL_ports port 443' "$egressConfig"
     ${pkgs.gnugrep}/bin/grep -Fx 'http_access deny CONNECT !SSL_ports' "$egressConfig"
