@@ -114,6 +114,7 @@
         egress.enable = true;
         resources = {
           memoryMiB = 9216;
+          vcpus = 4;
           nixCacheMiB = 65536;
           qgroupReservePercent = 15;
           qgroupReserveMinMiB = 512;
