@@ -130,7 +130,7 @@ let
       acl public_proxy_ports port 80 443
       acl SSL_ports port 443
       acl forbidden_dst dst ${lib.concatStringsSep " " blockedDestinationRanges}
-      acl runner_connections maxconn 64
+      acl runner_connections maxconn 256
       http_access deny !runner
       http_access deny runner_connections
       http_access deny CONNECT !SSL_ports
