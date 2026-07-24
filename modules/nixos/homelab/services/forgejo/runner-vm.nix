@@ -127,13 +127,14 @@ let
       http_port ${data.hostAddress}:${toString data.runner.egress.proxyPort}
       acl runner src ${data.guestAddress}/32
       acl CONNECT method CONNECT
+      acl public_proxy_ports port 80 443
       acl SSL_ports port 443
       acl forbidden_dst dst ${lib.concatStringsSep " " blockedDestinationRanges}
       acl runner_connections maxconn 64
       http_access deny !runner
       http_access deny runner_connections
-      http_access deny !CONNECT
-      http_access deny !SSL_ports
+      http_access deny CONNECT !SSL_ports
+      http_access deny !public_proxy_ports
       http_access deny forbidden_dst
       http_access allow runner
       http_access deny all

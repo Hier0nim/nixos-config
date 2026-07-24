@@ -196,6 +196,11 @@ in
     egressConfig="$(${pkgs.gnugrep}/bin/grep -Eo '/nix/store/[^ ]+\.conf' <<<"$runnerEgressExecStart" | ${pkgs.coreutils}/bin/head -n 1)"
     test -n "$egressConfig"
     ${pkgs.squid}/bin/squid -k parse -f "$egressConfig"
+    ${pkgs.gnugrep}/bin/grep -Fx 'acl public_proxy_ports port 80 443' "$egressConfig"
+    ${pkgs.gnugrep}/bin/grep -Fx 'acl SSL_ports port 443' "$egressConfig"
+    ${pkgs.gnugrep}/bin/grep -Fx 'http_access deny CONNECT !SSL_ports' "$egressConfig"
+    ${pkgs.gnugrep}/bin/grep -Fx 'http_access deny !public_proxy_ports' "$egressConfig"
+    if ${pkgs.gnugrep}/bin/grep -F 'HTTP_ports' "$egressConfig"; then exit 1; fi
     ${pkgs.gnugrep}/bin/grep -Fx 'acl egress_errors http_status 400-599' "$egressConfig"
     ${pkgs.gnugrep}/bin/grep -Fx 'logformat egress_error %ts.%03tu client=%>a method=%>rm squid=%Ss status=%>Hs' "$egressConfig"
     ${pkgs.gnugrep}/bin/grep -Fx 'access_log stdio:/run/forgejo-runner-egress-global/egress-errors.log egress_error egress_errors' "$egressConfig"
