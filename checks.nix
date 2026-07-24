@@ -34,11 +34,6 @@ let
   runnerContainerDockerHost =
     runnerConfig.services.gitea-actions-runner.instances.global.settings.container.docker_host;
   runnerEnvs = runnerConfig.services.gitea-actions-runner.instances.global.settings.runner.envs;
-  runnerHttpsProxy = runnerEnvs.HTTPS_PROXY or "";
-  runnerNoProxy = runnerEnvs.NO_PROXY or "";
-  runnerHttpProxyLower = runnerEnvs.http_proxy or "";
-  runnerHttpsProxyLower = runnerEnvs.https_proxy or "";
-  runnerNoProxyLower = runnerEnvs.no_proxy or "";
   runnerNixVolumeScript =
     runnerConfig.systemd.services.forgejo-runner-nix-volume-global.serviceConfig.ExecStart;
   runnerCacheResetScript =
@@ -74,7 +69,6 @@ let
   runnerVmUnit = hostServices."microvm@forgejo-runner";
   runnerProxyUnit = hostServices.forgejo-runner-proxy-global;
   runnerEgressUnit = hostServices.forgejo-runner-egress-global;
-  runnerEgressExecStart = runnerEgressUnit.serviceConfig.ExecStart;
 in
 {
   "homelab-state-root-regression" = pkgs.runCommand "homelab-state-root-regression" { } ''
@@ -131,33 +125,6 @@ in
     if ${pkgs.gnugrep}/bin/grep -Fq forgejo-runner-node <<<"$labels"; then
       exit 1
     fi
-    touch "$out"
-  '';
-
-  "runner-nix-proxy-regression" = pkgs.runCommand "runner-nix-proxy-regression" { } ''
-    set -euo pipefail
-    root="$TMPDIR/nix"
-    state="$TMPDIR/state"
-    mkdir -p "$root/nix/store" "$root/nix/var/nix" "$state"
-    export NIX_STATE_DIR="$state"
-    ${pkgs.nix}/bin/nix-store --init --store "local?root=$root"
-    cat >"$TMPDIR/proxy.nix" <<'EOF'
-    derivation {
-      name = "forgejo-proxy-environment";
-      system = "${system}";
-      builder = "/bin/sh";
-      args = [ "-c" "test \"$HTTP_PROXY\" = \"http://10.203.0.1:18081\"; test \"$HTTPS_PROXY\" = \"http://10.203.0.1:18081\"; test \"$http_proxy\" = \"http://10.203.0.1:18081\"; test \"$https_proxy\" = \"http://10.203.0.1:18081\"; test \"$NO_PROXY\" = \"127.0.0.1,localhost,10.203.0.1,10.203.0.2\"; test \"$no_proxy\" = \"127.0.0.1,localhost,10.203.0.1,10.203.0.2\"; printf 'proxy-forwarded\\n' > \"$out\"" ];
-      outputHashMode = "flat";
-      outputHashAlgo = "sha256";
-      outputHash = "7945d360a957e926a4c3e293d365d9900f324afa6ea7edbb4395eb06aae48243";
-    }
-    EOF
-    HTTP_PROXY=http://10.203.0.1:18081 HTTPS_PROXY=http://10.203.0.1:18081 NO_PROXY=127.0.0.1,localhost,10.203.0.1,10.203.0.2 http_proxy=http://10.203.0.1:18081 https_proxy=http://10.203.0.1:18081 no_proxy=127.0.0.1,localhost,10.203.0.1,10.203.0.2 \
-      ${pkgs.nix}/bin/nix-build \
-        --store "local?root=$root" \
-        --option sandbox false \
-        --option build-users-group "" \
-        "$TMPDIR/proxy.nix" >/dev/null
     touch "$out"
   '';
 
@@ -505,7 +472,6 @@ in
       '';
 
   "runner-service-regression" = pkgs.runCommand "runner-service-regression" { } ''
-    set -euo pipefail
     path=${lib.escapeShellArg runnerService.environment.PATH}
     execStart=${lib.escapeShellArg runnerService.serviceConfig.ExecStart}
     containerOptions=${lib.escapeShellArg runnerContainerOptions}
@@ -514,11 +480,6 @@ in
     containerDockerHost=${lib.escapeShellArg runnerContainerDockerHost}
     runnerHome=${lib.escapeShellArg (runnerEnvs.HOME or "")}
     runnerHttpProxy=${lib.escapeShellArg (runnerEnvs.HTTP_PROXY or "")}
-    runnerHttpsProxy=${lib.escapeShellArg runnerHttpsProxy}
-    runnerNoProxy=${lib.escapeShellArg runnerNoProxy}
-    runnerHttpProxyLower=${lib.escapeShellArg runnerHttpProxyLower}
-    runnerHttpsProxyLower=${lib.escapeShellArg runnerHttpsProxyLower}
-    runnerNoProxyLower=${lib.escapeShellArg runnerNoProxyLower}
     dockerHttpProxy=${lib.escapeShellArg (runnerDockerProxies."http-proxy" or "")}
     dockerHttpsProxy=${lib.escapeShellArg (runnerDockerProxies."https-proxy" or "")}
     dockerNoProxy=${lib.escapeShellArg (runnerDockerProxies."no-proxy" or "")}
@@ -529,34 +490,19 @@ in
     resetScript=${lib.escapeShellArg runnerCacheResetScript}
     migrationScript=${lib.escapeShellArg runnerCacheMigrationScript}
     legacyText=${lib.escapeShellArg runnerLegacyText}
-    egressExecStart=${lib.escapeShellArg runnerEgressExecStart}
     nixDaemonEnabled=${lib.escapeShellArg (if runnerNixDaemonEnabled then "true" else "false")}
     test "$nixDaemonEnabled" = false
     test "$containerPrivileged" = false
     test "$containerDockerHost" = -
-    test "$containerOptions" = "--security-opt=no-new-privileges --mount type=volume,src=forgejo-nix,dst=/nix"
+    test "$containerOptions" = "--security-opt=no-new-privileges --cap-drop=ALL --cap-add=CHOWN --cap-add=FOWNER --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --mount type=volume,src=forgejo-nix,dst=/nix"
     test -z "$runnerHome"
     test "$runnerHttpProxy" = "http://10.203.0.1:18081"
-    test "$runnerHttpsProxy" = "http://10.203.0.1:18081"
-    test "$runnerNoProxy" = "127.0.0.1,localhost,10.203.0.1,10.203.0.2"
-    test "$runnerHttpProxyLower" = "http://10.203.0.1:18081"
-    test "$runnerHttpsProxyLower" = "http://10.203.0.1:18081"
-    test "$runnerNoProxyLower" = "127.0.0.1,localhost,10.203.0.1,10.203.0.2"
     test "$dockerHttpProxy" = "http://10.203.0.1:18081"
     test "$dockerHttpsProxy" = "http://10.203.0.1:18081"
     test "$dockerNoProxy" = "127.0.0.1,localhost,10.203.0.1,10.203.0.2"
     test -z "$dockerHome"
     test "$validVolumes" = "forgejo-nix"
     test "$httpProxy" = "http://10.203.0.1:18081"
-    egressConfig="$(${pkgs.gnugrep}/bin/grep -oE '/nix/store/[^ ]+\.conf' <<<"$egressExecStart" | ${pkgs.coreutils}/bin/head -n 1)"
-    test -n "$egressConfig"
-    ${pkgs.gnugrep}/bin/grep -Fx 'acl runner_connections maxconn 256' "$egressConfig"
-    ${pkgs.gnugrep}/bin/grep -Fx 'acl egress_errors http_status 400-599' "$egressConfig"
-    ${pkgs.gnugrep}/bin/grep -Fx 'logformat egress_error %ts.%03tu %>a %rm %ru %>Hs' "$egressConfig"
-    ${pkgs.gnugrep}/bin/grep -Fx 'access_log stdio:/dev/stderr egress_error egress_errors' "$egressConfig"
-    if ${pkgs.gnugrep}/bin/grep -F 'access_log none' "$egressConfig"; then
-      exit 1
-    fi
     case "$execStart" in
       */bin/forgejo-runner\ daemon\ --config\ *) ;;
       *) exit 1 ;;

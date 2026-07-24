@@ -129,7 +129,7 @@ let
       acl CONNECT method CONNECT
       acl SSL_ports port 443
       acl forbidden_dst dst ${lib.concatStringsSep " " blockedDestinationRanges}
-      acl runner_connections maxconn 256
+      acl runner_connections maxconn 64
       http_access deny !runner
       http_access deny runner_connections
       http_access deny !CONNECT
@@ -139,9 +139,7 @@ let
       http_access deny all
       dns_nameservers 1.1.1.1 9.9.9.9
       cache deny all
-      acl egress_errors http_status 400-599
-      logformat egress_error %ts.%03tu %>a %rm %ru %>Hs
-      access_log stdio:/dev/stderr egress_error egress_errors
+      access_log none
       cache_store_log none
       cache_log stdio:/dev/stderr
       logfile_rotate 0
