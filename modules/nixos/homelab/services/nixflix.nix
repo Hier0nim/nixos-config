@@ -387,8 +387,11 @@ in
     systemd = {
       services = {
         nixflix-setup-dirs = {
+          after = [ "homelab-state-root.service" ];
+          requires = [ "homelab-state-root.service" ];
           script = lib.mkForce ''
             ${pkgs.systemd}/bin/systemd-tmpfiles --create \
+              --prefix=${lib.escapeShellArg cfg.state.root} \
               --prefix=${lib.escapeShellArg cfg.state.nixflix} \
               --prefix=${lib.escapeShellArg data.media} \
               --prefix=${lib.escapeShellArg data.downloads}

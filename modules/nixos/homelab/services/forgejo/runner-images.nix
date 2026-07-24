@@ -48,6 +48,7 @@ let
     max-free = ${toString (cfg.nixCacheMaxFreeMiB * 1024 * 1024)}
     post-build-hook = /bin/forgejo-nix-cleanup
     sandbox = false
+    build-users-group =
     EOF
   '';
   imageConfig = {

@@ -80,6 +80,11 @@ Examples:
 Private state is owned by the app user and group. Repair is recursive because
 all files below those paths should belong to the app.
 
+`/var/lib/homelab` is framework-owned shared namespace metadata. It remains
+`root:root 0755` so every app can traverse to its private child; app
+registrations may own only strict descendants. The framework repairs this one
+path non-recursively before app-state repairs and on activation.
+
 Apps opt in with:
 
 ```nix
@@ -355,6 +360,7 @@ UID/GID semantics for shared storage. This removes user-namespace isolation
 but is necessary for group-owned media directories.
 
 Compensating controls:
+
 - Tight `ReadWritePaths` on service units
 - `ProtectSystem=strict` where possible
 - `NoNewPrivileges=yes` on service units

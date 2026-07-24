@@ -18,6 +18,53 @@ let
 
   mkAppStateFile = app: file: "f ${file.path} ${file.mode} ${app.user} ${app.group} - -";
 
+  isStateRootOrAncestor = path: path == state.root || lib.hasPrefix "${path}/" state.root;
+
+  stateRootViolations = lib.flatten (
+    lib.mapAttrsToList (
+      name: app:
+      map (path: "${name}: ${path}") (
+        lib.filter isStateRootOrAncestor (app.state.paths ++ map (file: file.path) app.state.managedFiles)
+      )
+    ) stateApps
+  );
+
+  rootRepairScript =
+    let
+      esc = lib.escapeShellArg;
+    in
+    pkgs.writeShellScript "homelab-state-root-repair" ''
+      set -euo pipefail
+
+      state_root=${esc state.root}
+
+      if [ -L "$state_root" ]; then
+        echo "Refusing to follow symlink: $state_root" >&2
+        exit 1
+      fi
+
+      if [ -e "$state_root" ] && [ ! -d "$state_root" ]; then
+        echo "State root is not a directory: $state_root" >&2
+        exit 1
+      fi
+
+      ${pkgs.coreutils}/bin/mkdir -p "$state_root"
+      ${pkgs.coreutils}/bin/chown root:root "$state_root"
+      ${pkgs.coreutils}/bin/chmod 0755 "$state_root"
+    '';
+
+  mkRootStateRepair = {
+    "homelab-state-root" = {
+      description = "Repair permissions for the homelab state root";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "local-fs.target" ];
+      requires = [ "local-fs.target" ];
+      serviceConfig.Type = "oneshot";
+      unitConfig.RequiresMountsFor = [ state.root ];
+      script = "${rootRepairScript}";
+    };
+  };
+
   topLevelPaths =
     paths:
     lib.filter (
@@ -110,9 +157,15 @@ let
       ${repairServiceName} = {
         description = "Repair permissions for ${name} state";
         wantedBy = [ "multi-user.target" ];
-        after = [ "local-fs.target" ];
+        after = [
+          "local-fs.target"
+          "homelab-state-root.service"
+        ];
         inherit before;
-        requires = [ "local-fs.target" ];
+        requires = [
+          "local-fs.target"
+          "homelab-state-root.service"
+        ];
         path = [ pkgs.coreutils ];
         serviceConfig.Type = "oneshot";
         unitConfig.RequiresMountsFor = paths;
@@ -162,7 +215,18 @@ in
           ))
         ];
 
-        systemd.services = lib.mkMerge (lib.mapAttrsToList mkAppStateRepair stateApps);
+        system.activationScripts.homelab-state-root.text = "${rootRepairScript}";
+
+        assertions = [
+          {
+            assertion = stateRootViolations == [ ];
+            message = "homelab.apps may own only strict descendants of ${state.root}: ${lib.concatStringsSep ", " stateRootViolations}";
+          }
+        ];
+
+        systemd.services = lib.mkMerge (
+          [ mkRootStateRepair ] ++ lib.mapAttrsToList mkAppStateRepair stateApps
+        );
 
       }
     ]

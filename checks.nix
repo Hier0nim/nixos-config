@@ -56,12 +56,64 @@ let
     (runnerService.environment.NIX_REMOTE or "")
     runnerNixVolumeScript
   ];
-  hostServices = nixosConfigurations.server-legion.config.systemd.services;
+  hostConfig = nixosConfigurations.server-legion.config;
+  hostServices = hostConfig.systemd.services;
+  stateRootUnit = hostServices.homelab-state-root;
+  stateRepairUnits = map (name: hostServices."homelab-state-${name}") [
+    "jellyfin"
+    "radarr"
+    "sonarr"
+  ];
+  nixflixSetupUnit = hostServices.nixflix-setup-dirs;
+  forgejoSnapshotUnit = hostServices.homelab-forgejo-snapshot;
   runnerVmUnit = hostServices."microvm@forgejo-runner";
   runnerProxyUnit = hostServices.forgejo-runner-proxy-global;
   runnerEgressUnit = hostServices.forgejo-runner-egress-global;
 in
 {
+  "homelab-state-root-regression" = pkgs.runCommand "homelab-state-root-regression" { } ''
+    rootTmpfiles=${lib.escapeShellArg (lib.concatStringsSep "\n" hostConfig.systemd.tmpfiles.rules)}
+    rootRequires=${lib.escapeShellArg (lib.concatStringsSep "\n" stateRootUnit.requires)}
+    rootAfter=${lib.escapeShellArg (lib.concatStringsSep "\n" stateRootUnit.after)}
+    rootMounts=${lib.escapeShellArg (lib.concatStringsSep "\n" stateRootUnit.unitConfig.RequiresMountsFor)}
+    rootScript=${lib.escapeShellArg stateRootUnit.script}
+    nixflixRequires=${lib.escapeShellArg (lib.concatStringsSep "\n" nixflixSetupUnit.requires)}
+    nixflixAfter=${lib.escapeShellArg (lib.concatStringsSep "\n" nixflixSetupUnit.after)}
+    nixflixScript=${lib.escapeShellArg nixflixSetupUnit.script}
+    snapshotRequires=${lib.escapeShellArg (lib.concatStringsSep "\n" forgejoSnapshotUnit.requires)}
+    snapshotAfter=${lib.escapeShellArg (lib.concatStringsSep "\n" forgejoSnapshotUnit.after)}
+    snapshotScript=${lib.escapeShellArg forgejoSnapshotUnit.script}
+    contains() {
+      ${pkgs.gnugrep}/bin/grep -Fqx "$1" <<<"$2"
+    }
+    contains 'd /var/lib/homelab 0755 root root - -' "$rootTmpfiles"
+    contains 'z /var/lib/homelab 0755 root root - -' "$rootTmpfiles"
+    contains local-fs.target "$rootRequires"
+    contains local-fs.target "$rootAfter"
+    contains /var/lib/homelab "$rootMounts"
+    ${pkgs.gnugrep}/bin/grep -F 'chown root:root "$state_root"' "$rootScript"
+    ${pkgs.gnugrep}/bin/grep -F 'chmod 0755 "$state_root"' "$rootScript"
+    if ${pkgs.gnugrep}/bin/grep -F 'chown -R' "$rootScript"; then
+      exit 1
+    fi
+    contains homelab-state-root.service "$nixflixRequires"
+    contains homelab-state-root.service "$nixflixAfter"
+    contains homelab-state-root.service "$snapshotRequires"
+    contains homelab-state-root.service "$snapshotAfter"
+    ${pkgs.gnugrep}/bin/grep -F -- '--prefix=/var/lib/homelab' <<<"$nixflixScript"
+    ${pkgs.gnugrep}/bin/grep -F 'mkdir -m 0700 /var/lib/homelab/forgejo-backup.new' <<<"$snapshotScript"
+    if ${pkgs.gnugrep}/bin/grep -F 'install -d -m 0700 /var/lib/homelab' <<<"$snapshotScript"; then
+      exit 1
+    fi
+    ${lib.concatMapStringsSep "\n" (unit: ''
+      repairRequires=${lib.escapeShellArg (lib.concatStringsSep "\n" unit.requires)}
+      repairAfter=${lib.escapeShellArg (lib.concatStringsSep "\n" unit.after)}
+      contains homelab-state-root.service "$repairRequires"
+      contains homelab-state-root.service "$repairAfter"
+    '') stateRepairUnits}
+    touch "$out"
+  '';
+
   "runner-image-layout-regression" = pkgs.runCommand "runner-image-layout-regression" { } ''
     test "${toString (builtins.length runnerImages)}" = 1
     test "${lib.escapeShellArg (builtins.head runnerImages).reference}" = "forgejo-runner-nix:${pkgs.nix.version}"
@@ -322,6 +374,7 @@ in
           ${pkgs.gnugrep}/bin/grep -F 'substituters = https://cache.nixos.org/' "$root/fs/etc/nix/nix.conf"
           ${pkgs.gnugrep}/bin/grep -F 'trusted-public-keys = cache.nixos.org-1:' "$root/fs/etc/nix/nix.conf"
           ${pkgs.gnugrep}/bin/grep -F 'sandbox = false' "$root/fs/etc/nix/nix.conf"
+          ${pkgs.gnugrep}/bin/grep -Fx 'build-users-group =' "$root/fs/etc/nix/nix.conf"
           ${pkgs.gnugrep}/bin/grep -F 'min-free = 4294967296' "$root/fs/etc/nix/nix.conf"
           ${pkgs.gnugrep}/bin/grep -F 'max-free = 8589934592' "$root/fs/etc/nix/nix.conf"
           ${pkgs.gnugrep}/bin/grep -F 'post-build-hook = /bin/forgejo-nix-cleanup' "$root/fs/etc/nix/nix.conf"
@@ -342,7 +395,7 @@ in
             name = "forgejo-cleanup-first";
             system = "__SYSTEM__";
             builder = "/bin/sh";
-            args = [ "-c" "${pkgs.coreutils}/bin/mkdir -p \"$TEST_ROOT/homeless-shelter\"; printf first > $out" ];
+            args = [ "-c" ": > \"$TEST_ROOT/homeless-shelter\"; printf first > $out" ];
             TEST_ROOT = "__TEST_ROOT__";
           }
           EOF
@@ -359,6 +412,9 @@ in
             -e "s#__SYSTEM__#${system}#g" \
             -e "s#__TEST_ROOT__#$testRoot#g" \
             "$state/first.nix" "$state/second.nix"
+          export NIX_STATE_DIR="$state/nix-state"
+          export NIX_LOG_DIR="$state/nix-log"
+          mkdir -p "$NIX_STATE_DIR" "$NIX_LOG_DIR"
           ${pkgs.nix}/bin/nix-store --init --store "local?root=$failureRoot"
           if ${pkgs.nix}/bin/nix-build \
             --store "local?root=$failureRoot" \
@@ -369,6 +425,9 @@ in
             exit 1
           fi
           ${pkgs.nix}/bin/nix-store --init --store "local?root=$nestedRoot"
+          for path in ${cleanupTestHook} ${pkgs.bash} ${pkgs.coreutils}; do
+            ${pkgs.coreutils}/bin/cp -a -- "$path" "$nestedRoot/nix/store/"
+          done
           ${pkgs.nix}/bin/nix-build \
             --store "local?root=$nestedRoot" \
             --option sandbox false \

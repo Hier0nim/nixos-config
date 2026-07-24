@@ -54,6 +54,8 @@ in
     ];
 
     systemd.services.homelab-forgejo-snapshot = {
+      after = [ "homelab-state-root.service" ];
+      requires = [ "homelab-state-root.service" ];
       description = "Create a consistent Forgejo backup snapshot";
       serviceConfig = {
         Type = "oneshot";
@@ -96,7 +98,6 @@ in
           ${systemctl} stop ${forgejoService}
         fi
 
-        install -d -m 0700 ${lib.escapeShellArg cfg.state.root}
         rm -rf ${lib.escapeShellArg snapshotTmpDir}
         mkdir -m 0700 ${lib.escapeShellArg snapshotTmpDir}
         cp -a --reflink=auto ${lib.escapeShellArg "${forgejoStateDir}/."} ${lib.escapeShellArg snapshotTmpDir}

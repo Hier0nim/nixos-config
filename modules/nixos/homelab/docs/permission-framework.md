@@ -70,6 +70,7 @@ need read or write access to the same directories.
 Location: `/data/media`, `/data/downloads`, `/data/photos`, `/data/nas`
 
 Properties:
+
 - Group-owned by a role group (e.g. `media`, `photos`, `nas`)
 - Uses setgid directories (`2775` or `2770`) so new files inherit the group
 - Repair is non-recursive -- only the root and declared subdirectories get
@@ -88,9 +89,18 @@ that service should access these paths.
 Location: `/var/lib/homelab/<app>`, `/var/cache/<app>`, etc.
 
 Properties:
+
 - Owned by the app user and group
 - Repair is recursive -- all files below belong to the app
 - Apps declare with `state.paths = [ "/var/lib/homelab/myapp" ]`
+
+### Shared State Namespace
+
+`/var/lib/homelab` is a framework-owned traversal boundary, not app state. It is
+always `root:root` with mode `0755`; apps may own only strict descendants. A
+dedicated non-recursive root repair unit runs before each app-state repair and
+during activation. Service modules must not change ownership or mode on this
+directory, even for backup jobs.
 
 ## Role-to-Group Mapping
 
@@ -349,6 +359,7 @@ Check that the service is registered in `homelab.apps` with the correct
 ### Service cannot write to shared storage
 
 Check that:
+
 1. `storageAccess` includes the right role (e.g. `media`)
 2. `sharedWriter = true` if writing group-owned files
 3. The service user is in the correct group (check `extraGroups`)
@@ -359,6 +370,7 @@ Check `journalctl -u homelab-state-<app>.service` or
 `journalctl -u homelab-storage-<role>.service` for error messages.
 
 Common causes:
+
 - Symlink detected where a directory is expected (service may have created it)
 - Path does not exist and parent is not writable
 - Disk not mounted (check `RequiresMountsFor`)
