@@ -139,9 +139,11 @@ let
       http_access deny all
       dns_nameservers 1.1.1.1 9.9.9.9
       cache deny all
-      access_log none
+      acl egress_errors http_status 400-599
+      logformat egress_error %ts.%03tu client=%>a method=%>rm squid=%Ss status=%>Hs
+      access_log stdio:/run/${data.egressService}/egress-errors.log egress_error egress_errors
       cache_store_log none
-      cache_log stdio:/dev/stderr
+      cache_log stdio:/dev/null
       logfile_rotate 0
       forwarded_for delete
       shutdown_lifetime 1 seconds
@@ -1757,7 +1759,10 @@ let
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           DynamicUser = true;
-          ExecStartPre = "${pkgs.squid}/bin/squid -k parse -f ${mkEgressConfig data}";
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/install -m 0600 /dev/null /run/${data.egressService}/egress-errors.log"
+            "${pkgs.squid}/bin/squid -k parse -f ${mkEgressConfig data}"
+          ];
           ExecStart = "${pkgs.squid}/bin/squid -N -f ${mkEgressConfig data}";
           CPUQuota = "50%";
           MemoryHigh = "192M";
