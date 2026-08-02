@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 let
@@ -38,34 +37,41 @@ in
       };
     };
 
-    systemd.user.services = {
-      xdg-desktop-portal.serviceConfig.Environment = [
-        "XDG_CURRENT_DESKTOP=niri"
-      ];
-      xdg-desktop-portal-gtk.serviceConfig.Environment = [
-        "XDG_CURRENT_DESKTOP=niri"
-      ];
-      xdg-desktop-portal-gnome.serviceConfig.Environment = [
-        "XDG_CURRENT_DESKTOP=niri"
-      ];
-    };
+    systemd = {
+      user.services = {
+        xdg-desktop-portal.serviceConfig.Environment = [
+          "XDG_CURRENT_DESKTOP=niri"
+        ];
+        xdg-desktop-portal-gtk.serviceConfig.Environment = [
+          "XDG_CURRENT_DESKTOP=niri"
+        ];
+        xdg-desktop-portal-gnome.serviceConfig.Environment = [
+          "XDG_CURRENT_DESKTOP=niri"
+        ];
 
-    # Disable niri-flake's polkit agent to avoid conflict with DMS polkit
-    systemd.user.services.niri-flake-polkit.enable = false;
+        # Disable niri-flake's polkit agent to avoid conflict with DMS polkit
+        niri-flake-polkit.enable = false;
+      };
+
+      # Old greeter releases left hidden XDG cache directories owned by a retired
+      # system account. The upstream pre-start hook only chowns `*`, which omits
+      # dot-directories; make the cache writable before each greeter launch.
+      services.greetd.preStart = lib.mkAfter ''
+        chown -R greeter:greeter /var/lib/dms-greeter
+      '';
+    };
 
     services = {
       accounts-daemon.enable = true;
-
-      displayManager.dms-greeter = {
-        enable = true;
-        compositor.name = "niri";
-        configHome = config.users.users.${config.custom.username}.home;
-        package = inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      };
-
       upower.enable = true;
       power-profiles-daemon.enable = true;
       ddccontrol.enable = true;
+    };
+
+    programs.dms-greeter = {
+      enable = true;
+      compositor.name = "niri";
+      configHome = config.users.users.${config.custom.username}.home;
     };
 
     programs.dconf.enable = true;

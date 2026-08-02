@@ -9,7 +9,10 @@
   customLib,
 }:
 nixpkgs.lib.nixosSystem {
-  inherit system modules;
+  modules = [
+    { nixpkgs.hostPlatform = system; }
+  ]
+  ++ modules;
   specialArgs = {
     inherit
       customLib

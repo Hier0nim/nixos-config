@@ -8,7 +8,7 @@
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.disko.nixosModules.disko
-    inputs.dms.nixosModules.greeter
+    inputs.dank-greeter.nixosModules.default
 
     ./disko.nix
     ./hardware-configuration.nix

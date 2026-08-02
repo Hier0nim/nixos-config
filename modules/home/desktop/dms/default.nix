@@ -38,7 +38,8 @@ in
       package =
         inputs.danksearch.packages.${pkgs.stdenv.hostPlatform.system}.dsearch.overrideAttrs
           (old: {
-            vendorHash = "sha256-Gq3tVwe39m5KGfkI3DEnQEQEGs/cLDCiwx6XFM61f6c=";
+            proxyVendor = true;
+            vendorHash = "sha256-d9VdBmHvKSp03h4x59cKXLXGSVMEYAYEaaiBYluO564=";
           });
     };
 
