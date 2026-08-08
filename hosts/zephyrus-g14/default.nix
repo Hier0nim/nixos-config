@@ -4,6 +4,33 @@
   pkgs,
   ...
 }:
+let
+  applyWifiPowersave = pkgs.writeShellScript "apply-wifi-powersave" ''
+    if [ ! -r /sys/class/power_supply/ADP0/online ]; then
+      exit 0
+    fi
+
+    if [ "$(< /sys/class/power_supply/ADP0/online)" -eq 1 ]; then
+      power_save=off
+    else
+      power_save=on
+    fi
+
+    for wireless in /sys/class/net/*/wireless; do
+      [ -e "$wireless" ] || continue
+      interface="$(basename "$(dirname "$wireless")")"
+      ${pkgs.iw}/bin/iw dev "$interface" set power_save "$power_save" || true
+    done
+  '';
+  wifiPowersaveDispatcher = pkgs.writeShellScript "wifi-powersave-dispatcher" ''
+    case "$2" in
+      up | reapply)
+        [ -d "/sys/class/net/$1/wireless" ] || exit 0
+        exec ${applyWifiPowersave}
+        ;;
+    esac
+  '';
+in
 {
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
@@ -32,7 +59,30 @@
     # ../../modules/nixos/services/howdy.nix
   ];
 
-  networking.hostName = "zephyrus-g14";
+  networking = {
+    hostName = "zephyrus-g14";
+
+    # Keep Wi-Fi responsive while plugged in, where it shares a radio with
+    # Bluetooth audio. Re-enable power saving while running on battery.
+    networkmanager = {
+      wifi.powersave = lib.mkForce false;
+      dispatcherScripts = [ { source = wifiPowersaveDispatcher; } ];
+    };
+  };
+
+  systemd.services.wifi-powersave = {
+    description = "Set Wi-Fi power saving based on AC power";
+    after = [ "NetworkManager.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = applyWifiPowersave;
+    };
+  };
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="power_supply", KERNEL=="ADP0", ACTION=="change", TAG+="systemd", ENV{SYSTEMD_WANTS}+="wifi-powersave.service"
+  '';
 
   custom = {
     wifi.networks = {
