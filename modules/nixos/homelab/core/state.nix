@@ -59,7 +59,10 @@ let
       wantedBy = [ "multi-user.target" ];
       after = [ "local-fs.target" ];
       requires = [ "local-fs.target" ];
-      serviceConfig.Type = "oneshot";
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
       unitConfig.RequiresMountsFor = [ state.root ];
       script = "${rootRepairScript}";
     };
