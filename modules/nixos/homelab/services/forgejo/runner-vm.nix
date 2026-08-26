@@ -76,10 +76,10 @@ let
     in
     data.runner.runner.labels != [ ]
     && lib.all (label: builtins.elem (labelImage label) imageReferences) data.runner.runner.labels;
+  runnerNixSeedEpoch = data: (builtins.head data.images).nixSeedEpoch;
   runnerNixSeedValid =
     data:
-    data.runner.runner.nixSeedEpoch != ""
-    && lib.all (image: image.nixSeedEpoch == data.runner.runner.nixSeedEpoch) data.images;
+    data.images != [ ] && lib.all (image: image.nixSeedEpoch == runnerNixSeedEpoch data) data.images;
 
   mkCaddyfile =
     data:
@@ -469,7 +469,7 @@ let
         if [ -e "$epochFile" ] || [ -L "$epochFile" ]; then
           test -f "$epochFile"
           test ! -L "$epochFile"
-          test "$(< "$epochFile")" = ${lib.escapeShellArg data.runner.runner.nixSeedEpoch}
+          test "$(< "$epochFile")" = ${lib.escapeShellArg (runnerNixSeedEpoch data)}
         else
           test -z "$(${pkgs.findutils}/bin/find ${nixVolumeData} -mindepth 1 -maxdepth 1 -print -quit)"
         fi
@@ -1944,7 +1944,7 @@ in
         }
         {
           assertion = lib.all runnerNixSeedValid runnerData;
-          message = "Every selected runner image must carry the configured compatible Nix seed epoch.";
+          message = "Every selected runner image must carry the same Nix seed identity.";
         }
         {
           assertion = runnerCfg.nixCacheMinFreeMiB < runnerCfg.nixCacheMaxFreeMiB;

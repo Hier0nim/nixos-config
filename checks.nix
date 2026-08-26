@@ -21,7 +21,7 @@ let
     set -euo pipefail
     ${pkgs.coreutils}/bin/rm -rf -- /tmp/forgejo-nix-cleanup-regression/homeless-shelter
   '';
-  runnerSeedEpoch = runnerActions.runners.global.runner.nixSeedEpoch;
+  runnerSeedEpoch = runnerActions.images.nix.nixSeedEpoch;
   recoveryScript =
     nixosConfigurations.server-legion.config.systemd.services.forgejo-runner-docker-recovery-global.serviceConfig.ExecStart;
   runnerService = runnerConfig.systemd.services."gitea-runner-global";
@@ -316,6 +316,17 @@ in
             env USER=nobody NIX_REMOTE="local?root=$volumeRoot" ${pkgs.nix}/bin/nix-store --verify-path "$path"
           done < <(${pkgs.findutils}/bin/find "$storeRoot" -mindepth 1 -maxdepth 1 ! -name .links -print)
         }
+        seed_epoch_from_path() {
+          ${pkgs.python3}/bin/python3 - "$1" <<'PY'
+        import os
+        import sys
+
+        alphabet = "0123456789abcdfghijklmnpqrsvwxyz"
+        seed_hash = os.path.basename(sys.argv[1]).split("-", 1)[0]
+        assert len(seed_hash) == 32 and set(seed_hash) <= set(alphabet)
+        print("1" + "".join(f"{alphabet.index(char):02d}" for char in seed_hash))
+        PY
+        }
         ${lib.concatMapStringsSep "\n" (image: ''
           image=${lib.escapeShellArg image.archive}
           reference=${lib.escapeShellArg image.reference}
@@ -375,6 +386,7 @@ in
           test ! -e "$nixRoot/var/nix/daemon-socket"
           seedPath="$(${pkgs.findutils}/bin/find "$nixRoot/store" -mindepth 1 -maxdepth 1 -type d -name '*-forgejo-runner-nix-seed' -print -quit)"
           test -n "$seedPath"
+          test ${lib.escapeShellArg runnerSeedEpoch} = "$(seed_epoch_from_path "$seedPath")"
           test -z "$(${pkgs.findutils}/bin/find "$nixRoot/store" -mindepth 1 -maxdepth 1 -name '*nodejs-22*' -print -quit)"
           tree_manifest "$nixRoot" >"$root/nix.tree"
           if [ ! -e "$firstTree" ]; then

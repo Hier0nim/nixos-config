@@ -6,7 +6,6 @@
 }:
 let
   cfg = config.homelab.services.forgejo.actions;
-  nixSeedEpoch = "2";
   nixCleanupHook = pkgs.writeShellScriptBin "forgejo-nix-cleanup" ''
     set -euo pipefail
     ${pkgs.coreutils}/bin/rm -rf -- /homeless-shelter
@@ -33,6 +32,81 @@ let
       "/etc"
     ];
   };
+  # Keep the decimal-only option interface while deriving an injective identity
+  # from the seed output path. A changed seed derivation has a changed output path.
+  nixSeedEpoch =
+    "1"
+    +
+      builtins.replaceStrings
+        [
+          "0"
+          "1"
+          "2"
+          "3"
+          "4"
+          "5"
+          "6"
+          "7"
+          "8"
+          "9"
+          "a"
+          "b"
+          "c"
+          "d"
+          "f"
+          "g"
+          "h"
+          "i"
+          "j"
+          "k"
+          "l"
+          "m"
+          "n"
+          "p"
+          "q"
+          "r"
+          "s"
+          "v"
+          "w"
+          "x"
+          "y"
+          "z"
+        ]
+        [
+          "00"
+          "01"
+          "02"
+          "03"
+          "04"
+          "05"
+          "06"
+          "07"
+          "08"
+          "09"
+          "10"
+          "11"
+          "12"
+          "13"
+          "14"
+          "15"
+          "16"
+          "17"
+          "18"
+          "19"
+          "20"
+          "21"
+          "22"
+          "23"
+          "24"
+          "25"
+          "26"
+          "27"
+          "28"
+          "29"
+          "30"
+          "31"
+        ]
+        (builtins.substring 11 32 (toString nixSeed));
   seedExtraCommands = ''
     mkdir -p etc/nix root tmp workspace usr/local/bin nix/store nix/var/nix
     rm -rf homeless-shelter
