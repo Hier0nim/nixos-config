@@ -1,112 +1,19 @@
-# Declarative Forgejo and Actions runner
+# Forgejo and native Actions runner
 
-This directory defines Forgejo and its isolated direct-QEMU Actions runner. The authoritative files are `server.nix`, `actions.nix`, `runner-images.nix`, `runner-vm.nix`, and `runner-secrets.nix`.
+Forgejo runs on the host. Its single Actions runner is the standard NixOS `services.gitea-actions-runner.instances.global` service, using `pkgs.forgejo-runner` with the `nix:host` label, capacity 1, and a three-hour job timeout. It executes directly on `server-legion`; Docker and other container-runner options are inapplicable and intentionally absent.
 
-## Runner boundary
+The runner has a dedicated unprivileged `gitea-runner` account and the upstream persistent state, home, and host workdir below `/var/lib/gitea-runner`; this workdir does not affect `/nix/store`. Its token remains SOPS-encrypted in `secrets/server-legion/forgejo-runner.yaml`; a runner-owned `TOKEN=<value>` environment file is rendered from it, and its update restarts `gitea-runner-global.service`. The account is not trusted by Nix and has no sudo, Docker, or Podman access. No runner environment variables are configured. Logging, polling, and TLS use the upstream defaults, so there is no override to maintain.
 
-Each runner is an isolated direct-QEMU MicroVM. It has no host shares, a dedicated TAP network, a private Forgejo proxy, and fail-closed host firewall rules. The guest can reach any public HTTP on port 80 and HTTPS on port 443 through the optional egress proxy; there is no domain allowlist. Direct traffic, other ports, private networks, other host services, and the Docker socket are not reachable.
+Host jobs receive only Bash, coreutils, Git, curl, Node.js 24, and Nix on their explicit PATH. They use the normal host Nix daemon and the shared multi-user `/nix/store`, which is the only relevant local reuse, with Nix sandboxing enabled and sandbox fallback disabled. This is not a confidentiality boundary—store paths, build timing, and cache hits can be visible to jobs. Nix derivations must never embed secrets because derivation inputs and store paths can be exposed. The existing weekly GC deletes paths unreferenced for 14 days, preserving unreferenced outputs short-term. Do not enable global `keep-outputs`: CI has no arbitrary roots and doing so would grow disk use. Add deliberate GC roots only after measuring that GC eviction, rather than cache availability, is causing repeated work.
 
-The deployed global runner is deliberately small and single-purpose:
+The runner service is hardened with a static runner user, private temporary and device namespaces, read-only system paths except its state directory, no capabilities, no new privileges, and no access to `/var/lib/homelab`. These restrictions reduce accidental host access but do not make untrusted code safe: do not run untrusted pull requests, mutually distrusting repositories, or workflows with deployment credentials on this host runner. Pin `uses:` actions to immutable revisions and review every host workflow carefully.
 
-- 4 vCPUs;
-- 9 GiB guest memory, with the QEMU service capped at 10 GiB including overhead;
-- one concurrent job;
-- four bounded ext4 volumes for runner state, Docker data, workspace, and the persistent Nix cache.
+Forgejo Actions cache is disabled because it is not a Nix binary cache; do not add `actions/cache`, a shared cache service, or an Actions cache. No substituters or trusted keys are changed for this runner: adding a remote cache broadens trust and does not create a local cache. Nix's existing narinfo cache is metadata only. Register the token in the Forgejo UI with the smallest appropriate (global or repository) runner scope, then deploy. The pinned upstream runner re-registers when registration state is absent, labels differ, or the stored token hash differs. To rotate safely, create a replacement token at that scope, update the SOPS-encrypted secret without placing the token in plaintext, and deploy; the rendered token file restarts the service and the token-hash change causes re-registration. Confirm the new registration in Forgejo and the service log, then revoke the old token. Normal rotation needs no manual deletion of `.runner` or other runtime data. Remove the old VM runner registration in the Forgejo UI after migration to avoid scheduling jobs to it.
 
-Runner state and the Nix cache persist. Docker data and the workspace are disposable and reset on a cold start. Images are digest-pinned or Nix-built, loaded from offline OCI archives, and verified before the runner accepts jobs. Jobs cannot use privileged containers, arbitrary volumes, host paths, or Docker access. They retain Docker's standard capability profile and `no-new-privileges` inside the isolated VM.
+## Operations and scaling
 
-## Persistent Nix reuse
+Check the native service with `systemctl status gitea-runner-global.service` and `journalctl -u gitea-runner-global.service`. Scaling should start by raising capacity from 1 to 2 only after reviewing CPU, memory, disk contention, and trust; then add a separately scoped runner on a second host. Do not add shared binary caches or Harmonia merely to reduce downloads: they require separate trust, signing, and availability planning.
 
-The guest mounts `nix-cache.raw` at `/var/lib/forgejo-nix`. Its otherwise-empty `/var/lib/forgejo-nix/volume` directory is exposed through Docker's native local bind volume:
+## Legacy cleanup (manual only)
 
-```console
-docker volume create --driver local --opt type=none --opt o=bind --opt device=/var/lib/forgejo-nix/volume forgejo-nix
-```
-
-The guest creates and verifies that volume after Docker starts. The cache image is 64 GiB, with Nix retaining 4 GiB of free space and collecting until 8 GiB is free. Every job receives exactly:
-
-```console
---mount type=volume,src=forgejo-nix,dst=/nix
-```
-
-One canonical `forgejo-runner-nix` image serves every runner label. It combines the Node 20 Bookworm base required by Forgejo JavaScript actions and FHS-native tools with only Nix, Git, CA certificates, and minimal POSIX utilities. It carries the normal `/nix/store` configuration, an explicit empty `build-users-group` for direct job Nix, the cache.nixos substituter and key, 4/8 GiB `min-free`/`max-free` watermarks, a post-build hook that removes the unsandboxed builder's `/homeless-shelter` between derivations, and `sandbox = false` for local Docker jobs. Application services and toolchains—including PostgreSQL, Mailpit, Devenv, Chromium, Rust, and a second Node runtime—are deliberately not embedded. There is no guest Nix daemon, socket, remote setting, custom store URL, cache service, pressure timer, cache-path bind mount, or boot-store copy.
-
-The runner's `nixSeedEpoch` must match every selected image. A populated cache volume with another epoch, or unexpected legacy contents without an epoch, fails startup. Increment the runner and image epoch only for a seed change that makes the existing `/nix` layout incompatible, then perform the owner reset below; removal of an unused seed utility is compatible and does not reset cached paths.
-
-Nix's native `min-free`/`max-free` behavior bounds local-store collection. The filesystem remains fixed-size and the cache is shared by jobs on that runner, so path names, cache hits, timing, and capacity are not repository-confidential. Forgejo's Actions cache backend is intentionally disabled; `actions/cache` is therefore unsupported on this runner and should not be used as a second cache layer.
-
-A project that pins a new Nixpkgs revision can request a derivation that is not yet available from a configured binary cache. Nix then builds it locally once; large SDK bootstrap builds can take a long time. Do not restart a running build to speed it up. Successful outputs stay in the persistent 64 GiB cache and are reused by later jobs.
-
-## Owner migration and reset
-
-The declared cache is now 64 GiB, while an older installation may still have a 12 GiB `nix-cache.raw`. Deployment does not resize that file automatically. The storage service arms a migration interlock and the VM remains blocked until the owner performs the cache-only migration.
-
-Stop and runtime-mask the VM before deploying the cache change. The migration is destructive only to the persistent Nix cache; it does not touch runner state, Docker data, workspace, or Forgejo state.
-
-```console
-cd /home/hieronim/Projects/nixos-config
-sudo systemctl mask --runtime --now microvm@forgejo-runner.service
-nh os switch .#server-legion
-sudo systemctl is-enabled microvm@forgejo-runner.service
-sudo systemctl is-active microvm@forgejo-runner.service
-sudo systemctl start forgejo-runner-nix-cache-migrate-global.service
-sudo journalctl -u forgejo-runner-nix-cache-migrate-global.service --since today --no-pager
-sudo stat -c '%n %s bytes' /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
-sudo blkid /var/lib/microvms/forgejo-runner-storage-global/nix-cache/nix-cache.raw
-```
-
-The migration service refuses to run unless the VM remains `masked`/`masked-runtime` and `inactive`, the cache is unmounted and unattached, and the old image is smaller than the declared size. It temporarily retires the old image, creates and validates a fresh 64 GiB ext4 image, then removes the retired cache only after validation succeeds. A failed migration leaves the interlock armed and never changes `var.raw`.
-
-For a cache reset after a future seed epoch change, when the image already has the declared size, use the separate owner-only reset service instead:
-
-```console
-sudo systemctl start forgejo-runner-nix-cache-reset-global.service
-sudo journalctl -u forgejo-runner-nix-cache-reset-global.service --since today --no-pager
-```
-
-After either successful operation, boot the VM:
-
-```console
-sudo systemctl unmask --runtime microvm@forgejo-runner.service
-sudo systemctl start microvm@forgejo-runner.service
-sudo journalctl -u microvm@forgejo-runner.service --since today --no-pager
-```
-
-Run two Nix jobs on the same runner, reboot the VM, and run the jobs again. Confirm the second run reuses the persistent `/nix` volume, while workspace and Docker data remain disposable.
-
-## Validation
-
-Use non-activating checks:
-
-```console
-nix flake check
-pre-commit run --all-files
-```
-
-For a running guest, use read-only checks such as:
-
-```console
-findmnt -no SOURCE,FSTYPE,OPTIONS /var/lib/forgejo-nix
-df -h /var/lib/forgejo-nix
-docker volume inspect forgejo-nix
-docker volume ls
-systemctl status docker.service forgejo-runner-nix-volume-global.service gitea-runner-global.service
-```
-
-Pin every workflow `uses:` reference to an immutable commit SHA. Keep deployment credentials and mutually distrusting repositories on separate runners.
-
-## Docker job diagnostics
-
-The guest-root Docker observer records job and service-container lifecycle, network endpoints and aliases, selected `forgejo-nix` mount metadata, and Docker capability metadata. Jobs use Docker's standard default capability profile and retain each image's own `PATH` inside the isolated VM; they never receive Docker access or record environment values or container logs. During an active job, inspect it from the host with:
-
-```console
-sudo journalctl -fu microvm@forgejo-runner.service -o cat | grep --line-buffered 'Docker observer:'
-```
-
-For repeated package-fetch failures, inspect the error-only Squid log:
-
-```console
-sudo cat /run/forgejo-runner-egress-global/egress-errors.log
-```
-
-It records only the timestamp, guest address, method, Squid result, and HTTP status for failed transactions—not destinations, URLs, paths, queries, headers, bodies, successful requests, or environment values. No entry means the Nix builder did not reach Squid; a `5xx` entry means it did and the next investigation is Squid DNS/upstream connectivity.
+The migration does not delete prior VM data. After the old runner is stopped, deregistered, and any required data has been backed up, an operator may manually inspect and remove these obsolete paths: `/var/lib/microvms/forgejo-runner-storage-global/` (`var.raw`, `nix-cache/nix-cache.raw`, `docker/docker.raw`, and `work/work.raw`), `/var/lib/forgejo-nix/volume`, `/var/lib/forgejo-runner-work`, and Docker volume `forgejo-nix`. Do not remove them automatically as part of deployment.

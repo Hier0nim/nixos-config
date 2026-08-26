@@ -2,19 +2,19 @@
 let
   cfg = config.homelab;
   forgejoCfg = cfg.services.forgejo;
-  enabledRunners = lib.filterAttrs (_: runner: runner.enable) forgejoCfg.actions.runners;
+  actionsCfg = forgejoCfg.actions;
 in
 {
-  config = lib.mkIf (cfg.enable && forgejoCfg.enable && enabledRunners != { }) {
-    sops.secrets = lib.mapAttrs' (
-      _: runner:
-      lib.nameValuePair runner.runner.tokenSecret {
-        sopsFile = config.custom.repoPath + "/${runner.runner.tokenSopsFile}";
-        owner = "microvm";
-        group = "kvm";
-        mode = "0400";
-        restartUnits = [ "microvm@${runner.vmName}.service" ];
-      }
-    ) enabledRunners;
+  config = lib.mkIf (cfg.enable && forgejoCfg.enable && actionsCfg.enable) {
+    sops.secrets.${actionsCfg.tokenSecret}.sopsFile =
+      config.custom.repoPath + "/${actionsCfg.tokenSopsFile}";
+
+    sops.templates."forgejo-runner-token.env" = {
+      content = "TOKEN=${config.sops.placeholder.${actionsCfg.tokenSecret}}\n";
+      owner = "gitea-runner";
+      group = "gitea-runner";
+      mode = "0400";
+      restartUnits = [ "gitea-runner-global.service" ];
+    };
   };
 }

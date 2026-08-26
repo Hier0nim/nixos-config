@@ -1,10 +1,8 @@
-{ lib, ... }:
+{ ... }:
 {
-  imports = lib.flatten [
+  imports = [
     ./server.nix
     ./actions.nix
-    ./runner-images.nix
     ./runner-secrets.nix
-    ./runner-vm.nix
   ];
 }
