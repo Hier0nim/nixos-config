@@ -102,7 +102,6 @@
     services = {
       actual.enable = true;
       "enable-actual".enable = true;
-      "remote-pi-relay".enable = true;
       forgejo.enable = true;
       forgejo.actions.runners.global = {
         vmName = "forgejo-runner";
