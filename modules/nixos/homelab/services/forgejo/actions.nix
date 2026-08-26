@@ -53,13 +53,18 @@ in
           pkgs.curl
           pkgs.nodejs_24
           pkgs.nix
+          pkgs.zstd
         ];
         settings = {
           runner = {
             capacity = 1;
             timeout = "3h";
           };
-          cache.enabled = false;
+          host.workdir_parent = "/var/lib/gitea-runner/global/work";
+          cache = {
+            enabled = true;
+            dir = "/var/lib/gitea-runner/global/actions-cache";
+          };
         };
       };
     };

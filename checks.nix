@@ -74,13 +74,16 @@ in
     packages=${lib.escapeShellArg (lib.concatStringsSep "\n" (map toString runnerInstance.hostPackages))}
     packageNames=${lib.escapeShellArg (lib.concatStringsSep "\n" (map lib.getName runnerInstance.hostPackages))}
     nixPackage=${lib.escapeShellArg (lib.getName pkgs.nix)}
+    zstdPackage=${lib.escapeShellArg (lib.getName pkgs.zstd)}
     rwPaths=${lib.escapeShellArg (lib.concatStringsSep "\n" runnerService.serviceConfig.ReadWritePaths)}
     inaccessiblePaths=${lib.escapeShellArg (lib.concatStringsSep "\n" runnerService.serviceConfig.InaccessiblePaths)}
     supplementaryGroups=${lib.escapeShellArg (lib.concatStringsSep "\n" runnerService.serviceConfig.SupplementaryGroups)}
     test "$labels" = nix:host
     test ${toString runnerInstance.settings.runner.capacity} -eq 1
     test ${lib.escapeShellArg runnerInstance.settings.runner.timeout} = 3h
-    test ${if runnerInstance.settings.cache.enabled then "true" else "false"} = false
+    test ${lib.escapeShellArg runnerInstance.settings.host.workdir_parent} = /var/lib/gitea-runner/global/work
+    test ${if runnerInstance.settings.cache.enabled then "true" else "false"} = true
+    test ${lib.escapeShellArg runnerInstance.settings.cache.dir} = /var/lib/gitea-runner/global/actions-cache
     ${pkgs.gnugrep}/bin/grep -Fqx /var/lib/gitea-runner <<<"$rwPaths"
     ${pkgs.gnugrep}/bin/grep -Fqx /var/lib/homelab <<<"$inaccessiblePaths"
     test -z "$supplementaryGroups"
@@ -108,6 +111,7 @@ in
     test ${if hostConfig.nix.settings.sandbox-fallback then "true" else "false"} = false
     ${pkgs.gnugrep}/bin/grep -Eq -- '-nodejs-24[.-]' <<<"$packages"
     ${pkgs.gnugrep}/bin/grep -Fqx "$nixPackage" <<<"$packageNames"
+    ${pkgs.gnugrep}/bin/grep -Fqx "$zstdPackage" <<<"$packageNames"
     touch "$out"
   '';
 
