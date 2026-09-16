@@ -26,7 +26,7 @@ in
       enable = true;
       enableSystemMonitoring = true;
       enableVPN = true;
-      enableClipboardPaste = true;
+      enableDynamicTheming = true;
       niri = {
         enableSpawn = true;
         enableKeybinds = false;
@@ -39,7 +39,7 @@ in
         inputs.danksearch.packages.${pkgs.stdenv.hostPlatform.system}.dsearch.overrideAttrs
           (old: {
             proxyVendor = true;
-            vendorHash = "sha256-d9VdBmHvKSp03h4x59cKXLXGSVMEYAYEaaiBYluO564=";
+            vendorHash = "sha256-W3tEb7OF93RjyIYeCP+JZk5H8GDDUsfeAUdrI+G0TCE=";
           });
     };
 
@@ -99,9 +99,4 @@ in
       wl-clipboard
     ];
   };
-
-  systemd.user.services.dms.Service.Environment = [
-    "QT_QPA_PLATFORMTHEME=qt6ct"
-    "QT_QPA_PLATFORMTHEME_QT6=qt6ct"
-  ];
 }

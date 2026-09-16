@@ -149,12 +149,12 @@
     };
 
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell";
+      url = "github:AvengeMedia/DankMaterialShell/v1.6.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     dank-greeter = {
-      url = "github:AvengeMedia/dank-greeter";
+      url = "github:AvengeMedia/dank-greeter/v1.6.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

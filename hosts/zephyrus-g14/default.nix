@@ -169,7 +169,6 @@ in
 
   environment.systemPackages = with pkgs; [
     stress-ng
-    mprime
     glmark2
     lm_sensors
     cifs-utils
