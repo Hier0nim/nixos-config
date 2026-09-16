@@ -103,9 +103,6 @@ in
         wgConfFile = config.sops.secrets.${wgConfSecretName}.path;
       };
 
-      theme.enable = true;
-      theme.name = "overseerr";
-
       flaresolverr.enable = true;
     }
     // lib.genAttrs arrServices (
@@ -154,16 +151,6 @@ in
         reverseProxy.expose = false;
         apiKey = secretRef "jellyfin_api_key";
 
-        system.pluginRepositories."Intro Skipper" = {
-          url = "https://raw.githubusercontent.com/intro-skipper/manifest/main/10.11/manifest.json";
-          hash = "sha256-g6YxniMc0LAo5oXsqg+kNM31fhb8igS6YVAnz3RnPD0=";
-        };
-
-        system.pluginRepositories."Jellyfin Stable Plugin Repo" = lib.mkForce {
-          url = "https://repo.jellyfin.org/files/plugin/manifest.json";
-          hash = "sha256-fd1auhliBL4maySfnwRpsjiK7yQpiQTJb6ffozy/efo=";
-        };
-
         users.admin = {
           policy.isAdministrator = true;
           password = secretRef "jellyfin_admin_password";
@@ -211,37 +198,49 @@ in
             collectionType = "movies";
             enableRealtimeMonitor = true;
             saveLocalMetadata = false;
+            subtitleFetcherOrder = [
+              "subbuzz"
+              "Open Subtitles"
+            ];
             subtitleDownloadLanguages = [
               "eng"
               "pol"
             ];
             saveSubtitlesWithMedia = true;
             requirePerfectSubtitleMatch = false;
-            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = true;
           };
           Shows = {
             paths = [ "${data.media}/tv" ];
             collectionType = "tvshows";
             enableRealtimeMonitor = true;
+            subtitleFetcherOrder = [
+              "subbuzz"
+              "Open Subtitles"
+            ];
             subtitleDownloadLanguages = [
               "eng"
               "pol"
             ];
             saveSubtitlesWithMedia = true;
             requirePerfectSubtitleMatch = false;
-            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = true;
           };
           Anime = {
             paths = [ "${data.media}/anime" ];
             collectionType = "tvshows";
             enableRealtimeMonitor = true;
+            subtitleFetcherOrder = [
+              "subbuzz"
+              "Open Subtitles"
+            ];
             subtitleDownloadLanguages = [
               "eng"
               "pol"
             ];
             saveSubtitlesWithMedia = true;
             requirePerfectSubtitleMatch = false;
-            skipSubtitlesIfEmbeddedSubtitlesPresent = false;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = true;
           };
         };
 
@@ -252,11 +251,22 @@ in
               OpenSubUserName = config.sops.placeholder.opensubtitles_username;
               OpenSubPassword._secret = config.sops.secrets.opensubtitles_password.path;
               OpenSubApiKey._secret = config.sops.secrets.opensubtitles_api_key.path;
-              EnableOpenSubtitles = true;
+              EnableOpenSubtitles = false;
               EnableSubdlCom = true;
               SubdlApiKey._secret = config.sops.secrets.subdl_api_key.path;
               EnableYifySubtitles = true;
-              Cache.SubLifeInMinutes = 43200;
+              Cache = {
+                SubLifeInMinutes = "Always";
+                Search = true;
+                SearchLifeInMinutes = "4 weeks";
+              };
+            };
+          };
+          "Open Subtitles" = {
+            enable = true;
+            config = {
+              Username = config.sops.placeholder.opensubtitles_username;
+              Password._secret = config.sops.secrets.opensubtitles_password.path;
             };
           };
           "Subtitle Extract" = {
@@ -270,7 +280,6 @@ in
             package = {
               version = "1.10.11.17";
               hash = "sha256-cfEnLqKeEGpQSth3NPjDnxCkgv2pePfgCXfVIOrYSiQ=";
-              repository = "Intro Skipper";
             };
           };
         };

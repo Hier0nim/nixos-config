@@ -55,32 +55,6 @@
         }
       );
 
-      # ========= Utility Apps =========
-      apps = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          update-plugin-hashes = {
-            type = "app";
-            program =
-              let
-                app = pkgs.writeShellApplication {
-                  name = "update-plugin-hashes";
-                  runtimeInputs = with pkgs; [
-                    curl
-                    nix
-                    gnused
-                  ];
-                  text = builtins.readFile ./scripts/update-plugin-hashes.sh;
-                };
-              in
-              "${app}/bin/update-plugin-hashes";
-          };
-        }
-      );
-
       # ========= DevShell =========
       # Custom shell for bootstrapping on new hosts, modifying nix-config, and secrets management
       devShells = forAllSystems (
@@ -111,7 +85,7 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     nixflix = {
-      url = "github:kiriwalawren/nixflix/2aa1d080f760584d1205575f730525349f5c38cb";
+      url = "github:kiriwalawren/nixflix/v3.1.0";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     copyparty = {

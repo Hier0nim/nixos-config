@@ -803,17 +803,17 @@
         "vpn-confinement": "vpn-confinement"
       },
       "locked": {
-        "lastModified": 1783006321,
-        "narHash": "sha256-JbzDiK4lQ+Wt7cAC3rhaG+PBnv5OHVMMHgGKUoxWjaA=",
+        "lastModified": 1788532869,
+        "narHash": "sha256-L+OGzRUhnTwUh09C9neDxucaMLcaA6oApLJrPvMLNjI=",
         "owner": "kiriwalawren",
         "repo": "nixflix",
-        "rev": "2aa1d080f760584d1205575f730525349f5c38cb",
+        "rev": "07b5ffc95e8c5a1ab182eb4f03b0d3d0cc99e9a3",
         "type": "github"
       },
       "original": {
         "owner": "kiriwalawren",
+        "ref": "v3.1.0",
         "repo": "nixflix",
-        "rev": "2aa1d080f760584d1205575f730525349f5c38cb",
         "type": "github"
       }
     },
@@ -1593,11 +1593,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780220602,
-        "narHash": "sha256-eynAfOmbmxJnkp7YewvCEbShNnnYJ9gLLqkzsYtBPeM=",
+        "lastModified": 1786901030,
+        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "rev": "db947814a175b7ca6ded66e21383d938df01c227",
+        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
         "type": "github"
       },
       "original": {
@@ -1656,11 +1656,11 @@
     },
     "vpn-confinement": {
       "locked": {
-        "lastModified": 1778182451,
-        "narHash": "sha256-Bz3n2THDGf90Z9gMqhH/J492prYH8B6RFRlxv/fPBwc=",
+        "lastModified": 1788035501,
+        "narHash": "sha256-3Xs9lCMwjvFURU7/fPEGDR5kCKvcdX2l5Fah1nZoaGQ=",
         "owner": "Maroka-chan",
         "repo": "VPN-Confinement",
-        "rev": "cf5bfc4c3559f2e783698b1aa23c165072039a7d",
+        "rev": "ce8949125b698406810ea71a8bd7b567d9a0b09f",
         "type": "github"
       },
       "original": {

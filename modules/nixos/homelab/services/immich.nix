@@ -1,6 +1,8 @@
 {
   config,
+  inputs,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -53,6 +55,7 @@ in
 
     services.immich = {
       enable = true;
+      package = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.immich;
       host = "127.0.0.1";
       openFirewall = false;
       inherit port;
