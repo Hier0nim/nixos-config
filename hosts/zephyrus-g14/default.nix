@@ -59,6 +59,21 @@ in
     # ../../modules/nixos/services/howdy.nix
   ];
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      # Temporary downgrade: upstream linux-firmware 20260910 regresses AMD DMCUB; keep known-good 20260810.
+      linux-firmware = prev.linux-firmware.overrideAttrs (_: rec {
+        version = "20260810";
+        src = final.fetchFromGitLab {
+          owner = "kernel-firmware";
+          repo = "linux-firmware";
+          tag = version;
+          hash = "sha256-P/fPpqaatp8Z2GV+I/OChiWGn6AhV+8w1RMFuX/LqHc=";
+        };
+      });
+    })
+  ];
+
   networking = {
     hostName = "zephyrus-g14";
 
