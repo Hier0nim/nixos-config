@@ -95,7 +95,6 @@ in
       kdePackages.qt6ct
       libsForQt5.qt5ct
       papirus-icon-theme
-      swappy
       wl-clipboard
     ];
   };

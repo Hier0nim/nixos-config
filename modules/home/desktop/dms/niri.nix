@@ -52,7 +52,6 @@ in
         QT_QPA_PLATFORMTHEME = "qt6ct";
         QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
         ELECTRON_OZONE_PLATFORM_HINT = "auto";
-        DMS_SCREENSHOT_EDITOR = "swappy";
       };
 
       spawn-at-startup = [
@@ -61,6 +60,14 @@ in
             (lib.getExe niriFloatSticky)
             "-title"
             "(?i)(picture[- ]in[- ]picture|\\bpip\\b)"
+          ];
+        }
+        {
+          command = [
+            "${pkgs.coreutils}/bin/env"
+            "GSK_RENDERER=gl"
+            (lib.getExe pkgs.nautilus)
+            "-n"
           ];
         }
       ];
@@ -416,15 +423,34 @@ in
 
         "Mod+Shift+S" = hidden // {
           hotkey-overlay.title = "Screenshot (interactive)";
-          action.spawn = dmsIpc "niri" "screenshot" [ ];
+          action.spawn = [
+            "dms"
+            "screenshot"
+          ];
         };
         "Ctrl+Mod+Shift+S" = hidden // {
           hotkey-overlay.title = "Screenshot (screen)";
-          action.spawn = dmsIpc "niri" "screenshotScreen" [ ];
+          action.spawn = [
+            "dms"
+            "screenshot"
+            "full"
+          ];
         };
         "Alt+Mod+Shift+S" = hidden // {
           hotkey-overlay.title = "Screenshot (window)";
-          action.spawn = dmsIpc "niri" "screenshotWindow" [ ];
+          action.spawn = [
+            "dms"
+            "screenshot"
+            "window"
+          ];
+        };
+        "Ctrl+Alt+Mod+Shift+S" = hidden // {
+          hotkey-overlay.title = "Screenshot (scroll)";
+          action.spawn = [
+            "dms"
+            "screenshot"
+            "scroll"
+          ];
         };
         "Mod+Escape" = hidden // {
           allow-inhibiting = false;

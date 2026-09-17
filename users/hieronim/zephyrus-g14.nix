@@ -33,7 +33,7 @@
     qbittorrent
     proton-vpn
     protonmail-desktop
-    libreoffice-fresh
+    libreoffice-stable
     jellyfin-desktop
     via
   ];

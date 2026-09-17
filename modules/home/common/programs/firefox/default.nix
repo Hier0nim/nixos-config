@@ -28,6 +28,9 @@ let
     # Enable search in location bar
     "keyword.enabled" = true;
 
+    # Disable hardware video decoding
+    "media.hardware-video-decoding.enabled" = false;
+
     # Enable IPv6 again
     "network.dns.disableIPv6" = false;
 
