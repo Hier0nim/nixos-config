@@ -54,6 +54,7 @@
   "showWorkspaceName": true,
   "showWorkspaceApps": true,
   "showOccupiedWorkspacesOnly": true,
+  "workspaceActiveAppHighlightEnabled": true,
   "focusedWindowShowIcon": false,
   "weatherEnabled": false,
   "networkPreference": "wifi",
@@ -105,8 +106,6 @@
     }
   ],
   "notificationFocusedMonitor": true,
-  "dankIslandNotificationBadgeClearOnOpen": true,
-  "dankIslandHomeStatusSlot": "right",
   "osdPosition": 3,
   "osdPowerProfileEnabled": true,
   "powerActionConfirm": false,
@@ -148,7 +147,8 @@
         {
           "id": "clock",
           "enabled": true,
-          "clockCompactMode": false
+          "clockCompactMode": false,
+          "clockDateOrder": "timeFirst"
         },
         {
           "id": "privacyIndicator",
@@ -163,7 +163,8 @@
       "rightWidgets": [
         {
           "id": "systemTray",
-          "enabled": true
+          "enabled": true,
+          "trayUseInlineExpansion": true
         },
         {
           "id": "dankKDEConnect",
@@ -179,16 +180,17 @@
           "minimumWidth": true
         },
         {
-          "id": "ddcBrightness",
-          "enabled": true
-        },
-        {
           "id": "batteryPlus",
           "enabled": true
         },
         {
           "id": "controlCenterButton",
-          "enabled": true
+          "enabled": true,
+          "showIdleInhibitorIcon": false,
+          "showBatteryIcon": false,
+          "showBrightnessIcon": false,
+          "showBrightnessPercent": false,
+          "showAudioPercent": false
         }
       ],
       "spacing": 0,
@@ -231,7 +233,48 @@
       "shadowColorMode": "text",
       "shadowCustomColor": "#000000",
       "clickThrough": false,
-      "attachToScreenEdge": false
+      "attachToScreenEdge": false,
+      "islandFloating": false,
+      "islandUseOverlayLayer": false,
+      "islandCompactThickness": 28,
+      "islandOuterGap": 5,
+      "barInsetPadding": 5,
+      "islandHomeClockDisplay": "both",
+      "islandHomeCompactTight": false,
+      "islandHomeLayout": [
+        {
+          "id": "media",
+          "enabled": true
+        },
+        {
+          "id": "clock",
+          "enabled": true
+        },
+        {
+          "id": "weather",
+          "enabled": false
+        },
+        {
+          "id": "status",
+          "enabled": false
+        },
+        {
+          "id": "volume",
+          "enabled": false
+        },
+        {
+          "id": "brightness",
+          "enabled": false
+        },
+        {
+          "id": "notifications",
+          "enabled": true
+        }
+      ],
+      "islandSatellitesEnabled": true,
+      "islandReducedMotion": false,
+      "hoverPopouts": true,
+      "hoverPopoutDelay": 150
     }
   ],
   "desktopClockCustomColor": {
@@ -269,14 +312,20 @@
     },
     "dms_qr_generator": {
       "trigger": "qrg"
+    },
+    "dms_power": {
+      "trigger": "pw"
     }
   },
+  "clipboardClickToPaste": true,
   "clipboardEnterToPaste": true,
+  "clipboardUseOverlayLayer": true,
   "frameEnabled": true,
   "frameThickness": 2,
   "frameRounding": 10,
   "frameShowOnOverview": true,
   "frameCloseGaps": false,
   "frameLauncherArcExtender": true,
-  "configVersion": 16
+  "frameBarInsetPadding": 2,
+  "configVersion": 17
 }
