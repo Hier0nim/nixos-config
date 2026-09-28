@@ -63,11 +63,13 @@ in
           ];
         }
         {
+          # Service mode avoids a window; NAUTILUS_PERSIST keeps the warmed process alive.
           command = [
             "${pkgs.coreutils}/bin/env"
             "GSK_RENDERER=gl"
+            "NAUTILUS_PERSIST=1"
             (lib.getExe pkgs.nautilus)
-            "-n"
+            "--gapplication-service"
           ];
         }
       ];
