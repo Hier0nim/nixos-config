@@ -753,11 +753,11 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1788667329,
-        "narHash": "sha256-otEOHrqj8DsKVve6X8c1MTHHBgTPJ/sAlmV0PQdFo+4=",
+        "lastModified": 1790621660,
+        "narHash": "sha256-bGPbT+LSvBDKKiZTCvNRZE6VL5cdnTPvYpHH/JUJfHM=",
         "owner": "rbright",
         "repo": "nix-pi-agent",
-        "rev": "76351e25bc949d176de6df410701fc5385705505",
+        "rev": "3b93831e519b93656acb93b2de0f52a34804d51c",
         "type": "github"
       },
       "original": {
@@ -1114,11 +1114,11 @@
         "progress-mcp": "progress-mcp"
       },
       "locked": {
-        "lastModified": 1788763748,
-        "narHash": "sha256-EpeDAAcRLD7fWCiXQvoJ3FXism6Vh7tz2VTdN8SlGj4=",
+        "lastModified": 1790621952,
+        "narHash": "sha256-+GSi4izXr+Z9OYQGYSD0pxGVX8xmQAdnBp2odwjwaJg=",
         "ref": "refs/heads/main",
-        "rev": "d3f995de7aaed0af58dc29a323bfbe34f7cf3df7",
-        "revCount": 143,
+        "rev": "4f618575ab35c9a059faaad53ed88222fedbe402",
+        "revCount": 146,
         "type": "git",
         "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
       },
@@ -1288,11 +1288,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1788362815,
-        "narHash": "sha256-kftRIC2ZOG9XBDZrkoJTxvQ2HJsUM2ve3Kdf8oNM6SY=",
+        "lastModified": 1789664046,
+        "narHash": "sha256-2jciHV5LH2JqO6enMwy3BQK6Op+0QpsyGtwMizykUEM=",
         "ref": "main",
-        "rev": "92f0bef76726d2f9f422eb2934ce006f67cabb70",
-        "revCount": 38,
+        "rev": "a591f960130e20c8d33a47d8a6f466cfecf03dfd",
+        "revCount": 42,
         "type": "git",
         "url": "ssh://git@github.com/Hier0nim/progress-mcp.git"
       },
