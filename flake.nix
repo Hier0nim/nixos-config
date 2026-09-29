@@ -110,14 +110,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    cosmic-manager = {
-      url = "github:HeitorAugustoLN/cosmic-manager";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        home-manager.follows = "home-manager";
-      };
-    };
-
     umbriel = {
       url = "git+https://github.com/noctalia-dev/umbriel";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -125,36 +117,6 @@
     noctalia.url = "github:noctalia-dev/noctalia/cachix";
     noctalia-greeter = {
       url = "github:noctalia-dev/noctalia-greeter";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    dms = {
-      url = "github:AvengeMedia/DankMaterialShell/v1.6.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    dank-greeter = {
-      url = "github:AvengeMedia/dank-greeter/v1.6.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    danksearch = {
-      url = "github:AvengeMedia/danksearch";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    dankcalendar = {
-      url = "github:AvengeMedia/dankcalendar";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    niri = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    niri-float-sticky = {
-      url = "github:probeldev/niri-float-sticky";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
