@@ -35,7 +35,9 @@ in
   imports = [
     inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
     inputs.disko.nixosModules.disko
-    inputs.dank-greeter.nixosModules.default
+    inputs.umbriel.nixosModules.default
+    inputs.noctalia.nixosModules.default
+    inputs.noctalia-greeter.nixosModules.default
 
     ./disko.nix
     ./hardware-configuration.nix
@@ -46,7 +48,7 @@ in
     ../../modules/nixos/profiles/laptop.nix
     ../../modules/nixos/profiles/workstation.nix
     ../../modules/nixos/profiles/gaming.nix
-    ../../modules/nixos/profiles/dms.nix
+    ../../modules/nixos/profiles/umbriel-zephyrus.nix
 
     ../../modules/nixos/boot/plymouth.nix
     ../../modules/nixos/boot/usbcore.nix
@@ -57,6 +59,12 @@ in
     ../../modules/nixos/services/local-llama.nix
 
     # ../../modules/nixos/services/howdy.nix
+  ];
+
+  # Noctalia's official binary cache is trusted on this laptop only.
+  nix.settings.substituters = lib.mkAfter [ "https://noctalia.cachix.org" ];
+  nix.settings.trusted-public-keys = lib.mkAfter [
+    "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
   ];
 
   nixpkgs.overlays = [
@@ -183,6 +191,7 @@ in
   powerManagement.powertop.enable = true;
 
   environment.systemPackages = with pkgs; [
+    ddcutil
     stress-ng
     glmark2
     lm_sensors

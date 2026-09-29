@@ -1,0 +1,115 @@
+# Reference template: copy manually to ~/.config/umbriel/config.toml and edit there.
+# The display plugin owns outputs.toml; never replace that file.
+[include]
+files = ["outputs.toml"]
+
+[general]
+autostart = ["noctalia", "env GSK_RENDERER=gl NAUTILUS_PERSIST=1 nautilus --gapplication-service"]
+
+[input.keyboard]
+layout = "pl"
+repeat_delay = 600
+repeat_rate = 25
+
+[input.focus]
+follows_mouse = false
+
+[input.touchpad]
+tap = true
+natural_scroll = true
+
+[layout]
+mode = "scrolling"
+gap = 5
+
+# Declaring keybinds replaces the built-in set; keep navigation, workspaces
+# and all four scratchpad operations alongside the Niri-style shortcuts.
+[keybinds]
+"Mod+Return" = { action = "spawn:ghostty", repeat = false }
+"Mod+T" = { action = "spawn:ghostty", repeat = false }
+"Mod" = { action = "spawn:noctalia msg panel-toggle launcher", repeat = false }
+"Mod+Q" = { action = "window-close", repeat = false }
+"Mod+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true, repeat = false }
+"Mod+Ctrl+L" = { action = "spawn:noctalia msg session lock", repeat = false }
+"Mod+Ctrl+E" = { action = "spawn:noctalia msg panel-toggle session", repeat = false }
+"Mod+B" = { action = "spawn:firefox", repeat = false }
+"Mod+I" = { action = "spawn:noctalia msg settings-toggle", repeat = false }
+"Mod+C" = { action = "spawn:noctalia msg panel-toggle control-center calendar", repeat = false }
+"Mod+D" = { action = "spawn:noctalia msg panel-toggle control-center home", repeat = false }
+"Alt+Tab" = { action = "spawn:noctalia msg window-switcher open", repeat = false }
+"Mod+F12" = { action = "cheatsheet-toggle", repeat = false }
+"Mod+V" = { action = "spawn:noctalia msg panel-toggle clipboard", repeat = false }
+"Mod+N" = { action = "spawn:noctalia msg panel-toggle control-center notifications", repeat = false }
+"Mod+Shift+S" = { action = "spawn:noctalia msg screenshot-region", repeat = false }
+"Mod+Ctrl+Shift+S" = { action = "spawn:noctalia msg screenshot-fullscreen", repeat = false }
+"Mod+Alt+Shift+S" = { action = "spawn:noctalia msg screenshot-annotate", repeat = false }
+"XF86AudioRaiseVolume" = "spawn:noctalia msg volume-up 3"
+"XF86AudioLowerVolume" = "spawn:noctalia msg volume-down 3"
+"XF86AudioMute" = { action = "spawn:noctalia msg volume-mute", repeat = false }
+"XF86AudioMicMute" = { action = "spawn:noctalia msg mic-mute", repeat = false }
+"XF86MonBrightnessUp" = "spawn:noctalia msg brightness-up"
+"XF86MonBrightnessDown" = "spawn:noctalia msg brightness-down"
+"XF86AudioPlay" = { action = "spawn:noctalia msg media toggle", repeat = false }
+"XF86AudioPause" = { action = "spawn:noctalia msg media toggle", repeat = false }
+"XF86AudioNext" = { action = "spawn:noctalia msg media next", repeat = false }
+"XF86AudioPrev" = { action = "spawn:noctalia msg media previous", repeat = false }
+
+"Mod+Left" = "window-focus-left"
+"Mod+Down" = "window-focus-down"
+"Mod+Up" = "window-focus-up"
+"Mod+Right" = "window-focus-right"
+"Mod+H" = "window-focus-left"
+"Mod+J" = "window-focus-down"
+"Mod+K" = "window-focus-up"
+"Mod+L" = "window-focus-right"
+"Mod+F1" = "window-focus-next"
+"Mod+Shift+Left" = "column-move-left"
+"Mod+Shift+Down" = "window-move-down"
+"Mod+Shift+Up" = "window-move-up"
+"Mod+Shift+Right" = "column-move-right"
+"Mod+Shift+H" = "column-move-left"
+"Mod+Shift+J" = "window-move-down"
+"Mod+Shift+K" = "window-move-up"
+"Mod+Shift+L" = "column-move-right"
+
+"Mod+G" = { action = "window-toggle-floating", repeat = false }
+"Mod+Shift+T" = { action = "window-focus-switch-floating", repeat = false }
+"Mod+P" = { action = "window-toggle-pinned", repeat = false }
+"Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
+"Mod+F" = { action = "window-toggle-maximize", repeat = false }
+"Mod+Shift+F" = { action = "window-toggle-fullscreen", repeat = false }
+"Mod+R" = "window-cycle-primary-extent"
+"Mod+Shift+R" = "window-cycle-primary-extent-back"
+"Mod+Comma" = "window-consume-left"
+"Mod+Period" = "window-consume-right"
+"Mod+WheelUp" = "window-focus-left"
+"Mod+WheelDown" = "window-focus-right"
+"Mod+Y" = { action = "workspace-set-layout:toggle", repeat = false }
+"Mod+O" = { action = "overview-toggle", repeat = false }
+
+"Mod+1" = "workspace-switch:1"
+"Mod+2" = "workspace-switch:2"
+"Mod+3" = "workspace-switch:3"
+"Mod+4" = "workspace-switch:4"
+"Mod+5" = "workspace-switch:5"
+"Mod+6" = "workspace-switch:6"
+"Mod+7" = "workspace-switch:7"
+"Mod+8" = "workspace-switch:8"
+"Mod+9" = "workspace-switch:9"
+"Mod+Shift+1" = "window-move-to-workspace:1"
+"Mod+Shift+2" = "window-move-to-workspace:2"
+"Mod+Shift+3" = "window-move-to-workspace:3"
+"Mod+Shift+4" = "window-move-to-workspace:4"
+"Mod+Shift+5" = "window-move-to-workspace:5"
+"Mod+Shift+6" = "window-move-to-workspace:6"
+"Mod+Shift+7" = "window-move-to-workspace:7"
+"Mod+Shift+8" = "window-move-to-workspace:8"
+"Mod+Shift+9" = "window-move-to-workspace:9"
+
+"Mod+Shift+Space" = { action = "window-move-to-scratchpad", repeat = false }
+"Mod+Space" = { action = "scratchpad-toggle", repeat = false }
+"Mod+Ctrl+Space" = { action = "window-restore-from-scratchpad", repeat = false }
+"Mod+Tab" = { action = "scratchpad-focus-next", repeat = false }
+
+[include.optional]
+files = ["noctalia.toml"]

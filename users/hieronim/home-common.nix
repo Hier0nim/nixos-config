@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   custom = {
     username = "hieronim";
@@ -17,7 +17,7 @@
       EDITOR = "nvim";
       TERM = "ghostty";
       BROWSER = "firefox";
-      SHELL = "${pkgs.nushell}/bin/nu";
+      SHELL = "/run/current-system/sw/bin/nu";
       FLAKE = config.custom.worktreePath;
       USERNAME = config.custom.username;
     };

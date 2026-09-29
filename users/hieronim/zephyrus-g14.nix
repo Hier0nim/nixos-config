@@ -8,7 +8,7 @@
   imports = [
     ./home-common.nix
 
-    (customLib.relativeToRoot "modules/home/profiles/desktop.nix")
+    (customLib.relativeToRoot "modules/home/profiles/umbriel-zephyrus.nix")
     (customLib.relativeToRoot "modules/home/profiles/dev.nix")
     (customLib.relativeToRoot "modules/home/profiles/gaming.nix")
     (customLib.relativeToRoot "modules/home/profiles/remote-admin.nix")
