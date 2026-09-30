@@ -49,11 +49,11 @@ in
           ])
         ];
         hashedPasswordFile = config.sops.secrets.user_password_hash.path;
-        shell = pkgs.nushell;
+        shell = pkgs.zsh;
       };
 
       root = {
-        shell = pkgs.nushell;
+        shell = pkgs.zsh;
         hashedPasswordFile = config.sops.secrets.root_password_hash.path;
       };
     };

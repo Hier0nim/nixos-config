@@ -7,7 +7,7 @@
     ./bash.nix
     ./carapace.nix
     ./direnv.nix
-    ./nushell.nix
+    ./zsh.nix
     ./starship.nix
     ./yazi.nix
     ./fastfetch.nix

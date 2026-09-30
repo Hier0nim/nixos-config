@@ -17,7 +17,7 @@
       EDITOR = "nvim";
       TERM = "ghostty";
       BROWSER = "firefox";
-      SHELL = "/run/current-system/sw/bin/nu";
+      SHELL = "/run/current-system/sw/bin/zsh";
       FLAKE = config.custom.worktreePath;
       USERNAME = config.custom.username;
     };

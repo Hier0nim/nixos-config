@@ -3,7 +3,7 @@
   programs.yazi = {
     enable = true;
     package = pkgs.yazi;
-    enableNushellIntegration = true;
+    enableZshIntegration = true;
     shellWrapperName = "y";
     settings = {
       mgr = {
@@ -17,7 +17,6 @@
   home.packages = with pkgs; [
     fd
     ffmpegthumbnailer
-    fzf
     jq
     poppler
     ripgrep

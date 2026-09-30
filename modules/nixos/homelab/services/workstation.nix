@@ -135,17 +135,23 @@ in
             };
           };
 
+          programs.zsh.enable = true;
+
           users = {
             mutableUsers = false;
+            defaultUserShell = pkgs.zsh;
             groups.sops.gid = 984;
             users = {
-              root.openssh.authorizedKeys.keys = cfg.ssh.authorizedKeys;
+              root = {
+                shell = pkgs.zsh;
+                openssh.authorizedKeys.keys = cfg.ssh.authorizedKeys;
+              };
 
               ${ws.user} = {
                 isNormalUser = true;
                 uid = 1000;
                 home = "/home/${ws.user}";
-                shell = pkgs.nushell;
+                shell = pkgs.zsh;
                 extraGroups = [ "sops" ];
                 openssh.authorizedKeys.keys = cfg.ssh.authorizedKeys;
               };
@@ -171,6 +177,7 @@ in
           };
 
           environment.systemPackages = with pkgs; [
+            zsh
             curl
             git
             socat
