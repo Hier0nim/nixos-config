@@ -42,6 +42,17 @@ let
   };
 in
 {
+  "maintainerr-cleanup-policy-regression" =
+    let
+      rules = pkgs.writeText "maintainerr-cleanup-rules.json" (
+        builtins.toJSON hostConfig.nixflix.maintainerr.rules
+      );
+    in
+    pkgs.runCommand "maintainerr-cleanup-policy-regression" { } ''
+      ${pkgs.python3}/bin/python ${./scripts/test-maintainerr-rules.py} ${rules}
+      touch "$out"
+    '';
+
   "nixflix-unstable-packages-regression" =
     assert lib.all (
       name:

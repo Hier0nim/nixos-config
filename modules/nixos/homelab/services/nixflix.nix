@@ -156,6 +156,7 @@ in
       jellyfin = {
         inherit (cfg.services.jellyfin) enable;
         package = mediaPkgs.jellyfin;
+        system.serverName = "Grzybflix";
         reverseProxy.expose = false;
         apiKey = secretRef "jellyfin_api_key";
 
@@ -312,7 +313,14 @@ in
         inherit (cfg.services.maintainerr) enable group;
         package = mediaPkgs.maintainerr;
         reverseProxy.expose = false;
-        settings.forceJellyfinToIgnoreEmptyMediaFolders = false;
+        settings = {
+          forceJellyfinToIgnoreEmptyMediaFolders = false;
+          # Refresh eligibility hourly; process expired grace periods daily.
+          # These are separate jobs, not an atomic recheck immediately before deletion.
+          jobs.rules_handler_job_cron = "0 * * * *";
+          jobs.collection_handler_job_cron = "30 5 * * *";
+        };
+        rules = import ./maintainerr-rules.nix { inherit lib; };
       };
 
       torrentClients.qbittorrent = {
