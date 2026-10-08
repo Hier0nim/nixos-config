@@ -24,8 +24,37 @@ let
   ];
   nixflixSetupUnit = hostServices.nixflix-setup-dirs;
   forgejoSnapshotUnit = hostServices.homelab-forgejo-snapshot;
+  mediaPkgs =
+    inputs.nixpkgs.legacyPackages.${hostConfig.nixpkgs.hostPlatform.system}.extend
+      inputs.nixflix.overlays.default;
+  # Verify effective service packages, including Nixflix's passthrough options.
+  mediaPackages = {
+    radarr = hostConfig.nixflix.radarr.package;
+    sonarr = hostConfig.nixflix.sonarr.package;
+    sonarr-anime = hostConfig.nixflix.sonarr-anime.package;
+    prowlarr = hostConfig.nixflix.prowlarr.package;
+    jellyfin = hostConfig.nixflix.jellyfin.package;
+    seerr = hostConfig.nixflix.seerr.package;
+    maintainerr = hostConfig.nixflix.maintainerr.package;
+    qbittorrent-nox = hostConfig.services.qbittorrent.package;
+    flaresolverr = hostConfig.services.flaresolverr.package;
+    recyclarr = hostConfig.services.recyclarr.package;
+  };
 in
 {
+  "nixflix-unstable-packages-regression" =
+    assert lib.all (
+      name:
+      mediaPackages.${name}.drvPath
+      == mediaPkgs.${if name == "sonarr-anime" then "sonarr" else name}.drvPath
+    ) (lib.attrNames mediaPackages);
+    assert lib.all (plugin: !plugin.enable || plugin.package != null) (
+      lib.attrValues hostConfig.nixflix.jellyfin.plugins
+    );
+    pkgs.runCommand "nixflix-unstable-packages-regression" { } ''
+      touch "$out"
+    '';
+
   "homelab-state-root-regression" = pkgs.runCommand "homelab-state-root-regression" { } ''
     rootTmpfiles=${lib.escapeShellArg (lib.concatStringsSep "\n" hostConfig.systemd.tmpfiles.rules)}
     rootRequires=${lib.escapeShellArg (lib.concatStringsSep "\n" stateRootUnit.requires)}
@@ -55,7 +84,13 @@ in
     contains homelab-state-root.service "$nixflixAfter"
     contains homelab-state-root.service "$snapshotRequires"
     contains homelab-state-root.service "$snapshotAfter"
-    ${pkgs.gnugrep}/bin/grep -F -- '--prefix=/var/lib/homelab' <<<"$nixflixScript"
+    ${pkgs.gnugrep}/bin/grep -F -- '--prefix=/var/lib/homelab/nixflix' <<<"$nixflixScript"
+    ${pkgs.gnugrep}/bin/grep -F -- '--prefix=/data/media' <<<"$nixflixScript"
+    ${pkgs.gnugrep}/bin/grep -F -- '--prefix=/data/downloads' <<<"$nixflixScript"
+    if ${pkgs.gnugrep}/bin/grep -E -- '--prefix=/var/lib/homelab([[:space:]]|$)' <<<"$nixflixScript"; then
+      echo 'Nixflix setup must not process unrelated homelab state' >&2
+      exit 1
+    fi
     ${pkgs.gnugrep}/bin/grep -F 'mkdir -m 0700 /var/lib/homelab/forgejo-backup.new' <<<"$snapshotScript"
     if ${pkgs.gnugrep}/bin/grep -F 'install -d -m 0700 /var/lib/homelab' <<<"$snapshotScript"; then
       exit 1

@@ -85,8 +85,8 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     nixflix = {
-      url = "github:kiriwalawren/nixflix/v3.1.0";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      url = "github:kiriwalawren/nixflix/v3.2.0";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     copyparty = {
       url = "github:9001/copyparty";

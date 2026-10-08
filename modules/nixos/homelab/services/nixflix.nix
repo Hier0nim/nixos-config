@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -11,6 +12,11 @@ let
   inherit (cfg.media.vpn) wgConfSecretName;
   nixflixStateServices = lib.attrNames (lib.filterAttrs (_: svc: svc.runsUnderNixflix) cfg.services);
   jellyfinHwAccel = cfg.services.jellyfin.hardwareAcceleration;
+  # Keep media applications on the local unstable pin without changing host pkgs.
+  # Nixflix's overlay supplies Maintainerr, which is absent from nixpkgs.
+  mediaPkgs =
+    inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.extend
+      inputs.nixflix.overlays.default;
 
   mediaSecretsFile = "${config.custom.repoPath}/secrets/${hostName}/media.yaml";
   mkMediaSecret = name: {
@@ -112,6 +118,7 @@ in
       in
       {
         inherit (cfg.services.${name}) enable;
+        package = mediaPkgs.${if name == "sonarr-anime" then "sonarr" else name};
         vpn.enable = true;
         config = {
           apiKey = secretRef "${secretName}_api_key";
@@ -148,8 +155,16 @@ in
     // {
       jellyfin = {
         inherit (cfg.services.jellyfin) enable;
+        package = mediaPkgs.jellyfin;
         reverseProxy.expose = false;
         apiKey = secretRef "jellyfin_api_key";
+
+        # Upstream-managed CSS updates independently of the flake lock.
+        # Keep the Jellyfin 12 Modern-layout compatibility sheet last.
+        branding.customCss = ''
+          @import url("https://cdn.jsdelivr.net/gh/lscambo13/ElegantFin@main/Theme/ElegantFin-jellyfin-theme-build-latest-minified.css");
+          @import url("https://cdn.jsdelivr.net/gh/mihaif7/elegantfin-jf12@main/Theme/ElegantFin-jf12-modern-latest.css");
+        '';
 
         users.admin = {
           policy.isAdministrator = true;
@@ -275,19 +290,12 @@ in
               ExtractionDuringLibraryScan = true;
             };
           };
-          "Intro Skipper" = {
-            enable = true;
-            package = {
-              version = "1.10.11.17";
-              hash = "sha256-cfEnLqKeEGpQSth3NPjDnxCkgv2pePfgCXfVIOrYSiQ=";
-            };
-          };
         };
       };
 
       seerr = {
         inherit (cfg.services.seerr) enable;
-        package = lib.mkForce pkgs.seerr;
+        package = mediaPkgs.seerr;
         apiKey = secretRef "seerr_api_key";
         jellyfin.adminUsername = "admin";
         jellyfin.adminPassword = secretRef "jellyfin_admin_password";
@@ -302,12 +310,14 @@ in
 
       maintainerr = {
         inherit (cfg.services.maintainerr) enable group;
+        package = mediaPkgs.maintainerr;
         reverseProxy.expose = false;
         settings.forceJellyfinToIgnoreEmptyMediaFolders = false;
       };
 
       torrentClients.qbittorrent = {
         enable = true;
+        package = mediaPkgs.qbittorrent-nox;
         vpn.enable = true;
         webuiPort = 8080;
         password = secretRef "qbittorrent_password";
@@ -393,14 +403,19 @@ in
       })
     ];
 
+    # These applications expose their package option only through NixOS services.
+    services.flaresolverr.package = mediaPkgs.flaresolverr;
+    services.recyclarr.package = mediaPkgs.recyclarr;
+
     systemd = {
       services = {
         nixflix-setup-dirs = {
           after = [ "homelab-state-root.service" ];
           requires = [ "homelab-state-root.service" ];
+          # The parent is handled by homelab-state-root. Do not process unrelated
+          # app state here: an Immich tmpfiles error must not block the media stack.
           script = lib.mkForce ''
             ${pkgs.systemd}/bin/systemd-tmpfiles --create \
-              --prefix=${lib.escapeShellArg cfg.state.root} \
               --prefix=${lib.escapeShellArg cfg.state.nixflix} \
               --prefix=${lib.escapeShellArg data.media} \
               --prefix=${lib.escapeShellArg data.downloads}
