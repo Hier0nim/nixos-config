@@ -7,7 +7,8 @@
     settings = {
       General = {
         Experimental = true;
-        FastConnectable = true;
+        # Fast-connect mode increases idle power consumption.
+        FastConnectable = false;
       };
     };
   };
@@ -20,7 +21,7 @@
     requires = [ "bluetooth.service" ];
     wantedBy = [ "bluetooth.service" ];
     serviceConfig.Type = "oneshot";
-    serviceConfig.ExecStart = "${pkgs.kmod}/bin/rfkill unblock bluetooth";
+    serviceConfig.ExecStart = "${pkgs.util-linux}/bin/rfkill unblock bluetooth";
   };
 
   # Also unblock after resume from suspend (asus_wmi re-blocks on resume).
@@ -39,6 +40,6 @@
       "suspend-then-hibernate.target"
     ];
     serviceConfig.Type = "oneshot";
-    serviceConfig.ExecStart = "${pkgs.kmod}/bin/rfkill unblock bluetooth";
+    serviceConfig.ExecStart = "${pkgs.util-linux}/bin/rfkill unblock bluetooth";
   };
 }

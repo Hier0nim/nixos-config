@@ -36,9 +36,12 @@ in
     after = [ "systemd-suspend.service" ];
     environment = hibernateEnvironment;
     script = ''
+      # No timer is armed when suspending on AC power.
+      [ -r "$HIBERNATE_LOCK" ] || exit 0
+
       curtime=$(date +%s)
-      sustime=$(cat $HIBERNATE_LOCK)
-      rm $HIBERNATE_LOCK
+      sustime=$(cat "$HIBERNATE_LOCK")
+      rm "$HIBERNATE_LOCK"
       if [ $(($curtime - $sustime)) -ge $HIBERNATE_SECONDS ] ; then
         systemctl hibernate
       else

@@ -7,6 +7,9 @@
     dconf.enable = true;
   };
 
+  # The generic graphical target can start before Umbriel exports WAYLAND_DISPLAY.
+  custom.hardware.asus.rogControlCenterSessionTarget = "umbriel-session.target";
+
   services.displayManager.noctalia-greeter = {
     enable = true;
     settings = {

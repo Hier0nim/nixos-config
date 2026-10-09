@@ -11,6 +11,12 @@ in
   options.custom.hardware.asus = {
     enable = lib.mkEnableOption "ASUS laptop services (asusd, supergfxd, lact, rog-control-center)";
 
+    rogControlCenterSessionTarget = lib.mkOption {
+      type = lib.types.str;
+      default = "graphical-session.target";
+      description = "User target reached after the compositor exports its session environment.";
+    };
+
     asusdConfigPath = lib.mkOption {
       type = lib.types.path;
       description = "Path to the asusd.ron configuration file.";
@@ -41,26 +47,28 @@ in
 
     programs.rog-control-center = {
       enable = true;
+      # The user service below is the only startup path.
       autoStart = false;
     };
 
     systemd.user.services.rog-control-center = {
       description = "rog-control-center";
 
-      after = [ "graphical-session.target" ];
-      partOf = [ "graphical-session.target" ];
-      wantedBy = [ "graphical-session.target" ];
+      after = [ cfg.rogControlCenterSessionTarget ];
+      partOf = [ cfg.rogControlCenterSessionTarget ];
+      wantedBy = [ cfg.rogControlCenterSessionTarget ];
 
-      startLimitBurst = 5;
-      startLimitIntervalSec = 120;
+      unitConfig.ConditionEnvironment = "WAYLAND_DISPLAY";
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = lib.getExe' pkgs.asusctl "rog-control-center";
-        Restart = "always";
-        RestartSec = 1;
+        # Wait for Noctalia's tray watcher, not an arbitrary delay.
+        ExecStartPre = "${lib.getExe' pkgs.glib.bin "gdbus"} wait --session --timeout 60 org.kde.StatusNotifierWatcher";
+        ExecStart = "${lib.getExe' pkgs.asusctl "rog-control-center"} --autostart --background";
+        # Quitting the app must leave it stopped.
+        Restart = "no";
+        TimeoutStartSec = 65;
         TimeoutStopSec = 10;
-        ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
       };
     };
   };

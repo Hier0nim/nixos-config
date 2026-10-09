@@ -1,3 +1,6 @@
+# Disabled on the G14: the endless udev command delays power events, and blanket
+# USB autosuspend can delay input-device wake-up. Use short-lived event handlers
+# with device-specific rules instead; the G14's power/ module handles Bluetooth.
 {
   pkgs,
   ...
