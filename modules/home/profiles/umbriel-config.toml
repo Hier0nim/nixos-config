@@ -4,7 +4,12 @@
 files = ["outputs.toml"]
 
 [general]
+show_cheatsheet = false
 autostart = ["noctalia", "env GSK_RENDERER=gl NAUTILUS_PERSIST=1 nautilus --gapplication-service"]
+
+# Disable primary-selection paste (middle click and Shift+Insert), not Ctrl+V.
+[input]
+middle_click_paste = false
 
 [input.keyboard]
 layout = "pl"
@@ -33,13 +38,16 @@ gap = 5
 "Mod+Ctrl+L" = { action = "spawn:noctalia msg session lock", repeat = false }
 "Mod+Ctrl+E" = { action = "spawn:noctalia msg panel-toggle session", repeat = false }
 "Mod+B" = { action = "spawn:firefox", repeat = false }
-"Mod+I" = { action = "spawn:noctalia msg settings-toggle", repeat = false }
+"Mod+S" = { action = "spawn:noctalia msg settings-toggle", repeat = false }
 "Mod+C" = { action = "spawn:noctalia msg panel-toggle control-center calendar", repeat = false }
 "Mod+D" = { action = "spawn:noctalia msg panel-toggle control-center home", repeat = false }
 "Alt+Tab" = { action = "spawn:noctalia msg window-switcher open", repeat = false }
 "Mod+F12" = { action = "cheatsheet-toggle", repeat = false }
 "Mod+V" = { action = "spawn:noctalia msg panel-toggle clipboard", repeat = false }
 "Mod+N" = { action = "spawn:noctalia msg panel-toggle control-center notifications", repeat = false }
+"Mod+Shift+N" = { action = "spawn:noctalia msg notification-dnd-toggle", repeat = false }
+"Mod+Ctrl+I" = { action = "spawn:noctalia msg caffeine-toggle", repeat = false }
+"Ctrl+Alt+Delete" = { action = "session-quit", repeat = false }
 "Mod+Shift+S" = { action = "spawn:noctalia msg screenshot-region", repeat = false }
 "Mod+Ctrl+Shift+S" = { action = "spawn:noctalia msg screenshot-fullscreen", repeat = false }
 "Mod+Alt+Shift+S" = { action = "spawn:noctalia msg screenshot-annotate", repeat = false }
@@ -72,12 +80,43 @@ gap = 5
 "Mod+Shift+K" = "window-move-up"
 "Mod+Shift+L" = "column-move-right"
 
+# Niri monitor navigation and whole-column transfer, using physical output positions.
+"Mod+Alt+Left" = "output-focus-left"
+"Mod+Alt+Down" = "output-focus-down"
+"Mod+Alt+Up" = "output-focus-up"
+"Mod+Alt+Right" = "output-focus-right"
+"Mod+Alt+H" = "output-focus-left"
+"Mod+Alt+J" = "output-focus-down"
+"Mod+Alt+K" = "output-focus-up"
+"Mod+Alt+L" = "output-focus-right"
+"Mod+Alt+Shift+Left" = "column-move-to-output-left"
+"Mod+Alt+Shift+Down" = "column-move-to-output-down"
+"Mod+Alt+Shift+Up" = "column-move-to-output-up"
+"Mod+Alt+Shift+Right" = "column-move-to-output-right"
+"Mod+Alt+Shift+H" = "column-move-to-output-left"
+"Mod+Alt+Shift+J" = "column-move-to-output-down"
+"Mod+Alt+Shift+K" = "column-move-to-output-up"
+"Mod+Alt+Shift+L" = "column-move-to-output-right"
+
+"Mod+Page_Down" = "workspace-next"
+"Mod+Page_Up" = "workspace-previous"
+"Mod+U" = "workspace-next"
+"Mod+I" = "workspace-previous"
+
 "Mod+G" = { action = "window-toggle-floating", repeat = false }
 "Mod+Shift+T" = { action = "window-focus-switch-floating", repeat = false }
 "Mod+P" = { action = "window-toggle-pinned", repeat = false }
 "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
 "Mod+F" = { action = "window-toggle-maximize", repeat = false }
 "Mod+Shift+F" = { action = "window-toggle-fullscreen", repeat = false }
+"Mod+F11" = { action = "window-toggle-fullscreen", repeat = false }
+# Mod+C opens the calendar; keep centering on a separate chord.
+"Mod+Ctrl+C" = { action = "column-center", repeat = false }
+"Mod+W" = { action = "column-toggle-tabbed", repeat = false }
+"Mod+Minus" = "window-modify-primary-extent:-0.1"
+"Mod+Equal" = "window-modify-primary-extent:0.1"
+"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1"
+"Mod+Shift+Equal" = "window-modify-secondary-extent:0.1"
 "Mod+R" = "window-cycle-primary-extent"
 "Mod+Shift+R" = "window-cycle-primary-extent-back"
 "Mod+Comma" = "window-consume-left"
@@ -105,6 +144,17 @@ gap = 5
 "Mod+Shift+7" = "window-move-to-workspace:7"
 "Mod+Shift+8" = "window-move-to-workspace:8"
 "Mod+Shift+9" = "window-move-to-workspace:9"
+
+# Move the whole column, rather than only the focused window.
+"Mod+Ctrl+Shift+1" = "column-move-to-workspace:1"
+"Mod+Ctrl+Shift+2" = "column-move-to-workspace:2"
+"Mod+Ctrl+Shift+3" = "column-move-to-workspace:3"
+"Mod+Ctrl+Shift+4" = "column-move-to-workspace:4"
+"Mod+Ctrl+Shift+5" = "column-move-to-workspace:5"
+"Mod+Ctrl+Shift+6" = "column-move-to-workspace:6"
+"Mod+Ctrl+Shift+7" = "column-move-to-workspace:7"
+"Mod+Ctrl+Shift+8" = "column-move-to-workspace:8"
+"Mod+Ctrl+Shift+9" = "column-move-to-workspace:9"
 
 "Mod+Shift+Space" = { action = "window-move-to-scratchpad", repeat = false }
 "Mod+Space" = { action = "scratchpad-toggle", repeat = false }
