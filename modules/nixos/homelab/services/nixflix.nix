@@ -129,7 +129,6 @@ in
             { name = "YTS"; }
             { name = "Nyaa.si"; }
             { name = "LimeTorrents"; }
-            { name = "AnimeTosho"; }
           ];
           applications = [
             {
