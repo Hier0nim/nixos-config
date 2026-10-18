@@ -1,14 +1,21 @@
+let
+  kanagawaTheme = "https://vokinn.github.io/kanagawa-discord/dist/kanagawa-wave.theme.css";
+in
 {
   programs.equibop = {
     enable = true;
 
     settings = {
       arRPC = true;
-      customTitleBar = true;
+      # Keep RPC support without scanning running processes for games.
+      arRPCProcessScanning = false;
+      nativeTitleBar = false;
       staticTitle = true;
       discordBranch = "stable";
       enableSplashScreen = false;
-      hardwareAcceleration = false;
+      # Use the default GPU; do not request NVIDIA PRIME offloading.
+      hardwareAcceleration = true;
+      hardwareVideoAcceleration = true;
       minimizeToTray = true;
     };
 
@@ -17,9 +24,10 @@
       autoUpdateNotification = false;
       notifyAboutUpdates = false;
       useQuickCss = true;
-      themeLinks = [
-        "https://raw.githubusercontent.com/refact0r/midnight-discord/refs/heads/master/themes/flavors/midnight-vencord.theme.css"
-      ];
+      enableOnlineThemes = true;
+      themeLinks = [ kanagawaTheme ];
+      # Registering a theme link does not enable it in Equicord.
+      enabledThemeLinks = [ kanagawaTheme ];
 
       plugins = {
         ClearURLs.enabled = true;
