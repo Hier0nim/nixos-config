@@ -1,53 +1,58 @@
-# Source: https://gist.github.com/mattdenner/befcf099f5cfcc06ea04dcdd4969a221?permalink_comment_id=4795378#gistcomment-4795378
-# The configuration makes NixOS automatically hibernate the system after it has been suspended for a set amount of time (but only when not plugged in).
-
-{ pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  hibernateEnvironment = {
-    HIBERNATE_SECONDS = "600";
-    HIBERNATE_LOCK = "/var/run/autohibernate.lock";
-  };
+  nvidia = config.hardware.nvidia;
+  useNvidiaSleepServices =
+    nvidia.powerManagement.enable && !nvidia.powerManagement.kernelSuspendNotifier;
+  nvidiaSleep = "${nvidia.package.out}/bin/nvidia-sleep.sh";
 in
 {
-  boot.kernelParams = [ "mem_sleep_default=deep" ];
-
-  systemd.services."awake-after-suspend-for-a-time" = {
-    description = "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
-    wantedBy = [ "suspend.target" ];
-    before = [ "systemd-suspend.service" ];
-    environment = hibernateEnvironment;
-    script = ''
-      if [ $(cat /sys/class/power_supply/ADP0/online) -eq 0 ]; then
-        curtime=$(date +%s)
-        echo "$curtime $1" >> /tmp/autohibernate.log
-        echo "$curtime" > $HIBERNATE_LOCK
-        ${pkgs.util-linux}/bin/rtcwake -m no -s $HIBERNATE_SECONDS
+  # Remove inherited deep-sleep settings on s2idle-only hosts.
+  options.boot.kernelParams = lib.mkOption {
+    apply =
+      params:
+      if (config.systemd.sleep.settings.Sleep.MemorySleepMode or "") == "s2idle" then
+        lib.filter (param: param != "mem_sleep_default=deep") params
       else
-        echo "System is on AC power, skipping wake-up scheduling for hibernation." >> /tmp/autohibernate.log
-      fi
-    '';
-    serviceConfig.Type = "simple";
+        params;
   };
 
-  systemd.services."hibernate-after-recovery" = {
-    description = "Hibernates after a suspend recovery due to timeout";
-    wantedBy = [ "suspend.target" ];
-    after = [ "systemd-suspend.service" ];
-    environment = hibernateEnvironment;
-    script = ''
-      # No timer is armed when suspending on AC power.
-      [ -r "$HIBERNATE_LOCK" ] || exit 0
+  config = {
+    systemd.sleep.settings.Sleep = {
+      AllowSuspend = true;
+      AllowHibernation = true;
+      AllowSuspendThenHibernate = true;
+      HibernateDelaySec = "10min";
+      HibernateOnACPower = true;
+    };
 
-      curtime=$(date +%s)
-      sustime=$(cat "$HIBERNATE_LOCK")
-      rm "$HIBERNATE_LOCK"
-      if [ $(($curtime - $sustime)) -ge $HIBERNATE_SECONDS ] ; then
-        systemctl hibernate
-      else
-        ${pkgs.util-linux}/bin/rtcwake -m no -s 1
-      fi
-    '';
-    serviceConfig.Type = "simple";
+    systemd.services = lib.mkIf useNvidiaSleepServices {
+      nvidia-suspend-then-hibernate = {
+        description = "NVIDIA suspend-then-hibernate preparation";
+        before = [ "systemd-suspend-then-hibernate.service" ];
+        requiredBy = [ "systemd-suspend-then-hibernate.service" ];
+        path = [ pkgs.kbd ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${nvidiaSleep} suspend";
+        };
+      };
+      nvidia-resume = {
+        after = [ "systemd-suspend-then-hibernate.service" ];
+        requiredBy = [ "systemd-suspend-then-hibernate.service" ];
+      };
+    };
+
+    # NixOS loads sleep hooks from /etc, not the NVIDIA package directory.
+    environment.etc = lib.mkIf useNvidiaSleepServices {
+      "systemd/system-sleep/nvidia" = {
+        source = "${nvidia.package.out}/lib/systemd/system-sleep/nvidia";
+        mode = "0755";
+      };
+    };
   };
 }

@@ -28,7 +28,16 @@ in
     );
   };
 
-  hardware.nvidia.dynamicBoost.enable = true;
+  # Firmware supports s2idle only.
+  systemd.sleep.settings.Sleep.MemorySleepMode = "s2idle";
+
+  hardware.nvidia = {
+    dynamicBoost.enable = true;
+    moduleParams.nvidia.NVreg_TemporaryFilePath = "/var/tmp";
+  };
+  # Cardwire blocks NVIDIA access on battery; skip powerd instead of failing.
+  # asusd manages powerd on subsequent AC/battery transitions.
+  systemd.services.nvidia-powerd.unitConfig.ConditionACPower = true;
 
   services = {
     # asusd owns the AC/battery profiles and CPU EPP settings.

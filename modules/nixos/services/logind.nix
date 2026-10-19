@@ -1,12 +1,10 @@
 {
   services.logind.settings.Login = {
-    # On battery: suspend
-    lidSwitch = "suspend";
+    # Use native timed hibernation on both battery and AC power.
+    HandleLidSwitch = "suspend-then-hibernate";
+    HandleLidSwitchExternalPower = "suspend-then-hibernate";
 
-    # On AC (external power) but NOT docked: suspend
-    lidSwitchExternalPower = "suspend";
-
-    # When docked: ignore
-    lidSwitchDocked = "ignore";
+    # Closing the lid must not sleep a docked workstation.
+    HandleLidSwitchDocked = "ignore";
   };
 }
