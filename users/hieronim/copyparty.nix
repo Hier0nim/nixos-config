@@ -23,6 +23,13 @@ in
     '';
   };
 
+  # Native 100 ms retries can exhaust rclone-config's shared start limit
+  # while DNS reconnects. Space retries out without changing its lifecycle.
+  home-manager.users.hieronim.systemd.user.services = {
+    "rclone-mount:.nas.hieronim@serverlegion-dav".Service.RestartSec = "5s";
+    "rclone-mount:.nas.shared@serverlegion-dav".Service.RestartSec = "5s";
+  };
+
   home-manager.users.hieronim.programs.rclone = {
     enable = true;
     remotes.serverlegion-dav = {
