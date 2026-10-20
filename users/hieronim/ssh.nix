@@ -43,24 +43,11 @@ in
       files.key.owner = "hieronim";
     };
 
-    hieronim-ssh-hetzner-punktia = {
-      prompts.key = {
-        description = "Existing private key for hetzner-punktia";
-        type = "multiline-hidden";
-        persist = true;
-      };
-      files.key.owner = "hieronim";
-    };
-
     # Hostnames stay secret, so render this fragment outside the Nix store.
     hieronim-ssh-hosts = {
       prompts = {
         server-legion = {
           description = "Existing private hostname/address for homelab";
-          type = "hidden";
-        };
-        punktia = {
-          description = "Existing private hostname/address for punktia-prod";
           type = "hidden";
         };
       };
@@ -69,9 +56,6 @@ in
         printf '%s\n' \
           'Host homelab' \
           "  HostName $(cat "$prompts/server-legion")" \
-          "" \
-          'Host punktia-prod' \
-          "  HostName $(cat "$prompts/punktia")" \
           > "$out/config"
       '';
     };
@@ -124,13 +108,6 @@ in
             ProxyJump = "homelab";
             HostKeyAlias = "server-legion-workstation";
             ForwardAgent = true;
-          };
-          punktia-prod = {
-            User = "root";
-            IdentityFile = vars.hieronim-ssh-hetzner-punktia.files.key.path;
-            IdentitiesOnly = true;
-            ServerAliveInterval = 60;
-            ServerAliveCountMax = 3;
           };
           router = {
             HostName = "192.168.8.1";
