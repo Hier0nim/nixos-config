@@ -1,0 +1,249 @@
+# Snapshot of GUI settings from ~/.local/state/noctalia/settings.toml.
+# Used only when that file is absent. desktop.nix substitutes @wallpaperDirectory@.
+config_version = 15
+
+[bar.default]
+center = [ "taskbar" ]
+end = [ "tray", "notifications", "network", "bluetooth", "bar", "volume", "battery", "session" ]
+font_weight = 600
+margin_ends = 0
+position = "left"
+radius_bottom_left = 0
+radius_top_left = 0
+scale = 1.2500000111758709
+start = [ "bar_2", "control-center", "clock", "media", "privacy", "recorder" ]
+thickness = 40
+
+[brightness]
+enable_ddcutil = true
+sync_all_monitors = true
+
+[calendar]
+enabled = true
+
+    [calendar.account.personal_google]
+    type = "google"
+
+[control_center]
+hidden_tabs = [ "weather" ]
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [
+    "lockscreen-login-box@DP-7",
+    "lockscreen-login-box@eDP-2",
+    "lockscreen-login-box@DP-6",
+    "lockscreen-login-box@eDP-1"
+]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-6"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 1280.0
+    cy = 1258.0
+    output = "DP-6"
+    placement_height = 1440.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-6".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-7"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 1280.0
+    cy = 1258.0
+    output = "DP-7"
+    placement_height = 1440.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-7".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 853.0
+    cy = 944.74249267578125
+    output = "eDP-1"
+    placement_height = 1066.0
+    placement_width = 1706.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-2"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 853.0
+    cy = 883.9998779296875
+    output = "eDP-2"
+    placement_height = 1066.0
+    placement_width = 1706.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-2".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[plugins]
+enabled = [ "prponkshe/umbriel-displays", "noctalia/umbriel-companion", "noctalia/screen_recorder" ]
+
+[shell]
+screen_time_enabled = true
+umbriel_overview_type_to_launch_enabled = true
+
+    [shell.animation]
+    speed = 1.5000000223517418
+
+    [shell.greeter_sync]
+    auto_sync = true
+
+    [shell.launcher]
+    categories = false
+    show_app_origin_indicator = false
+
+    [shell.panel]
+    open_near_click_control_center = true
+    open_near_click_session = true
+
+    [shell.screenshot]
+    annotate = true
+    confirm_region = true
+    remember_last_region = true
+    skip_annotate_on_copy_save = true
+
+    [shell.window_switcher]
+    current_workspace_only = true
+
+[theme]
+builtin = "Kanagawa"
+
+    [theme.templates]
+    builtin_ids = [ "btop", "gtk3", "gtk4", "ghostty", "qt", "umbriel" ]
+    community_ids = [ "pywalfox" ]
+
+[wallpaper]
+directory = "@wallpaperDirectory@"
+
+    [wallpaper.default]
+    path = "@wallpaperDirectory@/fear-samori.png"
+
+    [wallpaper.last]
+    path = "@wallpaperDirectory@/fear-samori.png"
+
+    [wallpaper.monitors.eDP-1]
+    path = "@wallpaperDirectory@/fear-samori.png"
+
+[weather]
+enabled = false
+
+[widget.bar]
+type = "prponkshe/umbriel-displays:bar"
+
+[widget.bar_2]
+type = "noctalia/umbriel-companion:bar"
+
+[widget.battery]
+hide_when_full = true
+show_label = false
+
+[widget.control-center]
+enabled = false
+
+[widget.launcher]
+enabled = false
+
+[widget.media]
+hide_when_no_media = true
+
+[widget.network]
+show_label = false
+
+[widget.notifications]
+hide_when_no_unread = true
+
+[widget.privacy]
+hide_inactive = true
+
+[widget.recorder]
+enabled = false
+type = "noctalia/screen_recorder:recorder"
+
+[widget.taskbar]
+group_by_workspace = true
+hide_empty_workspaces = true
+icon_scale = 1.2500000000000002
+inactive_opacity = 0.5
+minimal = true
+workspace_label_placement = "inside"
+
+[widget.volume]
+show_label = false
+
+[widget.workspaces]
+hide_when_empty = true
