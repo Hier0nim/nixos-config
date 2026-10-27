@@ -1,4 +1,3 @@
-# Cardwire battery policy and NVIDIA power/suspend integration.
 {
   config,
   lib,
@@ -32,7 +31,7 @@ in
   };
 
   systemd.services = {
-    # Cardwire blocks NVIDIA access on battery; skip powerd instead of failing.
+    # Cardwire blocks NVIDIA access on battery.
     nvidia-powerd.unitConfig.ConditionACPower = true;
     nvidia-suspend-then-hibernate = lib.mkIf useNvidiaSleepServices {
       description = "NVIDIA suspend-then-hibernate preparation";

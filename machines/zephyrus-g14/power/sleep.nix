@@ -1,7 +1,6 @@
-# Firmware sleep mode, lid behavior, and timed hibernation policy.
 { lib, ... }:
 {
-  # nixos-hardware adds deep sleep, but this laptop's firmware supports s2idle only.
+  # Override nixos-hardware: this firmware supports only s2idle.
   options.boot.kernelParams = lib.mkOption {
     apply = params: lib.filter (param: param != "mem_sleep_default=deep") params;
   };

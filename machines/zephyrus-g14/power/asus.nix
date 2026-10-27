@@ -1,7 +1,6 @@
-# ASUS owns the laptop's AC/battery profiles and requests radio-policy updates.
 { lib, pkgs, ... }:
 let
-  # Radio commands need privileges unavailable inside asusd's sandbox.
+  # Run radio changes outside asusd's sandbox.
   requestRadioPower = pkgs.writeShellScript "request-radio-power" ''
     exec ${pkgs.systemd}/bin/systemctl --no-block restart radio-power.service
   '';
@@ -17,7 +16,7 @@ in
       enable = true;
       asusdConfig.source = asusdConfig;
     };
-    # Do not run competing AC/battery profile managers.
+    # asusd manages power profiles.
     power-profiles-daemon.enable = lib.mkForce false;
     tlp.enable = lib.mkForce false;
     supergfxd.enable = lib.mkForce false;

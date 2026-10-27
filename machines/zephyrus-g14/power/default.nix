@@ -1,4 +1,3 @@
-# Machine-local power policy, split by responsibility.
 {
   imports = [
     ./asus.nix

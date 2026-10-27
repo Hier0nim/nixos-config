@@ -1,26 +1,7 @@
-{ self, ... }:
-let
-  inherit (self) inputs;
-in
 {
   meta = {
     name = "hieronim-fleet";
     domain = "clan.pieczarkowo.me";
-  };
-
-  # Machine composition; host-specific settings live in machines/.
-  machines.zephyrus-g14 = {
-    imports = [
-      inputs.determinate.nixosModules.default
-      inputs.nixos-hardware.nixosModules.asus-zephyrus-ga402x-nvidia
-      inputs.asus-px-keyboard-tool.nixosModules.default
-      inputs.umbriel.nixosModules.default
-      inputs.noctalia.nixosModules.default
-      inputs.noctalia-greeter.nixosModules.default
-      ./users/hieronim
-    ];
-
-    nix.registry.nixpkgs.flake = inputs.nixpkgs;
   };
 
   inventory.machines.zephyrus-g14 = {

@@ -1,4 +1,3 @@
-# NixOS module: Copyparty credentials and their Home Manager rclone mounts.
 { config, pkgs, ... }:
 let
   credentials = config.clan.core.vars.generators.hieronim-copyparty;
@@ -11,20 +10,18 @@ in
       type = "hidden";
       persist = true;
     };
-    # Retain the canonical password for future server integration without
-    # deploying it to this client. Only rclone's derived file is needed here.
+    # Deploy only the rclone credential, not the original password.
     files.password.deploy = false;
     files.pass.owner = "hieronim";
     runtimeInputs = [ pkgs.rclone ];
-    # Obscuring is rclone's file format, not encryption. Clan keeps it secret.
+    # rclone obscure is reversible. Store its output as a secret.
     script = ''
       password="$(cat "$out/password")"
       printf '%s' "$password" | rclone obscure - > "$out/pass"
     '';
   };
 
-  # Native 100 ms retries can exhaust rclone-config's shared start limit
-  # while DNS reconnects. Space retries out without changing its lifecycle.
+  # Slow retries to avoid the start limit while DNS reconnects.
   home-manager.users.hieronim.systemd.user.services = {
     "rclone-mount:.nas.hieronim@serverlegion-dav".Service.RestartSec = "5s";
     "rclone-mount:.nas.shared@serverlegion-dav".Service.RestartSec = "5s";

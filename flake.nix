@@ -8,6 +8,10 @@
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.follows = "clan-core/flake-parts";
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
     home-manager = {
@@ -71,17 +75,33 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
 
-      imports = [ inputs.clan-core.flakeModules.default ];
+      imports = [
+        inputs.clan-core.flakeModules.default
+        inputs.git-hooks.flakeModule
+      ];
 
       flake.clan.imports = [ ./clan.nix ];
 
       perSystem =
-        { pkgs, system, ... }:
+        {
+          config,
+          pkgs,
+          system,
+          ...
+        }:
         {
           formatter = pkgs.nixfmt;
+          pre-commit.settings.hooks = {
+            nixfmt.enable = true;
+            deadnix.enable = true;
+            statix.enable = true;
+          };
 
           devShells.default = pkgs.mkShell {
-            packages = [ inputs.clan-core.packages.${system}.clan-cli ];
+            shellHook = config.pre-commit.shellHook;
+            packages = config.pre-commit.settings.enabledPackages ++ [
+              inputs.clan-core.packages.${system}.clan-cli
+            ];
           };
         };
     };

@@ -1,11 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [
-    ./shell.nix
-    ./firefox.nix
-    ./desktop.nix
-    ./applications.nix
-  ];
+  imports = [ ./shell.nix ];
 
   home = {
     stateVersion = "25.05";
@@ -13,7 +8,6 @@
     preferXdgDirectories = true;
     sessionVariables = {
       EDITOR = "nvim";
-      BROWSER = "firefox";
     };
     packages = with pkgs; [
       deja
@@ -21,9 +15,7 @@
       eza
       trash-cli
       fd
-      ffmpegthumbnailer
       jq
-      poppler
       ripgrep
       _7zz
       gcc

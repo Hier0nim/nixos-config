@@ -1,4 +1,3 @@
-# Apply AC/battery radio policy on connection, Bluetooth, and resume events.
 { lib, pkgs, ... }:
 let
   radioPower = pkgs.writeShellApplication {
@@ -19,19 +18,19 @@ let
   '';
 in
 {
-  # NetworkManager must not overwrite the runtime policy.
+  # Leave Wi-Fi power saving to the script.
   networking.networkmanager = {
     wifi.powersave = lib.mkForce null;
     settings.connection."wifi.powersave" = 1;
     dispatcherScripts = [ { source = dispatcher; } ];
   };
 
-  # The script controls autosuspend through each adapter's power/control file.
+  # Allow the script to control Bluetooth autosuspend.
   boot.extraModprobeConfig = ''
     options btusb enable_autosuspend=1
   '';
 
-  # Blanket tuning would override the radio policy.
+  # powertop would override the radio settings.
   powerManagement.powertop.enable = lib.mkForce false;
   powerManagement.resumeCommands = command;
 
@@ -50,7 +49,7 @@ in
 
   systemd.services.bluetooth.postStart = command;
 
-  # Queue work outside udev; repeated events must also reapply the policy.
+  # Run outside udev and reapply on each adapter event.
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci[0-9]*", RUN+="${pkgs.systemd}/bin/systemctl --no-block restart radio-power.service"
   '';

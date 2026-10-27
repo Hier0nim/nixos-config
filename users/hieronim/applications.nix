@@ -10,10 +10,7 @@ in
     inputs.pi-config.homeManagerModules.default
   ];
 
-  programs.nix-index-database.comma.enable = true;
-
   home.packages = with pkgs; [
-    # Personal editor; plain Neovim remains available in the system profile.
     inputs.nvim.packages.${stdenv.hostPlatform.system}.default
     teams-for-linux
     proton-pass
@@ -34,52 +31,56 @@ in
     (import inputs.creamlinux-installer { inherit pkgs; })
   ];
 
-  programs.equibop = {
-    enable = true;
-    settings = {
-      arRPC = true;
-      arRPCProcessScanning = false;
-      nativeTitleBar = false;
-      staticTitle = true;
-      discordBranch = "stable";
-      enableSplashScreen = false;
-      hardwareAcceleration = true;
-      hardwareVideoAcceleration = true;
-      minimizeToTray = true;
-    };
-    equicord.settings = {
-      autoUpdate = false;
-      autoUpdateNotification = false;
-      notifyAboutUpdates = false;
-      useQuickCss = true;
-      enableOnlineThemes = true;
-      themeLinks = [ discordTheme ];
-      enabledThemeLinks = [ discordTheme ];
-      plugins = {
-        ClearURLs.enabled = true;
-        FixYoutubeEmbeds.enabled = true;
+  programs = {
+    nix-index-database.comma.enable = true;
+
+    equibop = {
+      enable = true;
+      settings = {
+        arRPC = true;
+        arRPCProcessScanning = false;
+        nativeTitleBar = false;
+        staticTitle = true;
+        discordBranch = "stable";
+        enableSplashScreen = false;
+        hardwareAcceleration = true;
+        hardwareVideoAcceleration = true;
+        minimizeToTray = true;
+      };
+      equicord.settings = {
+        autoUpdate = false;
+        autoUpdateNotification = false;
+        notifyAboutUpdates = false;
+        useQuickCss = true;
+        enableOnlineThemes = true;
+        themeLinks = [ discordTheme ];
+        enabledThemeLinks = [ discordTheme ];
+        plugins = {
+          ClearURLs.enabled = true;
+          FixYoutubeEmbeds.enabled = true;
+        };
       };
     };
-  };
 
-  programs.obs-studio = {
-    enable = true;
-    plugins = [ pkgs.obs-studio-plugins.obs-backgroundremoval ];
-  };
+    obs-studio = {
+      enable = true;
+      plugins = [ pkgs.obs-studio-plugins.obs-backgroundremoval ];
+    };
 
-  programs.spicetify = {
-    enable = true;
-    enabledExtensions = with spicePkgs.extensions; [
-      adblock
-      shuffle
-    ];
-    enabledCustomApps = with spicePkgs.apps; [
-      newReleases
-      ncsVisualizer
-    ];
-    enabledSnippets = [ spicePkgs.snippets.pointer ];
-    theme = spicePkgs.themes.sleek;
-    colorScheme = "BladeRunner";
+    spicetify = {
+      enable = true;
+      enabledExtensions = with spicePkgs.extensions; [
+        adblock
+        shuffle
+      ];
+      enabledCustomApps = with spicePkgs.apps; [
+        newReleases
+        ncsVisualizer
+      ];
+      enabledSnippets = [ spicePkgs.snippets.pointer ];
+      theme = spicePkgs.themes.sleek;
+      colorScheme = "BladeRunner";
+    };
   };
 
   home.file.".ideavimrc".source = ./files/ideavimrc;

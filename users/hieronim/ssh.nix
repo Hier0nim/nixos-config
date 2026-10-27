@@ -1,11 +1,10 @@
-# NixOS module: SSH credentials and the Home Manager client that uses them.
 { config, ... }:
 let
   vars = config.clan.core.vars.generators;
   homeDirectory = config.users.users.hieronim.home;
 in
 {
-  # Persist existing private keys; do not generate replacement identities.
+  # Import existing keys instead of generating new identities.
   clan.core.vars.generators = {
     hieronim-ssh-github-personal = {
       prompts.key = {
@@ -43,7 +42,7 @@ in
       files.key.owner = "hieronim";
     };
 
-    # Hostnames stay secret, so render this fragment outside the Nix store.
+    # Keep the private hostname out of the Nix store.
     hieronim-ssh-hosts = {
       prompts = {
         server-legion = {

@@ -6,7 +6,6 @@
   ...
 }:
 let
-  # Resolve the wallpaper directory for this user's seed, not the old checkout.
   noctaliaSettings = pkgs.replaceVars ./files/noctalia/settings.toml {
     wallpaperDirectory = "${config.xdg.dataHome}/wallpapers";
   };
@@ -14,11 +13,36 @@ in
 {
   imports = [ inputs.noctalia.homeModules.default ];
 
-  # NixOS owns the compositor and shell service. Umbriel's files stay writable.
+  programs.ghostty = {
+    enable = true;
+    settings = {
+      font-family = "JetBrainsMono Nerd Font Mono";
+      font-size = 12;
+      theme = "Kanagawa Wave";
+      resize-overlay = "never";
+      window-decoration = "none";
+    };
+  };
+
+  systemd.user.services.zellij-cleanup = {
+    Unit = {
+      Description = "Stop Zellij sessions when the graphical session ends";
+      PartOf = [ "graphical-session.target" ];
+      Before = [ "exit.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/true";
+      ExecStop = "-${lib.getExe pkgs.zellij} kill-all-sessions -y";
+      TimeoutStopSec = 10;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   programs.noctalia = {
     enable = true;
-    package = null;
-    # Nix manages these defaults; GUI preferences remain in the writable state file.
+    package = null; # Installed by NixOS.
     settings.shell = {
       polkit_agent = true;
       session.power.suspend = "systemctl suspend-then-hibernate";
@@ -26,7 +50,7 @@ in
   };
 
   home = {
-    # Seed GUI preferences only. Never replace existing files or symlinks.
+    # Seed settings once; keep later GUI edits.
     activation.seedNoctalia = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       settingsFile=${lib.escapeShellArg "${config.xdg.stateHome}/noctalia/settings.toml"}
 
@@ -41,8 +65,13 @@ in
       package = pkgs.bibata-cursors;
       size = 24;
     };
-    sessionVariables.GSK_RENDERER = "gl";
+    sessionVariables = {
+      BROWSER = "firefox";
+      GSK_RENDERER = "gl";
+    };
     packages = with pkgs; [
+      ffmpegthumbnailer
+      poppler
       wl-clipboard
       adw-gtk3
       papirus-icon-theme
@@ -55,7 +84,7 @@ in
   };
   systemd.user.sessionVariables.GSK_RENDERER = "gl";
 
-  # Noctalia owns GTK theme and colors; retain only icon and cursor preferences.
+  # Noctalia manages GTK theme and colors.
   dconf.settings."org/gnome/desktop/interface" = {
     icon-theme = "Papirus-Dark";
     cursor-theme = "Bibata-Modern-Classic";
