@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  image = "ghcr.io/listenarrs/listenarr:canary-1.3.4@sha256:22350ced1c74b6c42e8cb1ec5f9da317ef3819398f0695b0259609fa688c056d";
+  image = "ghcr.io/listenarrs/listenarr:canary-1.3.4@sha256:99b4ae68cf7478dd364c19c3ae379d115ec3b127dfdae5666b0a480de75d8f34";
   libraryDir = "/data/media/audiobooks";
   downloadDir = "/data/downloads/torrent/audiobooks";
   stateDir = "/var/lib/listenarr";

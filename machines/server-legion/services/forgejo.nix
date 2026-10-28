@@ -60,7 +60,7 @@ in
   };
 
   services.gitea-actions-runner = {
-    package = pkgs.forgejo-runner;
+    package = pkgs.gitea-actions-runner;
     instances.global = {
       enable = true;
       name = "server-legion-forgejo-ci";

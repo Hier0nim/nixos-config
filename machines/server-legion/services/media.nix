@@ -348,8 +348,14 @@ in
     };
     jellyfin-plugin-usernames = {
       description = "Apply secret usernames to Jellyfin subtitle plugins";
-      after = [ "jellyfin-plugins.service" ];
-      requires = [ "jellyfin-plugins.service" ];
+      after = [
+        "jellyfin-api-key.service"
+        "jellyfin-plugins.service"
+      ];
+      requires = [
+        "jellyfin-api-key.service"
+        "jellyfin-plugins.service"
+      ];
       wantedBy = [ "multi-user.target" ];
       path = [
         pkgs.curl
