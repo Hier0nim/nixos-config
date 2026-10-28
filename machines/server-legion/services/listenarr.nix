@@ -62,6 +62,8 @@ in
       LISTENARR_API = "http://127.0.0.1:${toString port}/api/v1";
       LISTENARR_LIBRARY_DIR = libraryDir;
       LISTENARR_DOWNLOAD_DIR = downloadDir;
+      LISTENARR_QBITTORRENT_HOST = config.nixflix.torrentClients.qbittorrent.connectionAddress;
+      LISTENARR_PROWLARR_HOST = config.nixflix.prowlarr.connectionAddress;
     };
     serviceConfig = {
       Type = "oneshot";

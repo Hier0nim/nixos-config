@@ -13,6 +13,8 @@ from pathlib import Path
 API = os.environ["LISTENARR_API"].rstrip("/")
 LIBRARY_DIR = os.environ["LISTENARR_LIBRARY_DIR"]
 DOWNLOAD_DIR = os.environ["LISTENARR_DOWNLOAD_DIR"]
+QB_HOST = os.environ["LISTENARR_QBITTORRENT_HOST"]
+PROWLARR_HOST = os.environ["LISTENARR_PROWLARR_HOST"]
 QB_CLIENT_ID = "00000000-0000-4000-8000-000000000001"
 QB_CLIENT_NAME = "Legion qBittorrent"
 UNSAFE_METHODS = {"DELETE", "PATCH", "POST", "PUT"}
@@ -72,15 +74,21 @@ def configure_root_folder():
                 "name": "Audiobooks",
                 "path": LIBRARY_DIR,
                 "isDefault": True,
-                "caseSensitivityMode": "Auto",
+                "caseSensitivityMode": "Sensitive",
             },
         )
         return
 
     request_json(
-        "PATCH",
+        "PUT",
         f"/rootfolders/{folder['id']}",
-        {"name": "Audiobooks", "isDefault": True, "caseSensitivityMode": "Auto"},
+        {
+            "id": folder["id"],
+            "name": "Audiobooks",
+            "path": LIBRARY_DIR,
+            "isDefault": True,
+            "caseSensitivityMode": "Sensitive",
+        },
     )
 
 
@@ -133,7 +141,7 @@ def configure_qbittorrent():
         "id": existing["id"] if existing else QB_CLIENT_ID,
         "name": QB_CLIENT_NAME,
         "type": "qbittorrent",
-        "host": "127.0.0.1",
+        "host": QB_HOST,
         "port": 8080,
         "username": "admin",
         "password": password,
@@ -159,7 +167,7 @@ def import_prowlarr_indexers():
     """Import audiobook-category indexers from the machine's Prowlarr instance."""
     api_key = Path(os.environ["CREDENTIALS_DIRECTORY"], "prowlarr-api-key").read_text().rstrip("\r\n")
     payload = {
-        "url": "http://127.0.0.1",
+        "url": f"http://{PROWLARR_HOST}",
         "port": 9696,
         "clearPort": False,
         "apiKey": api_key,
