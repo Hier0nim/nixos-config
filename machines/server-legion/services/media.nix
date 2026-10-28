@@ -373,27 +373,31 @@ in
         set -euo pipefail
         umask 0077
         BASE_URL="http://${config.nixflix.jellyfin.connectionAddress}:${toString config.nixflix.jellyfin.network.internalHttpPort}"
-        AUTH_HEADER="$(mktemp)"
         CURRENT_CONFIG="$(mktemp)"
         DESIRED_CONFIG="$(mktemp)"
-        trap 'rm -f "$AUTH_HEADER" "$CURRENT_CONFIG" "$DESIRED_CONFIG"' EXIT
-        printf 'Authorization: %s\\n' "$(< /run/jellyfin/auth-token)" > "$AUTH_HEADER"
+        trap 'rm -f "$CURRENT_CONFIG" "$DESIRED_CONFIG"' EXIT
 
         apply_username() {
           plugin_name="$1"
           config_key="$2"
-          plugin_id=$(curl --fail --silent --show-error --header "@$AUTH_HEADER" "$BASE_URL/Plugins" \
+          plugin_id=$(curl --fail --silent --show-error \
+            --variable "authToken@/run/jellyfin/auth-token" \
+            --expand-header 'Authorization: {{authToken:trim}}' "$BASE_URL/Plugins" \
             | jq -r --arg name "$plugin_name" '.[] | select(.Name == $name) | .Id // empty')
           if [ -z "$plugin_id" ]; then
             echo "Jellyfin plugin not found: $plugin_name" >&2
             exit 1
           fi
-          curl --fail --silent --show-error --header "@$AUTH_HEADER" \
+          curl --fail --silent --show-error \
+            --variable "authToken@/run/jellyfin/auth-token" \
+            --expand-header 'Authorization: {{authToken:trim}}' \
             "$BASE_URL/Plugins/$plugin_id/Configuration" > "$CURRENT_CONFIG"
           jq --rawfile username "$CREDENTIALS_DIRECTORY/username" --arg key "$config_key" \
             '.[$key] = ($username | rtrimstr("\\n"))' \
             "$CURRENT_CONFIG" > "$DESIRED_CONFIG"
-          curl --fail --silent --show-error --header "@$AUTH_HEADER" \
+          curl --fail --silent --show-error \
+            --variable "authToken@/run/jellyfin/auth-token" \
+            --expand-header 'Authorization: {{authToken:trim}}' \
             -H 'Content-Type: application/json' -X POST --data-binary "@$DESIRED_CONFIG" \
             "$BASE_URL/Plugins/$plugin_id/Configuration" >/dev/null
         }
