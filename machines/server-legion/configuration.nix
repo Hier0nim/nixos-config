@@ -1,4 +1,9 @@
-{ self, pkgs, ... }:
+{
+  self,
+  pkgs,
+  lib,
+  ...
+}:
 {
   imports = [
     ../../modules/nixos/common.nix
@@ -6,6 +11,11 @@
     ./hardware.nix
     ./storage.nix
     ./services
+  ];
+
+  nix.settings.trusted-users = lib.mkOverride 40 [
+    "root"
+    "hieronim"
   ];
 
   nixpkgs.config.allowUnfree = true;
