@@ -51,6 +51,14 @@
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    copyparty = {
+      url = "github:9001/copyparty";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixflix = {
+      url = "github:kiriwalawren/nixflix/v3.2.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     umbriel = {
       url = "github:noctalia-dev/umbriel";
