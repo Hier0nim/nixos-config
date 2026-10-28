@@ -22,6 +22,7 @@ let
   mkProxy =
     {
       port,
+      host ? "127.0.0.1",
       auth ? null,
       apiBypass ? false,
       pathPrefix ? null,
@@ -30,7 +31,7 @@ let
       extraProxyConfig ? "",
     }:
     let
-      upstream = "127.0.0.1:${toString port}";
+      upstream = "${host}:${toString port}";
       proxyConfig = lib.concatStringsSep "\n" (
         lib.filter (value: value != "") [
           extraProxyConfig
@@ -82,21 +83,25 @@ let
 
   virtualHosts = {
     "sonarr.pieczarkowo.me".extraConfig = mkProxy {
+      host = config.nixflix.sonarr.connectionAddress;
       port = 8989;
       auth = "media-admin";
       apiBypass = true;
     };
     "sonarr-anime.pieczarkowo.me".extraConfig = mkProxy {
+      host = config.nixflix."sonarr-anime".connectionAddress;
       port = 8990;
       auth = "media-admin";
       apiBypass = true;
     };
     "radarr.pieczarkowo.me".extraConfig = mkProxy {
+      host = config.nixflix.radarr.connectionAddress;
       port = 7878;
       auth = "media-admin";
       apiBypass = true;
     };
     "indexers.pieczarkowo.me".extraConfig = mkProxy {
+      host = config.nixflix.prowlarr.connectionAddress;
       port = 9696;
       auth = "media-admin";
     };
@@ -118,6 +123,7 @@ let
       auth = "media-admin";
     };
     "pobieralnia.pieczarkowo.me".extraConfig = mkProxy {
+      host = config.nixflix.torrentClients.qbittorrent.connectionAddress;
       port = 8080;
       auth = "media-admin";
       apiBypass = true;
