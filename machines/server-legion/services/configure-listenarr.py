@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Apply the host's Listenarr settings through its local API."""
 
+import http.cookiejar
 import json
 import os
 import sys
@@ -14,19 +15,30 @@ LIBRARY_DIR = os.environ["LISTENARR_LIBRARY_DIR"]
 DOWNLOAD_DIR = os.environ["LISTENARR_DOWNLOAD_DIR"]
 QB_CLIENT_ID = "00000000-0000-4000-8000-000000000001"
 QB_CLIENT_NAME = "Legion qBittorrent"
+UNSAFE_METHODS = {"DELETE", "PATCH", "POST", "PUT"}
+COOKIE_JAR = http.cookiejar.CookieJar()
+OPENER = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(COOKIE_JAR))
+CSRF_TOKEN = None
 
 
 def request_json(method, path, payload=None):
     """Call the local Listenarr API without logging request or response bodies."""
+    global CSRF_TOKEN
+    if method in UNSAFE_METHODS and CSRF_TOKEN is None:
+        CSRF_TOKEN = request_json("GET", "/antiforgery/token")["token"]
+
     body = None if payload is None else json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json"}
+    if method in UNSAFE_METHODS:
+        headers["X-XSRF-TOKEN"] = CSRF_TOKEN
     request = urllib.request.Request(
         f"{API}{path}",
         data=body,
-        headers={"Content-Type": "application/json"},
+        headers=headers,
         method=method,
     )
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
+        with OPENER.open(request, timeout=20) as response:
             content = response.read()
     except urllib.error.HTTPError as error:
         raise RuntimeError(f"Listenarr API returned HTTP {error.code} for {method} {path}") from None
