@@ -1,3 +1,10 @@
 result
 .direnv/
 /.pre-commit-config.yaml
+__pycache__/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json

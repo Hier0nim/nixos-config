@@ -2,17 +2,17 @@
 {
   imports = [
     ./state.nix
-    ./actual.nix
-    ./enable-actual.nix
+    ./identity
+    ./certificates.nix
+    ./actual
     ./media.nix
     ./audiobookshelf.nix
-    ./listenarr.nix
-    ./beszel.nix
-    ./forgejo.nix
-    ./immich.nix
-    ./workstation.nix
+    ./listenarr
+    ./beszel
+    ./forgejo
+    ./immich
     ./ttyd.nix
-    ./copyparty.nix
-    ./proxy.nix
+    ./copyparty
+    ./proxy
   ];
 }

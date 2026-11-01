@@ -98,16 +98,6 @@ in
             IdentityFile = vars.hieronim-ssh-server-legion.files.key.path;
             IdentitiesOnly = true;
           };
-          "legion-workstation workstation-dev" = {
-            HostName = "10.233.10.2";
-            Port = 22;
-            User = "hieronim";
-            IdentityFile = vars.hieronim-ssh-server-legion.files.key.path;
-            IdentitiesOnly = true;
-            ProxyJump = "homelab";
-            HostKeyAlias = "server-legion-workstation";
-            ForwardAgent = true;
-          };
           router = {
             HostName = "192.168.8.1";
             User = "root";

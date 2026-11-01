@@ -6,6 +6,7 @@
 }:
 let
   snapshotRoot = "/var/backup/homelab";
+  identityEnabled = config.services.authelia.instances.homelab.enable or false;
   systemctl = "${pkgs.systemd}/bin/systemctl";
   nixflixStateDir = config.nixflix.stateDir;
   arrBackupDirs = map (name: "${nixflixStateDir}/${name}/Backups") [
@@ -15,6 +16,11 @@ let
     "prowlarr"
   ];
   snapshotServices = [
+    {
+      name = "copyparty-state";
+      unit = "copyparty.service";
+      source = "/var/lib/copyparty";
+    }
     {
       name = "actual";
       unit = "actual.service";
@@ -54,7 +60,13 @@ let
         "logs"
       ];
     }
-  ];
+  ]
+  ++ lib.optional identityEnabled {
+    name = "authelia";
+    unit = "authelia-homelab.service";
+    source = "/var/lib/authelia-homelab";
+    exclude = [ "notifications.txt" ];
+  };
   snapshotSources = map (service: service.source) snapshotServices;
   snapshotScript = lib.concatMapStringsSep "\n" (service: ''
     if ${systemctl} is-active --quiet ${lib.escapeShellArg service.unit}; then
@@ -97,11 +109,15 @@ let
     runtimeInputs = [
       pkgs.coreutils
       pkgs.systemd
+      pkgs.util-linux
     ];
     text = ''
       set -euo pipefail
+      umask 077
       if [ "$#" -ne 1 ]; then
-        echo "Usage: homelab-restore-state actual|enable-actual|audiobookshelf|listenarr|forgejo|jellyfin|seerr" >&2
+        echo "Usage: homelab-restore-state ${
+          lib.concatStringsSep "|" (map (service: service.name) snapshotServices)
+        }|forgejo" >&2
         exit 2
       fi
       case "$1" in
@@ -120,24 +136,65 @@ let
         echo "Snapshot not found: $snapshot" >&2
         exit 1
       fi
-      ${systemctl} stop "$unit"
-      rollback="''${source}.before-borg-restore-$(date +%Y%m%d%H%M%S)"
-      if [ -e "$source" ]; then
-        mv -T "$source" "$rollback"
+      # Serialize restores with snapshots before stopping any service.
+      exec 9>${lib.escapeShellArg "${snapshotRoot}/.state.lock"}
+      flock -n 9 || { echo "Another state snapshot or restore is running" >&2; exit 1; }
+      rollback=$(mktemp -d "''${source}.before-borg-restore-XXXXXXXX")
+      was_active=false
+      stop_attempted=false
+      saved=false
+      copying=false
+      complete=false
+      if ${systemctl} is-active --quiet "$unit"; then
+        was_active=true
       fi
-      if ! cp -a --reflink=auto "$snapshot" "$source"; then
-        rm -rf "$source"
-        if [ -e "$rollback" ]; then
-          mv -T "$rollback" "$source"
+      # On failure, restore old data only after confirming the service has stopped.
+      cleanup() {
+        status=$?
+        trap - EXIT INT TERM
+        if ! "$complete"; then
+          if "$copying"; then
+            if ! ${systemctl} stop "$unit"; then
+              echo "Cannot stop $unit for rollback. Previous state retained at $rollback" >&2
+              exit 1
+            fi
+            rm -rf -- "$source" || exit 1
+          fi
+          if "$saved"; then
+            if ! mv -T -- "$rollback" "$source"; then
+              echo "Cannot restore previous state from $rollback; $unit remains stopped" >&2
+              exit 1
+            fi
+          else
+            rmdir -- "$rollback" || true
+          fi
+          if "$was_active" && "$stop_attempted"; then
+            ${systemctl} start "$unit" || status=1
+          fi
         fi
-        ${systemctl} start "$unit" || true
-        exit 1
+        exit "$status"
+      }
+      trap cleanup EXIT
+      trap 'exit 130' INT
+      trap 'exit 143' TERM
+      stop_attempted=true
+      ${systemctl} stop "$unit"
+      if [ -e "$source" ] || [ -L "$source" ]; then
+        mv -T -- "$source" "$rollback"
+        saved=true
       fi
-      if ! ${systemctl} start "$unit"; then
-        echo "Restore copied, but $unit did not start. Previous state is at $rollback" >&2
-        exit 1
+      copying=true
+      cp -a --reflink=auto "$snapshot" "$source"
+      if "$was_active"; then
+        ${systemctl} start "$unit"
       fi
-      echo "Restored $1. Previous state retained at $rollback"
+      complete=true
+      if "$saved"; then
+        echo "Restored $1. Previous state retained at $rollback"
+      else
+        rmdir -- "$rollback"
+        echo "Restored $1. No previous state existed."
+      fi
     '';
   };
 in
@@ -156,7 +213,11 @@ in
     };
 
     copyparty.folders = [ "/data/nas" ];
+    copyparty-state.folders = [ "${snapshotRoot}/copyparty-state" ];
 
+    authelia = lib.mkIf identityEnabled {
+      folders = [ "${snapshotRoot}/authelia" ];
+    };
     actual.folders = [ "${snapshotRoot}/actual" ];
     enable-actual.folders = [ "${snapshotRoot}/enable-actual" ];
     audiobookshelf.folders = [ "${snapshotRoot}/audiobookshelf" ];
@@ -203,13 +264,18 @@ in
         ReadWritePaths = [ snapshotRoot ];
         TimeoutStartSec = "infinity";
       };
-      path = [ pkgs.coreutils ];
+      path = [
+        pkgs.coreutils
+        pkgs.util-linux
+      ];
       script = ''
         set -euo pipefail
+        exec 9>${lib.escapeShellArg "${snapshotRoot}/.state.lock"}
+        flock -n 9 || { echo "Another state snapshot or restore is running" >&2; exit 1; }
         active_units=()
         cleanup() {
           status=$?
-          trap - EXIT
+          trap - EXIT INT TERM
           ${snapshotCleanup}
           for unit in "''${active_units[@]}"; do
             ${systemctl} start "$unit" || status=1
@@ -245,6 +311,8 @@ in
           rm -rf "$previous"
         }
         trap cleanup EXIT
+        trap 'exit 130' INT
+        trap 'exit 143' TERM
         ${snapshotScript}
         ${snapshotCopies}
       '';

@@ -64,6 +64,28 @@ let
     "radarr"
     "prowlarr"
   ];
+  # External UIs must not be reachable by routed peers, including inherited VPN routes.
+  externalUiPorts =
+    lib.concatMapStringsSep "," (name: toString config.nixflix.${name}.config.hostConfig.port)
+      (
+        lib.filter (
+          name: config.nixflix.${name}.config.hostConfig.authenticationMethod == "external"
+        ) arrServices
+      );
+  forwardGuards = [
+    {
+      tool = "iptables";
+      address = config.vpnNamespaces.wg.namespaceAddress;
+    }
+  ]
+  ++ lib.optional config.networking.enableIPv6 {
+    tool = "ip6tables";
+    address = config.vpnNamespaces.wg.namespaceAddressIPv6;
+  };
+  guardRule =
+    address:
+    "-d ${address} -p tcp -m multiport --dports ${externalUiPorts} -j REJECT --reject-with tcp-reset";
+
   mediaWriterUsers = [
     "sonarr"
     "sonarr-anime"
@@ -82,6 +104,8 @@ let
     config = {
       apiKey = secretRef name "api-key";
       hostConfig = {
+        # Caddy gates the UI; API authentication remains application-owned.
+        authenticationMethod = "external";
         password = secretRef name "password";
         backupInterval = 1;
         backupRetention = 28;
@@ -338,10 +362,29 @@ in
     downloadarr.qbittorrent.categories.prowlarr = "audiobooks";
   };
 
+  networking.firewall = lib.mkIf (externalUiPorts != "") {
+    extraCommands = lib.concatMapStringsSep "\n" (
+      guard:
+      let
+        rule = guardRule guard.address;
+      in
+      ''
+        ${guard.tool} -C FORWARD ${rule} 2>/dev/null || ${guard.tool} -I FORWARD 1 ${rule}
+      ''
+    ) forwardGuards;
+    extraStopCommands = lib.concatMapStringsSep "\n" (guard: ''
+      ${guard.tool} -D FORWARD ${guardRule guard.address} 2>/dev/null || true
+    '') forwardGuards;
+  };
+
   services.flaresolverr.package = mediaPackages.flaresolverr;
   services.recyclarr.package = mediaPackages.recyclarr;
 
   systemd.services = {
+    # Both Sonarr instances use the fixed /tmp/sonarr_backup path.
+    sonarr.serviceConfig.PrivateTmp = true;
+    sonarr-anime.serviceConfig.PrivateTmp = true;
+
     flaresolverr.vpnConfinement = {
       enable = true;
       vpnNamespace = "wg";

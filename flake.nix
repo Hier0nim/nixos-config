@@ -12,6 +12,11 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    terranix = {
+      url = "github:terranix/terranix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
     home-manager = {
@@ -86,6 +91,7 @@
       imports = [
         inputs.clan-core.flakeModules.default
         inputs.git-hooks.flakeModule
+        ./machines/server-legion/flake-module.nix
       ];
 
       flake.clan.imports = [ ./clan.nix ];

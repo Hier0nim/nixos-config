@@ -25,6 +25,6 @@
     "z /data/nas 2770 root nas - -"
     "d /data/nas/shared 2770 root nas - -"
     "d /data/nas/hieronim 2770 root nas - -"
-    "d /data/nas/sarka 2770 root nas - -"
+    "d /data/nas/sarcia 2770 root nas - -"
   ];
 }
