@@ -2,11 +2,8 @@
   description = "Hieronim's Clan configuration";
 
   inputs = {
-    clan-core = {
-      url = "https://git.clan.lol/clan/clan-core/archive/26.05.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
+    nixpkgs.follows = "clan-core/nixpkgs";
     flake-parts.follows = "clan-core/flake-parts";
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
