@@ -226,7 +226,6 @@ in
           "vc1"
           "vp8"
           "vp9"
-          "av1"
         ];
       };
       libraries = {
