@@ -172,6 +172,12 @@ in
       wgConfFile = secretPath "media-vpn" "wireguard.conf";
     };
     flaresolverr.enable = true;
+    # VPN-confined applications cannot reach the host's loopback listener.
+    notif.jellyfin = {
+      host = "grzybflix.${config.services.homelabIngress.domain}";
+      port = 443;
+      useSsl = true;
+    };
   }
   // lib.genAttrs arrServices mkArr
   // {
