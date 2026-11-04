@@ -50,13 +50,20 @@ in
       "docker-listenarr.service"
       "qbittorrent.service"
       "prowlarr.service"
+      "prowlarr-indexers.service"
     ];
-    requires = [ "docker-listenarr.service" ];
+    requires = [
+      "docker-listenarr.service"
+      "prowlarr-indexers.service"
+    ];
     unitConfig.RequiresMountsFor = [
       downloadDir
       libraryDir
     ];
-    restartTriggers = [ configureScript ];
+    restartTriggers = [
+      configureScript
+      config.systemd.services.prowlarr-indexers.serviceConfig.ExecStart
+    ];
     path = [ pkgs.python3 ];
     environment = {
       LISTENARR_API = "http://127.0.0.1:${toString port}/api/v1";

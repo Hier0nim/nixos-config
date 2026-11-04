@@ -129,7 +129,7 @@ let
         ++ [
           {
             name = "ABtorrents";
-            enable = false;
+            enable = true;
             baseUrl = "https://usefultrash.net/";
             cookie = secretRef "prowlarr-abtorrents" "cookie";
             # Fourteen days are mandatory; add two days before considering retirement.
