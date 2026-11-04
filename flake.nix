@@ -58,7 +58,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixflix = {
-      url = "github:kiriwalawren/nixflix/v3.2.0";
+      url = "github:kiriwalawren/nixflix/v4.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
