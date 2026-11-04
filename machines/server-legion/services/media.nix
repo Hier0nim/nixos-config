@@ -25,6 +25,7 @@ let
       "api-key"
       "password"
     ];
+    prowlarr-abtorrents = [ "cookie" ];
     jellyfin = [
       "api-key"
       "admin-password"
@@ -112,11 +113,30 @@ let
       };
     }
     // lib.optionalAttrs (name == "prowlarr") {
-      indexers = [
-        { name = "YTS"; }
-        { name = "Nyaa.si"; }
-        { name = "LimeTorrents"; }
-      ];
+      # Public trackers stop at ratio 1.0 or 48 hours, whichever comes first.
+      indexers =
+        map
+          (name: {
+            inherit name;
+            "torrentBaseSettings.seedRatio" = 1.0;
+            "torrentBaseSettings.seedTime" = 48 * 60;
+          })
+          [
+            "YTS"
+            "Nyaa.si"
+            "LimeTorrents"
+          ]
+        ++ [
+          {
+            name = "ABtorrents";
+            enable = false;
+            baseUrl = "https://usefultrash.net/";
+            cookie = secretRef "prowlarr-abtorrents" "cookie";
+            # Fourteen days are mandatory; add two days before considering retirement.
+            "torrentBaseSettings.seedTime" = 16 * 24 * 60;
+            "torrentBaseSettings.packSeedTime" = 16 * 24 * 60;
+          }
+        ];
       applications = [
         {
           name = "Sonarr";
@@ -389,6 +409,9 @@ in
   services.recyclarr.package = mediaPackages.recyclarr;
 
   systemd.services = {
+    # Indexer validation response bodies can contain cookies.
+    prowlarr-indexers.serviceConfig.StandardOutput = "null";
+
     # Both Sonarr instances use the fixed /tmp/sonarr_backup path.
     sonarr.serviceConfig.PrivateTmp = true;
     sonarr-anime.serviceConfig.PrivateTmp = true;
