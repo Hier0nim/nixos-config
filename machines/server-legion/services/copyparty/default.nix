@@ -91,6 +91,13 @@ in
 
   users.users.copyparty.extraGroups = [ "nas" ];
 
+  # Indexes belong to the daemon, independently of uploaded content ownership.
+  systemd.tmpfiles.rules = lib.concatMap (volume: [
+    "d ${volume.path}/.hist 0700 copyparty copyparty - -"
+    "Z ${volume.path}/.hist - copyparty copyparty - -"
+    "z ${volume.path}/.hist/up2k.db* 0600 copyparty copyparty - -"
+  ]) (lib.attrValues config.services.copyparty.volumes);
+
   services.caddy.virtualHosts."pliki.${domain}".extraConfig = lib.mkForce (
     import ./proxy.nix {
       upstream = config.services.homelabIngress.services.pliki.upstream;

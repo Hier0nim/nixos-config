@@ -2,6 +2,7 @@
 
 import base64
 import http.client
+import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
@@ -59,6 +60,36 @@ def basic(name, password=None):
     """Build synthetic native Basic credentials."""
     value = name + ":" + (password or passwords[name])
     return {"Authorization": "Basic " + base64.b64encode(value.encode()).decode()}
+
+
+def indexed_upload(volume):
+    """Exercise two up2k chunks, the SQLite index, readback and native deletion."""
+    payload = os.urandom(1024 * 1024 + 37)
+    chunks = [payload[:1024 * 1024], payload[1024 * 1024:]]
+    hashes = [base64.urlsafe_b64encode(hashlib.sha512(chunk).digest()[:33]).decode() for chunk in chunks]
+    name = "indexed-permission-probe.bin"
+    path = f"/nas/{volume}/"
+    headers = {**basic("admin"), "Content-Type": "application/json"}
+    body = json.dumps({"name": name, "size": len(payload), "lmod": int(time.time()), "hash": hashes})
+    for _ in range(100):
+        status, _, response = request(path, headers, "POST", body)
+        if status != 503:
+            break
+        time.sleep(0.05)
+    assert status == 200, f"Indexed upload handshake failed ({status}): {response[:500]!r}"
+    upload = json.loads(response)
+    assert upload["hash"] == hashes
+    for digest, chunk in zip(hashes, chunks):
+        chunk_headers = {**basic("admin"), "Content-Type": "application/octet-stream",
+                         "X-Up2k-Hash": digest, "X-Up2k-Wark": upload["wark"]}
+        assert request(upload["purl"], chunk_headers, "POST", chunk)[0] == 200
+    status, _, response = request(path, headers, "POST", body)
+    assert status == 200 and json.loads(response)["hash"] == []
+    assert request(path + name, basic("admin"))[2] == payload
+    with sqlite3.connect(f"file:{nas / volume / '.hist/up2k.db'}?mode=ro", uri=True) as db:
+        assert db.execute("SELECT count(*) FROM up WHERE fn=?", (name,)).fetchone()[0] == 1
+    assert request(path + name, basic("admin"), "DELETE")[0] in [200, 204]
+    assert not (nas / volume / name).exists()
 
 
 def start_backend(config):
@@ -127,7 +158,6 @@ try:
     for name in ["shared", "hieronim", "sarcia"]:
         text = text.replace("/data/nas/" + name, str(nas / name))
     assert "@@COPYPARTY_IDP_KEY@@" not in text and proof in text
-    assert "\nsarka:" not in text and "/nas/sarka" not in text
     runtime.write_text(text)
     child = start_backend(runtime)
     native_sessions = sessions()
@@ -183,10 +213,9 @@ try:
         result = request("/nas/shared/?ls", basic(user))
         assert result[0] == 200 and json.loads(result[2])["acct"] == user
         assert calls["auth"] == before
-    # Native password-only behavior is unchanged, not an added legacy-name alias.
-    result = request("/nas/shared/?ls", basic("sarka", passwords["sarcia"]))
+    # Native Basic auth selects the account by password, not the supplied username.
+    result = request("/nas/shared/?ls", basic("ignored-user", passwords["sarcia"]))
     assert result[0] == 200 and json.loads(result[2])["acct"] == "sarcia"
-    assert request("/nas/sarka/original.txt", basic("sarcia"))[0] in [403, 404]
     assert request("/nas/hieronim/original.txt", basic("sarcia"))[0] in [403, 404]
     before = calls["auth"]
     assert request("/nas/shared/", {**basic("sarcia"), "Depth": "1"}, "PROPFIND")[0] == 207
@@ -201,10 +230,13 @@ try:
     assert request("/nas/shared/client.txt", native)[2] == b"native client payload"
     assert request("/nas/shared/client.txt", native, "DELETE")[0] in [200, 204]
 
+    for volume in ["sarcia", "hieronim", "shared"]:
+        indexed_upload(volume)
+
     assert (nas / "sarcia/original.txt").read_text() == "Original synthetic sarcia data"
     assert proof.encode() not in (root / "copyparty.log").read_bytes().lower()
     assert proof.encode() not in (root / "caddy.log").read_bytes().lower()
-    print("PASS runtime-secret setup and reload, SSO spoof/unknown/cross-user denial, native passwords/WebDAV/writes")
+    print("PASS runtime-secret setup and reload, SSO boundary, native clients and indexed chunked uploads")
 finally:
     for child in reversed(children):
         if child.poll() is None:

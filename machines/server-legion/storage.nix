@@ -20,7 +20,6 @@
     "z /data/photos 2770 root photos - -"
     "d /data/photos/library 2770 root photos - -"
     "d /data/photos/backups 2770 root photos - -"
-    "d /data/photos/profile 2770 root photos - -"
     "d /data/nas 2770 root nas - -"
     "z /data/nas 2770 root nas - -"
     "d /data/nas/shared 2770 root nas - -"

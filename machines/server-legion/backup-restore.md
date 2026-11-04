@@ -38,9 +38,13 @@ Sonarr, Sonarr Anime, Radarr, and Prowlarr save their own database backups. Rest
 
 Listenarr's saved state restores its catalogue. At startup, Nix reapplies its library path, qBittorrent client, quality profile, Prowlarr indexers, and copy behavior. The copy leaves completed torrents in place for seeding.
 
-For Immich, stop `immich-server` and `immich-machine-learning`, then restore `immich-media`. Keep the restored `library`, `upload`, and `profile` directories at their original paths. Start Immich, then restore its database from the included Immich backup under Administration, Maintenance. Immich can rebuild thumbnails and encoded video, so those files are not in the backup.
+For Immich, stop `immich-server` and `immich-machine-learning`, then restore `immich-media`. Keep `library`, `upload`, and `profile` under `/data/photos`. Older archives store uploads under `/var/lib/homelab/immich-hot/upload`; copy those into `/data/photos/upload` before starting Immich. Start Immich, then restore its database from the included Immich backup under Administration, Maintenance. Immich can rebuild thumbnails and encoded video, so those files are not in the backup.
+
+Before rolling back to a configuration with the old Immich bind mounts, stop Immich and synchronize the current media directories back to its NVMe sources. Booting an old generation alone would expose stale media copies.
 
 For the NAS files, restore `copyparty` while Copyparty is stopped. Restore the matching `copyparty-state` snapshot and use the helper before starting Copyparty. That snapshot covers `/var/lib/copyparty`, including persistent key salts and the share database if sharing is later enabled. The file index can be rebuilt, but lost salts or share state can invalidate existing links. Older archives may not contain `copyparty-state`.
+
+After restoring older NAS metadata, apply the declared tmpfiles rules before starting Copyparty. Its `.hist` directories are private daemon state owned by `copyparty:copyparty`. Keep SQLite databases with their WAL files.
 
 For Forgejo, restore `forgejo-snapshot` and run `homelab-restore-state forgejo` with the matching Nix configuration active.
 

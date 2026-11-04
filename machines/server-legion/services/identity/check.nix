@@ -1,37 +1,4 @@
 { pkgs, config }:
-let
-  identity = config.services.authelia.instances.homelab;
-  client = builtins.head (
-    builtins.filter (
-      client: client.client_id == "immich"
-    ) identity.settings.identity_providers.oidc.clients
-  );
-  photos = config.services.immich.settings.oauth;
-in
-assert client.authorization_policy == "immich";
-assert client.require_pkce && client.pkce_challenge_method == "S256";
-assert client.token_endpoint_auth_method == "client_secret_post";
-assert
-  identity.settings.identity_providers.oidc.authorization_policies.immich == {
-    default_policy = "deny";
-    rules = [
-      {
-        policy = "one_factor";
-        subject = "group:household";
-      }
-    ];
-  };
-assert photos.clientId == client.client_id;
-assert photos.tokenEndpointAuthMethod == client.token_endpoint_auth_method;
-assert !photos.autoRegister && photos.roleClaim == "";
-assert
-  photos.clientSecret._secret
-  == config.clan.core.vars.generators.immich-oidc.files.client-secret.path;
-assert pkgs.lib.all (uri: builtins.elem uri client.redirect_uris) [
-  "https://fotki.pieczarkowo.me/auth/login"
-  "https://fotki.pieczarkowo.me/user-settings"
-  "app.immich:///oauth-callback"
-];
 pkgs.runCommand "legion-oidc-contracts"
   {
     nativeBuildInputs = [

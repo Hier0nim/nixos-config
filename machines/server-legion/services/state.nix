@@ -234,7 +234,7 @@ in
         "/data/photos/library"
         "/data/photos/backups"
         "/data/photos/profile"
-        "/var/lib/homelab/immich-hot/upload"
+        "/data/photos/upload"
       ];
       preBackupScript = ''
         if ! ${pkgs.findutils}/bin/find /data/photos/backups -type f -name '*.sql.gz' -mmin -1560 -print -quit | ${pkgs.gnugrep}/bin/grep -q .; then
@@ -328,6 +328,7 @@ in
       "/data/photos/library"
       "/data/photos/backups"
       "/data/photos/profile"
+      "/data/photos/upload"
     ];
   };
 }

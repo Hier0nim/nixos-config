@@ -20,6 +20,9 @@
     kernelPackages = pkgs.linuxPackages;
   };
 
+  # Headless NVENC clients still need the runtime driver libraries.
+  hardware.graphics.enable = true;
+
   hardware.nvidia = {
     modesetting.enable = true;
     open = false;

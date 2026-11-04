@@ -6,14 +6,6 @@
 }:
 let
   photos = "/data/photos";
-  hotRoot = "/var/lib/homelab/immich-hot";
-  bindTargets = [
-    "upload"
-    "thumbs"
-    "encoded-video"
-    "profile"
-  ];
-  hotDirs = map (name: "${hotRoot}/${name}") bindTargets;
   oidcFiles = config.clan.core.vars.generators.immich-oidc.files;
 in
 {
@@ -125,30 +117,17 @@ in
   };
 
   systemd = {
-    tmpfiles.rules = [
-      "d /var/lib/homelab 0755 root root - -"
-      "d ${hotRoot} 0755 root root - -"
-    ]
-    ++ map (dir: "d ${dir} 2770 immich photos - -") hotDirs
-    ++ map (name: "d ${photos}/${name} 2770 root photos - -") bindTargets;
+    tmpfiles.rules = map (name: "d ${photos}/${name} 2770 root photos - -") [
+      "upload"
+      "thumbs"
+      "encoded-video"
+      "profile"
+    ];
     services.immich-server = {
-      unitConfig.RequiresMountsFor = hotDirs;
+      unitConfig.RequiresMountsFor = [ photos ];
+      # Preserve access through the shared photos group.
       serviceConfig.PrivateUsers = lib.mkForce false;
     };
     tmpfiles.settings.immich = lib.mkForce { };
   };
-
-  fileSystems = lib.listToAttrs (
-    map (name: {
-      name = "${photos}/${name}";
-      value = {
-        device = "${hotRoot}/${name}";
-        fsType = "none";
-        options = [
-          "bind"
-          "x-systemd.requires-mounts-for=${hotRoot}/${name}"
-        ];
-      };
-    }) bindTargets
-  );
 }

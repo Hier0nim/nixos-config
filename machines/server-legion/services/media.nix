@@ -139,7 +139,10 @@ let
   };
 in
 {
-  imports = [ self.inputs.nixflix.nixosModules.default ];
+  imports = [
+    self.inputs.nixflix.nixosModules.default
+    ./vpn-dns.nix
+  ];
 
   nixpkgs.overlays = [ self.inputs.nixflix.overlays.default ];
   users.users =
