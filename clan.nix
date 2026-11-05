@@ -82,8 +82,7 @@
       roles.client.machines.server-legion.settings = {
         startAt = "*-*-* 03:30:00";
         destinations.hetzner-storagebox = {
-          repo = "u654384-sub2@u654384-sub2.your-storagebox.de:/./borgbackup";
-          rsh = "ssh -p 23 -oStrictHostKeyChecking=accept-new -i /run/secrets/vars/borgbackup/borgbackup.ssh";
+          repo = "ssh://u654384-sub2@u654384-sub2.your-storagebox.de:23/./borgbackup";
         };
       };
     };
