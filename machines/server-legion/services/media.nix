@@ -125,6 +125,7 @@ let
             "YTS"
             "Nyaa.si"
             "LimeTorrents"
+            "Knaben"
           ]
         ++ [
           {
@@ -162,6 +163,7 @@ in
   imports = [
     self.inputs.nixflix.nixosModules.default
     ./vpn-dns.nix
+    ./media-quality
   ];
 
   nixpkgs.overlays = [ self.inputs.nixflix.overlays.default ];
