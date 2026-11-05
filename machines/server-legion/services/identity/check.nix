@@ -6,11 +6,19 @@ pkgs.runCommand "legion-oidc-contracts"
       pkgs.openssl
     ];
     autheliaExec = config.systemd.services.authelia-homelab.serviceConfig.ExecStart;
+    clientHashes = builtins.toJSON (
+      map (credential: builtins.head (pkgs.lib.splitString ":" credential)) (
+        builtins.filter (
+          credential: pkgs.lib.hasInfix "-client-hash:" credential
+        ) config.systemd.services.authelia-homelab.serviceConfig.LoadCredential
+      )
+    );
   }
   ''
     python3 - <<'PY'
     from pathlib import Path
     import os
+    import json
     import shlex
     import shutil
     import subprocess
@@ -33,7 +41,7 @@ pkgs.runCommand "legion-oidc-contracts"
             [binary, 'crypto', 'hash', 'generate', 'argon2', '--random', '--no-confirm'], text=True)
         digest = next(line.split(': ', 1)[1].strip() for line in generated.splitlines()
                       if line.startswith('Digest: '))
-        for name in ['immich-client-hash', 'actual-client-hash', 'forgejo-client-hash', 'beszel-client-hash']:
+        for name in json.loads(os.environ['clientHashes']):
             (work / name).write_text(digest)
         subprocess.run([shutil.which('openssl'), 'genpkey', '-algorithm', 'RSA',
                         '-pkeyopt', 'rsa_keygen_bits:2048', '-out',

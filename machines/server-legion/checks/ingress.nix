@@ -7,9 +7,9 @@ let
   ) ingress.services;
   routes = pkgs.writeText "ingress-test-routes.json" (
     builtins.toJSON (
-      pkgs.lib.mapAttrs (name: service: {
+      pkgs.lib.mapAttrs (_: service: {
         inherit (service) upstream integrationApiBypass pathPrefix;
-        route = config.services.caddy.virtualHosts."${name}.${ingress.domain}".extraConfig;
+        route = config.services.caddy.virtualHosts.${service.hostname}.extraConfig;
       }) controls
     )
   );

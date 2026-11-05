@@ -23,7 +23,7 @@ builtins.mapAttrs (
     tunneled = enableTunnel && service.transport == "tunnel";
   in
   {
-    name = "${name}.${domain}";
+    name = service.hostname or "${name}.${domain}";
     type = "CNAME";
     content = if tunneled then "${tunnelId}.cfargotunnel.com" else directTarget;
     proxied = tunneled;

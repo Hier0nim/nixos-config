@@ -1,65 +1,81 @@
-# Legion ingress and identity
+# Legion access and maintenance
 
-## Where to edit
+Start with `services/proxy/default.nix` and each service's module when changing an address or upstream. `services/proxy/ingress.nix` builds the Caddy routes, `services/identity/` configures Authelia and OIDC, and `dns/` manages Cloudflare records. The running route list is `/etc/homelab-ingress/services.tsv`.
 
-- `services/proxy/default.nix` lists application upstreams, browser admission groups and public transports. `proxy/ingress.nix` renders ordinary Caddy routes.
-- `services/identity/default.nix` configures Authelia, SMTP, sessions, the initial user seed and browser admission policies.
-- Each native OIDC application's directory owns its client, authorization policy, credentials and application settings. `identity/generate-oidc-client.py` generates new client credentials only when explicitly invoked through Clan.
-- `services/certificates.nix` owns wildcard issuance and renewal. Caddy uses the certificate but does not load the Cloudflare API token.
-- `dns/` generates the managed Cloudflare records and provides the OpenTofu wrapper. Checks are declared in `checks/default.nix`, not the top-level flake.
+## Who can sign in
 
-`/etc/homelab-ingress/services.tsv` is a read-only route inventory. `auth = "native"` delegates authentication to the application; it does not mean anonymous access.
+Authelia has four application-access groups. `household` is for shared everyday apps, `finance` protects Actual, `media-admin` protects media management, and `infra-admin` protects server administration. The initial configuration puts Hieronim in all four and Sarcia in `household` and `finance`.
 
-## Authentication boundaries
+The live `/var/lib/authelia-homelab/users_database.yml` is authoritative. Editing the encrypted seed does not change existing users. Make later changes as root, preserve Authelia ownership and mode `0600`, and replace the file atomically. Authelia watches it.
 
-Sonarr, Sonarr Anime, Radarr, Prowlarr, Listenarr, Maintainerr, qBittorrent, ttyd and Enable-Actual use Authelia browser gates. Servarr External UI mode trusts Caddy inside its isolated backend boundary. Native keys/sessions still authenticate API requests. Exceptions match `/api` and `/api/*`, never `/api*`. Prowlarr has no public API exception. qBittorrent stays under `/qbittorrent/`, stripped upstream, and retains native login behind the gate.
+Files and photos already use household admission. Actual requires finance membership; Sarcia has access to the existing budget without owning it. Forgejo and Beszel admit Hieronim with `infra-admin`. Their existing native accounts and recovery paths remain unchanged. Jellyfin, Audiobookshelf and Seerr keep native login, including the shared Audiobookshelf account. `auth = "native"` delegates authentication to the app; it does not make it anonymous.
 
-Household admission requires one factor. Administrative and finance groups require MFA, except Sarcia's rule matches both her username and the required group. It grants no additional membership or native administrator role. Hieronim's MFA remains required. Proxy admission and application permissions are separate.
+Media management, the shell and Actual automation use proxy authentication. Browser admission does not grant native administrator rights. Existing API-key/session authentication remains in place. API exceptions match `/api` and `/api/*`, not `/api*`; Prowlarr has no public API exception. qBittorrent keeps native login behind its gate at `/qbittorrent/`.
 
-Immich, Actual, Forgejo and Beszel use native OIDC and their original native identities. Automatic registration and role synchronization remain disabled where configured. Audiobookshelf retains its shared account and native login. Jellyfin, Seerr, Git SSH/LFS, runners and native clients retain application-owned authentication.
+For the new household apps, Hieronim uses MFA and Sarcia uses her password. Existing app policies stay as configured. New Mealie and Donetick accounts map `infra-admin` to application administration; Donetick maps other household members to manager. ntfy is separate: it uses native credentials, denies anonymous access, and lets Hieronim read `infra` while Gatus can only publish. The detailed status page is Hieronim-only; Homepage's links grant no access to their targets.
 
-Immich's original Hieronim and Sarcia accounts are linked. Public sharing works. Sarcia's phone sign-in/background uploads remain deferred in NIXOS-0024. Forgejo's original `Hier0nim` administrator and Beszel's existing administrator are linked and accepted. Their native password recovery paths remain. Beszel's completed linking page is retired; NIXOS-0023 artifact A000002 retains a relinking recovery recipe. Matching the native email to the IdP is not required for an existing link.
+Authelia logout ends the IdP session, not every application's own session. Existing tokens may survive a group change. Keep the original native identities and account links when changing admission rules.
 
-Actual's Hieronim account owns the existing budget. Sarcia is BASIC, not an owner, and has an explicit grant to that budget. The original privileged automation identity remains private. Enable-Actual keeps `http://127.0.0.1:3100`; root-only Caddy injects the existing automation credential and forwards to Actual on `127.0.0.1:3101`, restricted to root/Caddy. Public password authentication and incoming `X-Actual-Password` are denied. Preserve `actual-local-guard.service` and the private Caddy Unix admin socket under `/run/caddy` mode `0700`. No TCP admin listener.
+## First login to the new apps
 
-Copyparty's browser route admits only `hieronim` and `sarcia` after household authentication. Fixed native ACLs control files. Native Basic and OPTIONS/PROPFIND reach the native challenge without browser redirects. Caddy strips incoming identity/proof headers and supplies the runtime proof only after browser admission. SSO responses must not expose `Set-Cookie`; even an expired native cookie contains a reusable SID. `copyparty-local-guard.service` restricts the trusted-header backend to root/Caddy.
+The addresses are `dokumenty`, `przepisy`, `todo`, `pdf`, `ntfy` and `status` under `pieczarkowo.me`. Homepage is at `pieczarkowo.me`. Check sharing and privacy before uploading household data.
 
-Copyparty guest sharing remains disabled. NIXOS-0026 retains the previous conditional route/test work and tracks enabling sharing separately. Windows/rclone reconnect and transfer are deferred in NIXOS-0024. The NixOS client works.
+Sign in to Paperless as both users, then run `paperless-manage shell` as root to give the household its document permissions and make Hieronim the administrator:
 
-Authelia logout at `https://auth.pieczarkowo.me/logout` ends the IdP session, not independent native application sessions. Existing app tokens may outlive an admission-group change.
+```python
+from django.contrib.auth.models import Group, Permission, User
+household, _ = Group.objects.get_or_create(name="household")
+household.permissions.set(Permission.objects.filter(
+    content_type__app_label="documents",
+    content_type__model__in=["document", "tag", "correspondent", "documenttype", "note", "customfield", "uisettings", "savedview"],
+))
+admin = User.objects.get(username="hieronim")
+for user in User.objects.filter(username__in=["hieronim", "sarcia"]):
+    user.groups.add(household)
+admin.is_staff = admin.is_superuser = True
+admin.set_unusable_password()
+admin.save()
+```
 
-## Runtime credentials and maintenance
+In Paperless, create an unfiltered workflow for newly added documents that gives `household` view and edit access. The group's global delete permission allows deletion too. Model permissions alone do not share existing document objects. Test an upload from each account and deletion as Sarcia. Use a maintained community Android scanner with a native API token. Hieronim's chosen administrator token gives his phone administrator access, not a restricted scanning role.
 
-Keep generator names, stored credentials and ownership unchanged. Do not regenerate keys to reorganize configuration. Secrets belong in encrypted Clan Vars and runtime credentials, never Nix values, argv or logs.
+In Mealie, confirm both users are in `Home` / `Family`. As Hieronim, remove the seeded local account, enable his household-management/organize permissions, and give Sarcia organize permission without user administration or invitations. Keep the group and household private, disable default public recipes, and do not create public cookbooks or share links. Check recipes, meal plans and shopping lists from both accounts. Install its PWA on the phones if wanted.
 
-Authelia's live `/var/lib/authelia-homelab/users_database.yml` is authoritative after initial seeding. Changing the encrypted seed does not update live users. Make later user changes securely as root, preserve Authelia ownership/mode `0600`, and replace the file atomically. Authelia watches it. Keep a consistent backup; the seed is not a current user database.
+In Donetick, confirm both users share `Home`, Hieronim is admin and Sarcia is manager. The official Android app uses `todo.pieczarkowo.me`; test its browser-to-app OIDC return on both phones. Self-hosted push reminders are not verified or configured through a bridge.
 
-| Account | Admission groups |
-| --- | --- |
-| hieronim | media-admin, infra-admin, household, finance |
-| sarcia | household, finance |
+Keep ordinary browser login SSO-only. Recover OIDC access through SSH and the matching Authelia membership, credentials and saved state, not by leaving a local browser administrator enabled. Paperless's native management shell remains available for account repair.
 
-SMTP uses Brevo with STARTTLS and certificate verification. Its startup check is disabled so a relay outage does not prevent enrolled users from signing in. For an explicitly approved credential replacement, use the hidden Clan prompt, not a shell argument:
+BentoPDF processes documents in the browser. Some tools download optional engines from jsDelivr; they do not upload documents for processing. ntfy's password/token is in root-only Clan Vars. Test background delivery and delivery after a phone restart. Its live cache lasts seven days; old encrypted Borg archives follow the separate backup retention.
+
+Gatus checks internal services every minute and reports one failure after three failed checks, then a recovery after two successes. Backup failures report immediately; a missing report becomes overdue after 26 hours. Check a normal scheduled backup and one controlled alert/recovery after deployment. Legion cannot report its own power loss or total internet outage without an external monitor.
+
+## Keep credentials and private routes private
+
+Keep existing generator names, credentials and ownership. Do not regenerate keys to reorganize files. Use encrypted Clan Vars and runtime credentials, never plaintext Nix values, command arguments or logs. For an approved SMTP credential replacement, use the hidden prompt:
 
 ```sh
 CLAN_NO_COMMIT=1 nix develop --command clan vars generate server-legion --generator authelia-smtp --no-regenerate
 ```
 
-The wildcard certificate covers `pieczarkowo.me` and `*.pieczarkowo.me`. The Cloudflare token needs Zone Read and DNS Edit for this zone only. Keep it in `cloudflare-dns/api-token`. `acme-renew-pieczarkowo.me.timer` handles renewal checks; manual issuance/renewal is a separate approved operation. Do not delete ACME state during a rollback.
+Actual's backend on `127.0.0.1:3101` admits only root/Caddy. Enable-Actual retains its saved `http://127.0.0.1:3100` target; Caddy supplies the existing automation credential. Do not accept public passwords or incoming `X-Actual-Password`. Keep `actual-local-guard.service` and Caddy's private Unix admin socket under `/run/caddy`; do not open a TCP admin listener.
 
-Copyparty's `idp-h-key` is a secret header name, not a secret value. The paired runtime credentials must stay private. Caddy stages `/run/caddy/copyparty-idp.caddy` mode `0400` because reload commands cannot access its startup credential namespace. Keep that path readable only by Caddy inside its private runtime directory.
+Copyparty trusts browser identity only after Caddy authentication and its private proof. Keep `copyparty-local-guard.service`. Strip incoming identity/proof headers and do not return native `Set-Cookie` through SSO, since its SID is reusable. Native Basic and OPTIONS/PROPFIND still reach the native challenge. The `idp-h-key` credential is a secret header name; Caddy's staged proof file stays mode `0400`.
 
-Forgejo LTS uses a small CLI patch to read its client secret from the environment during setup rather than argv. The daemon does not retain it. Its private `.authelia-source` fingerprint skips unchanged source updates so offline restarts do not require discovery. Do not manually edit that owned OAuth source.
+Copyparty's canonical private path is `/data/nas/sarcia`, mounted at `/nas/sarcia`. Keep its original generator and `sarka-password`. Password-only Basic ignores the supplied username; do not enable `--usernames` as incidental cleanup. Guest sharing stays disabled. A NixOS rollback does not reverse this directory rename; never overwrite an unexpected destination.
 
-Caddy's per-host access logs are disabled. Its structured error logger omits request URIs and request/response headers. This does not sanitize every native application message. Diagnose with selected non-sensitive fields; never paste raw Caddy/Jellyfin journals or callback URLs.
+Forgejo reads its setup client secret from the environment rather than argv. Its saved `.authelia-source` fingerprint avoids unnecessary source updates on restart. Do not edit that owned OAuth source by hand. Beszel relinking recovery is retained in NIXOS-0023 artifact A000002.
 
-## DNS and public transport
+Caddy access logs are off and its error logger omits request URLs and headers. Native app logs can still contain sensitive data. Inspect selected fields instead of pasting raw journals or callback URLs.
 
-Only `auth.pieczarkowo.me` uses Legion's Cloudflare Tunnel. The 17 application CNAMEs remain DNS-only and target `yze78b4.glddns.com`. The managed set has 18 records; mail, ACME and other undeclared records stay unmanaged. `ha.pieczarkowo.me` uses a tunnel managed outside this network. Do not adopt or change it.
+## Change DNS and certificates
 
-The auth origin rejects non-LAN and router-masqueraded peers before handlers. Only loopback cloudflared may supply `CF-Connecting-IP`. cloudflared validates HTTPS to `127.0.0.1:443` with matching SNI/Host and a final 404. Do not replace these peer checks with trust in arbitrary forwarded headers.
+Only Authelia uses Legion's Cloudflare Tunnel. Application CNAMEs are DNS-only and point to `yze78b4.glddns.com`. Mail, ACME and undeclared records stay unmanaged. `ha.pieczarkowo.me` belongs to a separate tunnel; do not adopt it.
 
-From the repository root:
+The auth origin checks the actual peer before trusting headers. Only loopback cloudflared may supply `CF-Connecting-IP`; it validates origin HTTPS with matching SNI/Host and a final 404. Do not replace those checks with general forwarded-header trust.
+
+The existing certificate covers the apex and all first-level subdomains. Caddy reads the certificate, not the Cloudflare token. Keep that token in `cloudflare-dns/api-token`, scoped to Zone Read and DNS Edit for this zone. The ACME renewal timer handles renewal; preserve its state during rollback.
+
+From the repository root, prepare and review a saved DNS plan:
 
 ```sh
 nix run .#legion-dns -- init -input=false
@@ -67,17 +83,11 @@ nix run .#legion-dns -- plan -out=review.tfplan
 nix run .#legion-dns -- show review.tfplan
 ```
 
-Review all additions, changes and deletions. Apply the exact saved plan only after separate approval:
+After separate approval, apply that exact plan with `nix run .#legion-dns -- apply review.tfplan`. Applying a saved plan does not ask again and can partly succeed before failing. The wrapper keeps the token in the provider environment. Its state and relative plans live under `$XDG_STATE_HOME/nixos-config/legion-dns/operator`, normally `~/.local/state/nixos-config/legion-dns/operator`, with private directory/file modes `0700`/`0600`.
 
-```sh
-nix run .#legion-dns -- apply review.tfplan
-```
+If state is lost, restore its backup. Otherwise inspect Cloudflare read-only and import only the declared records by their exact IDs. Do not delete/recreate records or adopt unrelated ones. Restoring OpenTofu state does not undo DNS changes.
 
-The wrapper passes Clan's token only in the provider environment. State and relative plans live under `$XDG_STATE_HOME/nixos-config/legion-dns/operator`, defaulting to `~/.local/state/nixos-config/legion-dns/operator`. Keep the directory mode `0700`, files `0600`, outside Git and the Nix store. Preserve the existing adopted state. Applying a saved plan does not ask again and can fail after partial changes.
-
-If state is lost, restore its private backup first. Otherwise use read-only Cloudflare inspection and import only exact declared records with `import 'cloudflare_dns_record.<service>' '<zone_id>/<record_id>'`. Do not delete/recreate DNS records or adopt unrelated ones. Restoring OpenTofu state does not undo DNS changes.
-
-The router reserves `192.168.8.2` for Legion. Its dnsmasq rules are:
+The router reserves `192.168.8.2` for Legion and uses these dnsmasq rules:
 
 ```text
 address=/*.pieczarkowo.me/192.168.8.2
@@ -88,18 +98,14 @@ server=/_dmarc.pieczarkowo.me/#
 server=/ha.pieczarkowo.me/#
 ```
 
-The empty server rule prevents public CNAME answers overriding local routing. The `#` exceptions use the existing upstream, AdGuard Home at `127.0.0.1:3053`. The wildcard does not affect the apex. Clients must use router DNS; browser DoH can bypass it. Do not add IPv6 or new upstream exceptions without checking actual routing. Router/DNS changes require separate approval.
+The empty server rule prevents public CNAMEs overriding local routing. The `#` exceptions use AdGuard Home at `127.0.0.1:3053`. This wildcard does not handle the apex, and browser DoH can bypass router DNS. Check apex resolution before accepting Homepage on the LAN. Router/DNS changes need their own approval.
 
-## Activation and recovery
+## Activate and check
 
-Run `nix flake check` and `nix develop --command pre-commit run --all-files`. Review the build/configuration scope against the current system before an authorized deployment. Do not deploy unrelated working-tree changes.
+Run `nix flake check` and `nix develop --command pre-commit run --all-files`, then review the build against the current system before an approved deployment. Keep SSH recovery, a protected prior generation and verified backups. See `backup-restore.md` for restore commands and exclusions.
 
-Keep SSH-key recovery, a prior protected NixOS generation, recent verified backups and external DNS/router state. See `backup-restore.md` for recovery commands and exclusions. Beszel is excluded from ongoing Borg; its cutover snapshots are local only. Isolated extraction and database checks are not a full disaster-recovery rehearsal. Restoring old state can revive revoked sessions.
+A rollback does not undo account links, budget ownership, DNS changes or filesystem renames. Do not restore databases automatically during activation. Actual and Copyparty guards own only their chains; never clear the whole firewall to repair them.
 
-A NixOS rollback does not undo account links, budget ownership, DNS changes or filesystem renames. Never restore databases automatically during activation. Actual and Copyparty guards own only their own chains. Preserve and verify each guard required by the target profile in both switch directions; never run blanket firewall cleanup.
+Enable-Actual keeps host networking, its loopback-only UI and `PUBLIC_URL=https://actual-sync.pieczarkowo.me`. The pinned image ignores `ACTUAL_URL`; use its supported settings/API to change a saved target. Do not force a banking import as a test or generalize this container's networking workaround.
 
-Copyparty's canonical private directory is `/data/nas/sarcia`, mounted at `/nas/sarcia`. Keep the original `copyparty` generator and `sarka-password` filename/password. Default password-only Basic ignores the supplied username; `--usernames` would be a separate compatibility change. Hieronim/shared paths remain unchanged. A rollback to a pre-rename profile requires stopping Copyparty, checking that the destination is absent, and renaming before activating old tmpfiles rules. Both `storage.nix` and generated Copyparty tmpfiles settings must agree. Never delete an unexpected destination or overwrite newer state.
-
-Enable-Actual uses host networking and a loopback-only UI. Keep its saved Actual URL, existing credentials and `PUBLIC_URL=https://actual-sync.pieczarkowo.me`. The pinned image ignores `ACTUAL_URL`. Change a saved target only through its supported settings/API; URL-specific caches and old credentials must not overwrite newer state. Do not apply host networking to other containers as a general workaround. NIXOS-0025 awaits the natural post-cutover banking result; do not force an import as a test.
-
-After networking changes, check DNS in each application's actual mount and network namespaces. `ip netns exec wg` supplies a different resolver view and can hide a missing mount. NIXOS-0020 and NIXOS-0021 separately track the VPN and scheduled-backup DNS faults. Do not change credentials, endpoints or global DNS speculatively.
+After a network change, test DNS and HTTPS as each daemon's actual UID inside its mount/network/root namespaces. `ip netns exec wg` alone can use a different resolver view and miss the problem. Do not change credentials, endpoints or global DNS to mask an unexplained failure.

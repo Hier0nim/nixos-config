@@ -2,6 +2,13 @@
 {
   imports = [
     ./state.nix
+    ./ntfy
+    ./gatus
+    ./paperless.nix
+    ./mealie.nix
+    ./donetick.nix
+    ./bentopdf.nix
+    ./homepage.nix
     ./identity
     ./certificates.nix
     ./actual

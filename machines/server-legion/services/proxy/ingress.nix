@@ -9,8 +9,13 @@ let
     "finance"
   ];
 
-  serviceModule = {
+  serviceModule = { name, ... }: {
     options = {
+      hostname = mkOption {
+        type = types.str;
+        default = "${name}.${cfg.domain}";
+        description = "Public hostname; use the base domain for the landing page.";
+      };
       upstream = mkOption {
         type = types.str;
         description = "Full HTTP or HTTPS backend URL, including its port.";
@@ -118,7 +123,7 @@ let
         }
       '';
     };
-  hostnames = lib.mapAttrs (name: _: "${name}.${cfg.domain}") cfg.services;
+  hostnames = lib.mapAttrs (_: service: service.hostname) cfg.services;
   tunnelServices = lib.filterAttrs (_: service: service.transport == "tunnel") cfg.services;
   inventory = lib.concatStringsSep "\n" (
     [ "hostname\ttransport-target\ttunnel-active\tproxy-auth\tgroup\tupstream" ]
@@ -181,6 +186,11 @@ in
         assertions = [
           {
             assertion =
+              lib.length (lib.unique (lib.attrValues hostnames)) == lib.length (lib.attrValues hostnames);
+            message = "Ingress hostnames must be unique.";
+          }
+          {
+            assertion =
               !cfg.enableTunnel
               || (
                 cfg.tunnelId != null
@@ -195,6 +205,10 @@ in
         ]
         ++ lib.concatLists (
           lib.mapAttrsToList (name: service: [
+            {
+              assertion = service.hostname == cfg.domain || service.hostname == "${name}.${cfg.domain}";
+              message = "${name} must use its service hostname or the base domain.";
+            }
             {
               assertion = builtins.match "[a-z0-9]+(-[a-z0-9]+)*" name != null && name != "home";
               message = "Ingress label '${name}' is invalid or reserved.";

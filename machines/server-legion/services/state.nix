@@ -66,7 +66,39 @@ let
     unit = "authelia-homelab.service";
     source = "/var/lib/authelia-homelab";
     exclude = [ "notifications.txt" ];
+  }
+  ++ lib.optional config.services.ntfy-sh.enable {
+    name = "ntfy";
+    unit = "ntfy-sh.service";
+    source = "/var/lib/private/ntfy-sh";
+  }
+  ++ lib.optional config.services.gatus.enable {
+    name = "gatus";
+    unit = "gatus.service";
+    source = "/var/lib/private/gatus";
+  }
+  ++ lib.optional config.services.mealie.enable {
+    name = "mealie";
+    unit = "mealie.service";
+    source = "/var/lib/private/mealie";
+  }
+  ++ lib.optional config.services.donetick.enable {
+    name = "donetick";
+    unit = "docker-donetick.service";
+    source = "/var/lib/donetick";
+  }
+  ++ lib.optional config.services.paperless.enable {
+    name = "paperless";
+    unit = "paperless-state.target";
+    source = config.services.paperless.dataDir;
+    # Keep large document snapshots on SATA so reflinks work and NVMe is not filled.
+    snapshot = "/data/.homelab-backup/paperless";
   };
+  snapshotPath = service: service.snapshot or "${snapshotRoot}/${service.name}";
+  snapshotWrites = [
+    snapshotRoot
+  ]
+  ++ lib.optional config.services.paperless.enable "/data/.homelab-backup";
   snapshotSources = map (service: service.source) snapshotServices;
   snapshotScript = lib.concatMapStringsSep "\n" (service: ''
     if ${systemctl} is-active --quiet ${lib.escapeShellArg service.unit}; then
@@ -75,14 +107,14 @@ let
     fi
   '') snapshotServices;
   snapshotCopies = lib.concatMapStringsSep "\n" (service: ''
-    copy_snapshot ${lib.escapeShellArg service.source} ${lib.escapeShellArg "${snapshotRoot}/${service.name}"} ${
+    copy_snapshot ${lib.escapeShellArg service.source} ${lib.escapeShellArg (snapshotPath service)} ${
       lib.concatMapStringsSep " " lib.escapeShellArg (service.exclude or [ ])
     }
   '') snapshotServices;
   snapshotCleanup = lib.concatMapStringsSep "\n" (
     service:
     let
-      destination = "${snapshotRoot}/${service.name}";
+      destination = snapshotPath service;
     in
     ''
       rm -rf ${lib.escapeShellArg "${destination}.new"} || status=1
@@ -95,7 +127,7 @@ let
     ${service.name})
       unit=${lib.escapeShellArg service.unit}
       source=${lib.escapeShellArg service.source}
-      snapshot=${lib.escapeShellArg "${snapshotRoot}/${service.name}"}
+      snapshot=${lib.escapeShellArg (snapshotPath service)}
       ;;
   '') snapshotServices;
   arrFreshnessCheck = lib.concatMapStringsSep "\n" (dir: ''
@@ -212,6 +244,12 @@ in
       '';
     };
 
+    ntfy.folders = lib.mkIf config.services.ntfy-sh.enable [ "${snapshotRoot}/ntfy" ];
+    gatus.folders = lib.mkIf config.services.gatus.enable [ "${snapshotRoot}/gatus" ];
+    mealie.folders = lib.mkIf config.services.mealie.enable [ "${snapshotRoot}/mealie" ];
+    donetick.folders = lib.mkIf config.services.donetick.enable [ "${snapshotRoot}/donetick" ];
+    paperless.folders = lib.mkIf config.services.paperless.enable [ "/data/.homelab-backup/paperless" ];
+
     copyparty.folders = [ "/data/nas" ];
     copyparty-state.folders = [ "${snapshotRoot}/copyparty-state" ];
 
@@ -246,11 +284,11 @@ in
   };
 
   systemd = {
-    tmpfiles.rules = [ "d ${snapshotRoot} 0700 root root - -" ];
+    tmpfiles.rules = map (path: "d ${path} 0700 root root - -") snapshotWrites;
 
     services.homelab-app-state-snapshot = {
       description = "Create consistent snapshots of stateful homelab apps";
-      unitConfig.RequiresMountsFor = snapshotSources ++ [ snapshotRoot ];
+      unitConfig.RequiresMountsFor = snapshotSources ++ snapshotWrites;
       serviceConfig = {
         Type = "oneshot";
         User = "root";
@@ -261,7 +299,7 @@ in
         ProtectHome = true;
         ProtectSystem = "strict";
         ReadOnlyPaths = snapshotSources;
-        ReadWritePaths = [ snapshotRoot ];
+        ReadWritePaths = snapshotWrites;
         TimeoutStartSec = "infinity";
       };
       path = [

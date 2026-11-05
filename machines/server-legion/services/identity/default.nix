@@ -17,6 +17,8 @@ let
   ) config.services.homelabIngress.services;
 in
 {
+  imports = [ ./app-clients.nix ];
+
   assertions = [
     {
       assertion = !identity.enable || (identity.settings.notifier.smtp.address or "") != "";
@@ -203,12 +205,30 @@ in
               name: service:
               let
                 rule = {
-                  domain = "${name}.${domain}";
-                  subject = "group:${service.group}";
-                  policy = groupPolicy service.group;
+                  domain = service.hostname;
+                  subject =
+                    if name == "status" then
+                      [
+                        [
+                          "user:hieronim"
+                          "group:${service.group}"
+                        ]
+                      ]
+                    else
+                      "group:${service.group}";
+                  policy =
+                    if
+                      builtins.elem name [
+                        "dashboard"
+                        "pdf"
+                      ]
+                    then
+                      "two_factor"
+                    else
+                      groupPolicy service.group;
                 };
               in
-              lib.optional (rule.policy == "two_factor") {
+              lib.optional (rule.policy == "two_factor" && name != "status") {
                 inherit (rule) domain;
                 # Both conditions must match; the MFA exception must not grant access.
                 subject = [
@@ -227,7 +247,11 @@ in
           {
             inherit domain;
             authelia_url = "https://auth.${domain}";
-            default_redirection_url = "https://grzybflix.${domain}";
+            default_redirection_url =
+              if config.services.homepage-dashboard.enable then
+                "https://${domain}"
+              else
+                "https://grzybflix.${domain}";
             same_site = "lax";
             inactivity = "5 minutes";
             expiration = "1 hour";

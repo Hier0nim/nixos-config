@@ -21,3 +21,6 @@
   legion-copyparty = import ../services/copyparty/check.nix { inherit pkgs config; };
   legion-forgejo = import ../services/forgejo/check.nix { inherit pkgs config; };
 }
+// pkgs.lib.optionalAttrs (config.services.gatus.enable && config.services.ntfy-sh.enable) {
+  legion-monitoring = import ../services/gatus/check.nix { inherit pkgs config; };
+}
