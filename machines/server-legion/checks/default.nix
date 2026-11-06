@@ -2,6 +2,7 @@
   pkgs,
   config,
   dns,
+  openDesignConfig,
 }:
 {
   legion-dns = dns;
@@ -20,6 +21,10 @@
   legion-beszel = import ../services/beszel/check.nix { inherit pkgs config; };
   legion-copyparty = import ../services/copyparty/check.nix { inherit pkgs config; };
   legion-forgejo = import ../services/forgejo/check.nix { inherit pkgs config; };
+  legion-open-design = import ../services/open-design/check.nix {
+    inherit pkgs;
+    config = openDesignConfig;
+  };
 }
 // pkgs.lib.optionalAttrs (config.services.gatus.enable && config.services.ntfy-sh.enable) {
   legion-monitoring = import ../services/gatus/check.nix { inherit pkgs config; };

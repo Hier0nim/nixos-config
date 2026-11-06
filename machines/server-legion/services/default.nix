@@ -2,6 +2,7 @@
 {
   imports = [
     ./state.nix
+    ./open-design
     ./ntfy
     ./gatus
     ./paperless.nix

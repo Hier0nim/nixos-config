@@ -1,0 +1,10 @@
+{
+  "name": "legion-open-design-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dedicated server Pi and browser CLI; not the desktop Pi profile.",
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.0",
+    "agent-browser": "0.41.2"
+  }
+}

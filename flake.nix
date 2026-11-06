@@ -15,6 +15,10 @@
       inputs.flake-parts.follows = "flake-parts";
     };
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";

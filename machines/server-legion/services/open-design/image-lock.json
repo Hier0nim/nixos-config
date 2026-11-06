@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "build": "nix2container; Nixpkgs and builder revisions are pinned in flake.lock",
+  "openDesign": {
+    "release": "open-design-v0.27.0",
+    "commit": "77b8eb889cf8a27a50d3325029d1b3bee5da0910",
+    "sourceHash": "sha256-KmfgKCKkikoLr3TA/rW9tLAA9YII17AjYZdCx2E9IMw=",
+    "packageVersion": "0.25.1",
+    "pnpmHash": "sha256-kmSw0/NBlNqqzh1+I2yNfyJCooM82nxHxj+xMGhUAPM="
+  },
+  "runtime": {
+    "pi": "1.5.0",
+    "agentBrowser": "0.41.2",
+    "agentBrowserPlatform": "linux-x64-gnu",
+    "agentBrowserBinarySha256": "c4351f3802ffa5254d8c69f20a52e2fcf56925c6016fcf4203db25a07d811379",
+    "npmHash": "sha256-j0R076DTz8zO85zc+lvgjme5NgkLEGaj84+z7wWoFcA="
+  }
+}

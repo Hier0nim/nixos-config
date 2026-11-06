@@ -1,0 +1,3 @@
+#!/bin/bash
+# Forward Chromium arguments; the container, not Chromium's sandbox, is the boundary.
+exec /bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-address=127.0.0.1 "$@"

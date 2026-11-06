@@ -19,7 +19,7 @@ clan backups restore server-legion borgbackup <archive-name> --service <state-na
 sudo homelab-restore-state <state-name>
 ```
 
-This works for `authelia`, `copyparty-state`, `actual`, `enable-actual`, `audiobookshelf`, `listenarr`, `jellyfin`, `seerr`, `ntfy`, `gatus`, `mealie`, `donetick` and `paperless`. Forgejo is the naming exception: restore `forgejo-snapshot`, then run `homelab-restore-state forgejo`.
+This works for `authelia`, `copyparty-state`, `actual`, `enable-actual`, `audiobookshelf`, `listenarr`, `jellyfin`, `seerr`, `ntfy`, `gatus`, `mealie`, `donetick`, `open-design` (when enabled) and `paperless`. Forgejo is the naming exception: restore `forgejo-snapshot`, then run `homelab-restore-state forgejo`.
 
 The helper stops the application, keeps its current data in a rollback directory and copies in the saved state. It restarts the application only if it was running before. If the restore fails, it tries to put the old data back. Check the result before deleting the rollback copy.
 
@@ -28,6 +28,8 @@ Paperless is stopped as a group through `paperless-state.target`, including its 
 Restore each application's matching Clan Vars too. Do not generate replacement signing keys or OIDC credentials. Authelia needs its live user database, SQLite enrollment database and matching encryption/OIDC keys together. Its initial user seed is not a replacement for the live database. Old backups can also bring back revoked sessions.
 
 After restoring, check login and a few real records. For Paperless, check a document and shared permissions. For Mealie and Donetick, check recipes and chores. For ntfy, check its account and cached messages. An isolated restore is the safe place to test this before a real disk failure.
+
+OpenDesign snapshots stop the container and interrupt generation. They save all of `/var/lib/open-design`, including Pi credentials. Test a restored copy with its matching image on another loopback port before replacing live state. Keep the rollback copy and log in again if old OAuth tokens no longer work. See [the service runbook](services/open-design/README.md).
 
 ## Restore the remaining data
 

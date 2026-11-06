@@ -82,6 +82,11 @@ let
     unit = "mealie.service";
     source = "/var/lib/private/mealie";
   }
+  ++ lib.optional config.services.open-design.enable {
+    name = "open-design";
+    unit = "docker-open-design.service";
+    source = "/var/lib/open-design";
+  }
   ++ lib.optional config.services.donetick.enable {
     name = "donetick";
     unit = "docker-donetick.service";
@@ -248,6 +253,7 @@ in
     gatus.folders = lib.mkIf config.services.gatus.enable [ "${snapshotRoot}/gatus" ];
     mealie.folders = lib.mkIf config.services.mealie.enable [ "${snapshotRoot}/mealie" ];
     donetick.folders = lib.mkIf config.services.donetick.enable [ "${snapshotRoot}/donetick" ];
+    open-design.folders = lib.mkIf config.services.open-design.enable [ "${snapshotRoot}/open-design" ];
     paperless.folders = lib.mkIf config.services.paperless.enable [ "/data/.homelab-backup/paperless" ];
 
     copyparty.folders = [ "/data/nas" ];
