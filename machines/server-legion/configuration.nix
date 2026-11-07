@@ -9,6 +9,7 @@
     ../../modules/nixos/common.nix
     ../../users/hieronim
     ./hardware.nix
+    ./fans.nix
     ./storage.nix
     ./services
   ];

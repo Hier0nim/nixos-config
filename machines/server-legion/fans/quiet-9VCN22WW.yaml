@@ -1,0 +1,83 @@
+name: server-quiet-9VCN22WW
+entries:
+  - fan1_speed: 0
+    fan2_speed: 0
+    cpu_lower_temp: 0
+    cpu_upper_temp: 60
+    gpu_lower_temp: 0
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 2000
+    fan2_speed: 1700
+    cpu_lower_temp: 50
+    cpu_upper_temp: 64
+    gpu_lower_temp: 65
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 2300
+    fan2_speed: 2000
+    cpu_lower_temp: 55
+    cpu_upper_temp: 68
+    gpu_lower_temp: 65
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 2500
+    fan2_speed: 2200
+    cpu_lower_temp: 60
+    cpu_upper_temp: 72
+    gpu_lower_temp: 65
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 2800
+    fan2_speed: 2500
+    cpu_lower_temp: 65
+    cpu_upper_temp: 76
+    gpu_lower_temp: 65
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 3200
+    fan2_speed: 2900
+    cpu_lower_temp: 70
+    cpu_upper_temp: 80
+    gpu_lower_temp: 65
+    gpu_upper_temp: 69
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 3500
+    fan2_speed: 3200
+    cpu_lower_temp: 75
+    cpu_upper_temp: 84
+    gpu_lower_temp: 65
+    gpu_upper_temp: 74
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+  - fan1_speed: 3700
+    fan2_speed: 3400
+    cpu_lower_temp: 80
+    cpu_upper_temp: 89
+    gpu_lower_temp: 70
+    gpu_upper_temp: 82
+    ic_lower_temp: 0
+    ic_upper_temp: 0
+    acceleration: 0
+    deceleration: 0
+enable_minifancurve: false
