@@ -146,13 +146,13 @@ in
   };
 
   systemd.services.borgbackup-job-hetzner-storagebox = lib.mkIf cfg.enable {
-    serviceConfig.LoadCredential = [ "gatus-backup-curl:${files."backup-curl.conf".path}" ];
     # A notification failure must not change the result of a completed backup.
+    # ExecStopPost gets no credentials tree, so read the deployed var directly.
     postStop = ''
       success=false
       if [ "$SERVICE_RESULT" = success ]; then success=true; fi
       ${pkgs.curl}/bin/curl --silent --show-error --fail --connect-timeout 3 --max-time 10 \
-        --config "$CREDENTIALS_DIRECTORY/gatus-backup-curl" --request POST \
+        --config ${lib.escapeShellArg files."backup-curl.conf".path} --request POST \
         "http://127.0.0.1:8083/api/v1/endpoints/backups_storage-box/external?success=$success" \
         --output /dev/null || echo 'Could not report backup result to Gatus' >&2
     '';
