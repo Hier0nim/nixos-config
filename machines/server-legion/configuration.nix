@@ -80,5 +80,8 @@
     ghostty.terminfo
   ];
 
+  # The broken nvidia-smi left tens of thousands of dumps; nothing here needs them.
+  systemd.coredump.settings.Coredump.Storage = "none";
+
   system.stateVersion = "25.05";
 }

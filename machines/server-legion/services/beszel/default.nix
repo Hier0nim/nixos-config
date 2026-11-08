@@ -143,6 +143,8 @@ in
       environment = {
         HUB_URL = "http://127.0.0.1:8090";
         SYSTEM_NAME = config.networking.hostName;
+        # nvidia-smi segfaults on this host, so GPU polling only crashes every 5s.
+        SKIP_GPU = true;
       };
       environmentFile = files."agent.env".path;
     };
