@@ -5,6 +5,18 @@ let
   lock = builtins.fromJSON (builtins.readFile ./image-lock.json);
   nodejs = pkgs.nodejs_24;
   pnpm = pkgs.pnpm_10;
+  # Node 24.19 added ObjectWrap cleanup hooks to the addon header without the
+  # runtime registry that makes their removal safe, so an addon built from those
+  # headers aborts in RemoveEnvironmentCleanupHook when V8 frees it. Build the
+  # native addons from headers without those calls until Node fixes the backport.
+  nodeHeaders = pkgs.runCommand "node-headers-${nodejs.version}-no-objectwrap-cleanup-hook" { } ''
+    mkdir -p "$out/include"
+    cp -rL ${nodejs}/include/node "$out/include/node"
+    chmod -R u+w "$out/include/node"
+    substituteInPlace "$out/include/node/node_object_wrap.h" \
+      --replace-fail "    AddCleanupHook();" "" \
+      --replace-fail "    RemoveCleanupHook();" ""
+  '';
   source = pkgs.fetchzip {
     url = "https://github.com/nexu-io/open-design/archive/${lock.openDesign.commit}.tar.gz";
     hash = lock.openDesign.sourceHash;
@@ -43,7 +55,7 @@ let
       NEXT_TELEMETRY_DISABLED = "1";
       ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
-      npm_config_nodedir = "${nodejs}";
+      npm_config_nodedir = "${nodeHeaders}";
       npm_config_build_from_source = "true";
       OPEN_DESIGN_POSTINSTALL_TARGETS = ''["apps/daemon","packages/components","packages/host"]'';
     };
