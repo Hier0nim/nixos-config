@@ -89,6 +89,16 @@ async function doctor(includeBrowser) {
   assert.equal((await command('/bin/pi', ['--version'])).trim(), versions.pi);
   assert.match(await command('/bin/agent-browser', ['--version']), new RegExp(versions.agentBrowser.replaceAll('.', '\\.')));
   assert.match(await command('/bin/chromium', ['--version']), new RegExp(versions.chromium.replaceAll('.', '\\.')));
+  phase = 'design tools';
+  await command('/bin/python3', ['-c', [
+    'import io, requests, cairosvg',
+    'from PIL import Image',
+    'png = cairosvg.svg2png(bytestring=b\'<svg xmlns="http://www.w3.org/2000/svg" width="2" height="3"/>\')',
+    'assert Image.open(io.BytesIO(png)).size == (2, 3)',
+  ].join('\n')]);
+  for (const tool of ['jq', 'magick', 'resvg', 'zip', 'unzip', 'file']) {
+    assert.ok((await stat(`/bin/${tool}`)).mode & 0o111, `${tool} is not executable`);
+  }
   phase = 'state';
   assert.notEqual(process.getuid(), 0);
   for (const path of [process.env.OD_DATA_DIR, process.env.HOME, process.env.PI_CODING_AGENT_DIR]) {
@@ -112,6 +122,10 @@ async function doctor(includeBrowser) {
   assert.equal(script.ok, true);
   assert.match(script.headers.get('content-type') ?? '', /javascript/);
   const policy = await readFile('/etc/open-design/pi-policy.md', 'utf8');
+  assert.equal(await readFile(join(process.env.PI_CODING_AGENT_DIR, 'AGENTS.md'), 'utf8'), policy);
+  const skillPath = join(process.env.PI_CODING_AGENT_DIR, 'skills/unslop/SKILL.md');
+  assert.ok(policy.includes(skillPath), 'Global policy must reference the unslop skill');
+  assert.equal(await readFile(skillPath, 'utf8'), await readFile('/etc/open-design/skills/unslop/SKILL.md', 'utf8'));
   const response = await fetch('http://127.0.0.1:7456/api/app-config', { signal: AbortSignal.timeout(5000) });
   assert.equal(response.ok, true);
   assert.equal((await response.json()).config.customInstructions, policy);

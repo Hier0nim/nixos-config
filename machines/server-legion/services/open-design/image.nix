@@ -52,7 +52,17 @@ let
       pkgs.poppler-utils
       pkgs.curl
       pkgs.ripgrep
-      pkgs.python3
+      (pkgs.python3.withPackages (ps: [
+        ps.pillow
+        ps.cairosvg
+        ps.requests
+      ]))
+      pkgs.jq
+      pkgs.imagemagick
+      pkgs.resvg
+      pkgs.zip
+      pkgs.unzip
+      pkgs.file
       pkgs.tini
       # OpenDesign uses ps to identify and stop agent processes.
       pkgs.procps
@@ -67,6 +77,8 @@ let
     cp -as ${packages.app}/. "$out/app/"
     cp ${./pi-launcher.mjs} "$out/etc/open-design/pi-launcher.mjs"
     cp ${./pi-policy.md} "$out/etc/open-design/pi-policy.md"
+    mkdir -p "$out/etc/open-design/skills/unslop"
+    cp ${./unslop/SKILL.md} "$out/etc/open-design/skills/unslop/SKILL.md"
     cp ${./entrypoint.sh} "$out/bin/open-design-entrypoint"
     cp ${./chromium-headless} "$out/bin/chromium-headless"
     cp ${./doctor.mjs} "$out/etc/open-design/doctor.mjs"

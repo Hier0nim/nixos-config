@@ -12,4 +12,6 @@ cp /etc/open-design/pi-policy.md "$policy"
 chmod 0600 "$policy"
 mv -f "$policy" "$PI_CODING_AGENT_DIR/AGENTS.md"
 trap - EXIT
+mkdir -p "$PI_CODING_AGENT_DIR/skills/unslop"
+ln -sfn /etc/open-design/skills/unslop/SKILL.md "$PI_CODING_AGENT_DIR/skills/unslop/SKILL.md"
 exec /bin/node /app/apps/daemon/dist/cli.js --no-open
