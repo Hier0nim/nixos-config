@@ -493,11 +493,11 @@
         "nixpkgs-darwin-x64": "nixpkgs-darwin-x64"
       },
       "locked": {
-        "lastModified": 1792147897,
-        "narHash": "sha256-nq5hszslZGZOICE6AVe/5831LVqW4S1Aw9Y9kcAOCXA=",
+        "lastModified": 1794409721,
+        "narHash": "sha256-UhMYi/9BvEc14H+EYkyFEefWKDj2aH8w7d01VhvuB7Q=",
         "owner": "earendil-works",
         "repo": "pi",
-        "rev": "90d863f7c1183b965f099855715d6e88c7b8a52c",
+        "rev": "6b339afc92e1dc6574f3234e1850dff36c77294b",
         "type": "github"
       },
       "original": {
@@ -814,11 +814,11 @@
         "progress-mcp": "progress-mcp"
       },
       "locked": {
-        "lastModified": 1792149416,
-        "narHash": "sha256-Id7W2/xTFfWCMV/J5H8hmOJIOBx/OWKAobq33UujxUU=",
+        "lastModified": 1794412737,
+        "narHash": "sha256-l9XSYmaSEojAWR3wRRSS6ua2PivV1RGDtZYnEGnUA0I=",
         "ref": "refs/heads/main",
-        "rev": "d1d6defc1da3111e829f785879bf90cb6d3a5ac6",
-        "revCount": 153,
+        "rev": "e9b01b795831f21c2d60c40da9f6546ad9dc0847",
+        "revCount": 155,
         "type": "git",
         "url": "ssh://git@github.com/Hier0nim/dot_pi.git"
       },
@@ -1260,11 +1260,11 @@
         "xdg-desktop-portal-umbriel": "xdg-desktop-portal-umbriel"
       },
       "locked": {
-        "lastModified": 1793634085,
-        "narHash": "sha256-RaGYwzMSdti7uJRGkWwCcSXNgjI/b9+MW3NnBHhuavA=",
+        "lastModified": 1794581480,
+        "narHash": "sha256-TTXrp5JD91NEcMpX4ChH/J/AtP0g8h3L+DCCgfVYt70=",
         "owner": "noctalia-dev",
         "repo": "umbriel",
-        "rev": "1968031d53a226c6f01b05b18fbff9b1d7179315",
+        "rev": "33a782dc750e78f0ef2d21fd9d3df33229ae06f9",
         "type": "github"
       },
       "original": {
@@ -1365,11 +1365,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793547787,
-        "narHash": "sha256-wWrHrvqEnrI0XhizNPdutwNyi+P+qvsMovm1ptlR4gY=",
+        "lastModified": 1793975757,
+        "narHash": "sha256-27TZy17ok3p11A5Av1X/FG5BFyvHUsHsQiYyesij250=",
         "owner": "noctalia-dev",
         "repo": "xdg-desktop-portal-umbriel",
-        "rev": "79f087598d596ae8a81dff1036d0ab3b5c446584",
+        "rev": "56951426eb9931db3f1c57348f226c2427fba4f3",
         "type": "github"
       },
       "original": {
