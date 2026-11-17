@@ -78,7 +78,6 @@ in
       celluloid
       gpu-screen-recorder
       loupe
-      nautilus
       papers
     ];
   };
@@ -153,7 +152,7 @@ in
         // {
           "application/pdf" = [ "org.gnome.Papers.desktop" ];
           "application/acrobat" = [ "org.gnome.Papers.desktop" ];
-          "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
+          "inode/directory" = [ "dev.noctalia.luciole.desktop" ];
         };
     };
   };

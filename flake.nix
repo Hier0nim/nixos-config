@@ -2,8 +2,11 @@
   description = "Hieronim's Clan configuration";
 
   inputs = {
-    clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
-    nixpkgs.follows = "clan-core/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    clan-core = {
+      url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-parts.follows = "clan-core/flake-parts";
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
@@ -62,10 +65,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixflix = {
-      url = "github:kiriwalawren/nixflix/v4.0.0";
+      url = "github:kiriwalawren/nixflix/v6.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    luciole = {
+      url = "github:noctalia-dev/luciole";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     umbriel = {
       url = "github:noctalia-dev/umbriel";
       inputs.nixpkgs.follows = "nixpkgs";

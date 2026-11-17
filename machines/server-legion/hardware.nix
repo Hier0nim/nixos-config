@@ -3,7 +3,6 @@
   imports = [ self.inputs.nixos-hardware.nixosModules.lenovo-legion-y530-15ich ];
 
   boot = {
-    initrd.systemd.enable = true;
     loader = {
       efi = {
         canTouchEfiVariables = true;

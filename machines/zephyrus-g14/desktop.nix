@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    self.inputs.luciole.nixosModules.default
     self.inputs.umbriel.nixosModules.default
     self.inputs.noctalia.nixosModules.default
     self.inputs.noctalia-greeter.nixosModules.default
@@ -14,6 +15,7 @@
   security.rtkit.enable = true;
 
   programs = {
+    luciole.enable = true;
     umbriel.enable = true;
     noctalia = {
       enable = true;
@@ -73,6 +75,13 @@
       };
     };
   };
+
+  # Umbriel generates a portals.conf with only a default backend list, so
+  # name Luciole's FileChooser backend explicitly.
+  xdg.portal.config.umbriel."org.freedesktop.impl.portal.FileChooser" = [
+    "luciole"
+    "gtk"
+  ];
 
   systemd.user.services.rog-control-center = {
     description = "rog-control-center";
