@@ -11,16 +11,44 @@ let
   };
 in
 {
-  imports = [ inputs.noctalia.homeModules.default ];
+  imports = [
+    inputs.luciole.homeModules.default
+    inputs.noctalia.homeModules.default
+  ];
 
-  programs.ghostty = {
-    enable = true;
-    settings = {
-      font-family = "JetBrainsMono Nerd Font Mono";
-      font-size = 12;
-      theme = "Kanagawa Wave";
-      resize-overlay = "never";
-      window-decoration = "none";
+  programs = {
+    ghostty = {
+      enable = true;
+      settings = {
+        font-family = "JetBrainsMono Nerd Font Mono";
+        font-size = 12;
+        theme = "Kanagawa Wave";
+        resize-overlay = "never";
+        window-decoration = "none";
+      };
+    };
+
+    luciole = {
+      enable = true;
+      package = null; # Installed by NixOS.
+      settings = {
+        schema_version = 1;
+        browser = {
+          view_mode = "list";
+          density = "comfortable";
+          show_hidden = true;
+          restore_last_window = true;
+        };
+      };
+    };
+
+    noctalia = {
+      enable = true;
+      package = null; # Installed by NixOS.
+      settings.shell = {
+        polkit_agent = true;
+        session.power.suspend = "systemctl suspend-then-hibernate";
+      };
     };
   };
 
@@ -38,15 +66,6 @@ in
       TimeoutStopSec = 10;
     };
     Install.WantedBy = [ "graphical-session.target" ];
-  };
-
-  programs.noctalia = {
-    enable = true;
-    package = null; # Installed by NixOS.
-    settings.shell = {
-      polkit_agent = true;
-      session.power.suspend = "systemctl suspend-then-hibernate";
-    };
   };
 
   home = {
