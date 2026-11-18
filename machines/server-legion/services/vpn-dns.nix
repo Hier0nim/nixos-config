@@ -8,6 +8,7 @@
         "radarr"
         "prowlarr"
         "qbittorrent"
+        "sabnzbd"
         "flaresolverr"
       ]
       (_: {

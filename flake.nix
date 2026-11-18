@@ -122,7 +122,13 @@
           devShells.default = pkgs.mkShell {
             shellHook = config.pre-commit.shellHook;
             packages = config.pre-commit.settings.enabledPackages ++ [
-              inputs.clan-core.packages.${system}.clan-cli
+              # Use the host nix on PATH instead of the wrapper's pinned upstream nix.
+              (inputs.clan-core.packages.${system}.clan-cli.override {
+                includedRuntimeDeps = [
+                  "age"
+                  "git"
+                ];
+              })
             ];
           };
         };

@@ -37,6 +37,10 @@ let
     ];
     seerr = [ "api-key" ];
     qbittorrent = [ "password" ];
+    "usenet-easyusenet" = [
+      "username"
+      "password"
+    ];
     "media-vpn" = [ "wireguard.conf" ];
   };
 
@@ -56,6 +60,24 @@ let
     '') files;
   };
 
+  sabnzbdApiKey = {
+    files = lib.genAttrs [ "api-key" "nzb-key" ] (_: {
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    });
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.openssl
+    ];
+    script = ''
+      umask 077
+      openssl rand -hex 16 > "$out/api-key"
+      openssl rand -hex 16 > "$out/nzb-key"
+      chmod 0400 "$out/api-key" "$out/nzb-key"
+    '';
+  };
+
   secretPath = service: name: config.clan.core.vars.generators.${service}.files.${name}.path;
   secretRef = service: name: { _secret = secretPath service name; };
 
@@ -65,14 +87,15 @@ let
     "radarr"
     "prowlarr"
   ];
-  # External UIs must not be reachable by routed peers, including inherited VPN routes.
-  externalUiPorts =
-    lib.concatMapStringsSep "," (name: toString config.nixflix.${name}.config.hostConfig.port)
-      (
-        lib.filter (
-          name: config.nixflix.${name}.config.hostConfig.authenticationMethod == "external"
-        ) arrServices
-      );
+  # Block routed peers from reaching UIs without app-level authentication.
+  externalUiPorts = lib.concatMapStringsSep "," toString (
+    map (name: config.nixflix.${name}.config.hostConfig.port) (
+      lib.filter (
+        name: config.nixflix.${name}.config.hostConfig.authenticationMethod == "external"
+      ) arrServices
+    )
+    ++ lib.optional config.nixflix.usenetClients.sabnzbd.enable config.nixflix.usenetClients.sabnzbd.settings.misc.port
+  );
   forwardGuards = [
     {
       tool = "iptables";
@@ -137,6 +160,7 @@ let
             "torrentBaseSettings.seedTime" = 16 * 24 * 60;
             "torrentBaseSettings.packSeedTime" = 16 * 24 * 60;
           }
+          { name = "NZBIndex"; }
         ];
       applications = [
         {
@@ -179,7 +203,9 @@ in
       ];
     };
 
-  clan.core.vars.generators = lib.mapAttrs mkSecretGenerator secretFiles;
+  clan.core.vars.generators = lib.mapAttrs mkSecretGenerator secretFiles // {
+    sabnzbd = sabnzbdApiKey;
+  };
 
   nixflix = {
     enable = true;
@@ -302,6 +328,8 @@ in
         };
       };
       plugins = {
+        "Jellyfin Enhanced".enable = true;
+        "Intro Skipper".enable = true;
         subbuzz = {
           enable = true;
           config = {
@@ -387,6 +415,33 @@ in
         audiobooks = "/data/downloads/torrent/audiobooks";
       };
       reverseProxy.expose = false;
+    };
+
+    usenetClients.sabnzbd = {
+      enable = true;
+      downloadsDir = "/data/downloads/usenet";
+      reverseProxy.expose = false;
+      vpn.enable = true;
+      settings = {
+        misc = {
+          api_key = secretRef "sabnzbd" "api-key";
+          nzb_key = secretRef "sabnzbd" "nzb-key";
+          port = 8081;
+        };
+        servers = [
+          {
+            name = "EasyUsenet";
+            host = "reader.easyusenet.nl";
+            port = 563;
+            username = secretRef "usenet-easyusenet" "username";
+            password = secretRef "usenet-easyusenet" "password";
+            connections = 20;
+            ssl = true;
+            ssl_verify = "strict";
+            priority = 0;
+          }
+        ];
+      };
     };
 
     downloadarr.qbittorrent.categories.prowlarr = "audiobooks";
