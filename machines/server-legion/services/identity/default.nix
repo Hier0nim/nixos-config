@@ -191,7 +191,9 @@ in
         oidcHmacSecretFile = oidcFiles.hmac-secret.path;
       };
       settings = {
+        theme = "auto";
         server.address = "tcp://127.0.0.1:9091/";
+        server.asset_path = "${./assets}";
         log.level = "info";
         default_2fa_method = "totp";
         authentication_backend.file = {
