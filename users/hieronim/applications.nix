@@ -12,14 +12,11 @@ in
 
   home.packages = with pkgs; [
     inputs.nvim.packages.${stdenv.hostPlatform.system}.default
-    teams-for-linux
     proton-pass
-    remmina
     qbittorrent
     proton-vpn
     protonmail-desktop
     libreoffice-stable
-    jellyfin-desktop
     via
     (heroic.override {
       extraPkgs = pkgs: [
@@ -28,6 +25,7 @@ in
       ];
     })
     prismlauncher
+    opencode
     (import inputs.creamlinux-installer { inherit pkgs; })
   ];
 
