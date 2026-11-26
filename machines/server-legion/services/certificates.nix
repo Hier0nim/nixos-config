@@ -34,7 +34,6 @@ in
       extraDomainNames = [ "*.${domain}" ];
       dnsProvider = "cloudflare";
       dnsResolver = "1.1.1.1:53";
-      dnsPropagationCheck = true;
       group = "caddy";
       credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE = tokenFile;
     };
