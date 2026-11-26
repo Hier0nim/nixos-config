@@ -30,6 +30,7 @@ let
       "api-key"
       "admin-password"
       "pieczarkowo-password"
+      "daniele-password"
       "opensubtitles-username"
       "opensubtitles-password"
       "opensubtitles-api-key"
@@ -239,26 +240,43 @@ in
         @import url("https://cdn.jsdelivr.net/gh/lscambo13/ElegantFin@main/Theme/ElegantFin-jellyfin-theme-build-latest-minified.css");
         @import url("https://cdn.jsdelivr.net/gh/mihaif7/elegantfin-jf12@main/Theme/ElegantFin-jf12-modern-latest.css");
       '';
-      users.admin = {
-        policy.isAdministrator = true;
-        password = secretRef "jellyfin" "admin-password";
-        mutable = false;
-        configuration = {
-          audioLanguagePreference = "pol";
-          subtitleLanguagePreference = "eng";
-          subtitleMode = "Smart";
+      users = {
+        admin = {
+          policy.isAdministrator = true;
+          password = secretRef "jellyfin" "admin-password";
+          mutable = false;
+          configuration = {
+            audioLanguagePreference = "eng";
+            subtitleLanguagePreference = "eng";
+            subtitleMode = "Smart";
+          };
         };
-      };
-      users.pieczarkowo = {
-        password = secretRef "jellyfin" "pieczarkowo-password";
-        mutable = false;
-        policy.enableSubtitleManagement = true;
-        configuration = {
-          displayMissingEpisodes = false;
-          enableNextEpisodeAutoPlay = true;
-          audioLanguagePreference = "pol";
-          subtitleLanguagePreference = "eng";
-          subtitleMode = "Smart";
+        pieczarkowo = {
+          password = secretRef "jellyfin" "pieczarkowo-password";
+          mutable = false;
+          policy.enableSubtitleManagement = true;
+          configuration = {
+            displayMissingEpisodes = false;
+            enableNextEpisodeAutoPlay = true;
+            audioLanguagePreference = "pol";
+            subtitleLanguagePreference = "eng";
+            subtitleMode = "Smart";
+          };
+        };
+        daniele = {
+          password = secretRef "jellyfin" "daniele-password";
+          mutable = false;
+          # Only items tagged "daniele" are visible; tags inherit from series.
+          policy.allowedTags = [ "daniele" ];
+          configuration = {
+            displayMissingEpisodes = false;
+            enableNextEpisodeAutoPlay = true;
+            # Polish audio when present, else the default track (usually English).
+            audioLanguagePreference = "pol";
+            playDefaultAudioTrack = false;
+            subtitleLanguagePreference = "pol";
+            subtitleMode = "Default";
+          };
         };
       };
       encoding = {
@@ -330,6 +348,7 @@ in
       plugins = {
         "Jellyfin Enhanced".enable = true;
         "Intro Skipper".enable = true;
+        "ShareLinks".enable = true;
         subbuzz = {
           enable = true;
           config = {
